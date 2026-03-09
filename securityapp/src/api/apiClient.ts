@@ -33,7 +33,11 @@ apiClient.interceptors.request.use(
       // Get token from AsyncStorage
       const token = await AsyncStorage.getItem('token') || await AsyncStorage.getItem('authToken');
 
-      if (token) {
+      // Don't send Authorization header for public endpoints (login, refresh)
+      // This prevents 401 errors if there is an expired token in storage
+      const isPublicEndpoint = config.url?.includes('/login/') || config.url?.includes('/token/refresh/');
+
+      if (token && !isPublicEndpoint) {
         config.headers.Authorization = `Bearer ${token}`;
       }
 

@@ -38,7 +38,7 @@ const resetUserScopedData = () => {
   useContactStore.getState().reset();
 };
 
-const convertApiUserToUser = (apiUser: LoginResponse['user']): User => {
+const convertApiUserToUser = (apiUser: any): User => {
   const fullName = apiUser.name || (apiUser.first_name && apiUser.last_name 
     ? `${apiUser.first_name} ${apiUser.last_name}`.trim()
     : apiUser.first_name || apiUser.last_name || apiUser.username || apiUser.email);
@@ -48,6 +48,8 @@ const convertApiUserToUser = (apiUser: LoginResponse['user']): User => {
     email: apiUser.email,
     name: fullName,
     phone: apiUser.phone || '',
+    role: apiUser.role || 'user',
+    status: (apiUser.status as any) || 'online',
     plan: apiUser.is_premium ? 'premium' : 'free',
   };
 };
@@ -74,12 +76,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         }
         
         // Update user with plan info from response
-            const updatedUser = {
-              ...user,
+        const updatedUser: User = {
+          ...user,
           name: response.user.name || user.name,
           phone: response.user.phone || user.phone,
           plan: response.user.is_premium ? 'premium' : 'free',
-            };
+          role: response.user.role || user.role,
+          status: (response.user.status as any) || user.status,
+        };
         set({user: updatedUser, isAuthenticated: true, isLoading: false, showOnboarding: true});
         const storage = await getStorage();
         await storage.setItem('authState', JSON.stringify({user: updatedUser}));
@@ -94,13 +98,13 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (email: string, password: string, name: string, phone: string) => {
     try {
       // Backend expects name, email, phone, password, password_confirm, plantype
-      const response = await apiService.register({
+      const response = await apiService.register(
         name,
         email,
         phone,
         password,
-        passwordConfirm: password,
-      });
+        password
+      );
       
       if (response.error) {
         throw new Error(response.error);
@@ -133,6 +137,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       name: plan === 'premium' ? 'Premium Tester' : 'Free Tester',
       email: plan === 'premium' ? 'premium@test.safetnet.app' : 'free@test.safetnet.app',
       phone: '+1234567890',
+      role: 'user',
+      status: 'online',
       plan,
     };
     set({user: testUser, isAuthenticated: true, isLoading: false, showOnboarding: true});
@@ -317,11 +323,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (profileData && (profileData.id || profileData.email)) {
         const currentUser = useAuthStore.getState().user;
         if (currentUser) {
-          const updatedUser = {
+          const updatedUser: User = {
             ...currentUser,
             name: profileData.name || profileData.first_name || currentUser.name,
             phone: profileData.phone || currentUser.phone,
-            plan: profileData.is_premium || profileData.plantype === 'premium' ? 'premium' : 'free',
+            plan: (profileData.is_premium || profileData.plantype === 'premium' ? 'premium' : 'free') as 'free' | 'premium',
           };
           set({user: updatedUser});
           const storage = await getStorage();
