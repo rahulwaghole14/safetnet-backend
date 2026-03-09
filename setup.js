@@ -35,7 +35,7 @@ function setupFrontend() {
 function setupBackend() {
   return new Promise((resolve, reject) => {
     console.log('🐍 Setting up Python virtual environment...');
-    const backendPath = path.join(__dirname, 'SafeTNet');
+    const backendPath = path.join(__dirname, 'SafeTNet', 'SafeTNet');
     const venvPath = path.join(backendPath, 'venv');
     
     // Check if venv already exists

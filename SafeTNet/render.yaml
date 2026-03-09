@@ -4,6 +4,7 @@ services:
     name: safetnet-backend
     runtime: python
     plan: starter
+    rootDir: SafeTNet/SafeTNet
     buildCommand: |
       python3 -m venv venv
       source venv/bin/activate
@@ -29,4 +30,3 @@ services:
     # Render will automatically provide DATABASE_URL for PostgreSQL database
     autoDeploy: true
     healthCheckPath: /api/auth/test-auth/
-
