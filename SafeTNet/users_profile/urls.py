@@ -5,10 +5,18 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
 from . import views_new_apis
+from security_app.views import UserAlertViewSet
 
 app_name = 'users'
 
+# Register ViewSets
+router = DefaultRouter()
+router.register(r'alerts', UserAlertViewSet, basename='user-alerts')
+
 urlpatterns = [
+    # Viewset routes (alerts: GET /api/user/alerts/, /api/user/alerts/unread/, POST /api/user/alerts/{id}/mark_read/)
+    path('', include(router.urls)),
+
     # User registration and authentication
     path('', views.UserRegistrationView.as_view(), name='user-registration'),
     path('login/', views.UserLoginView.as_view(), name='user-login'),
