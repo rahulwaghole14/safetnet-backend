@@ -1433,7 +1433,7 @@ class UserAlertViewSet(viewsets.ReadOnlyModelViewSet):
         officer_alerts = OfficerAlert.objects.filter(
             is_active=True
         ).filter(
-            models.Q(is_broadcast=True) | models.Q(users=user)
+            Q(is_broadcast=True) | Q(users=user)
         ).distinct()
         
         for alert in officer_alerts:
