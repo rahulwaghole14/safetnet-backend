@@ -19,7 +19,7 @@ services:
       - key: DJANGO_SETTINGS_MODULE
         value: SafeTNet.settings
       - key: PYTHON_VERSION
-        value: 3.13.0
+        value: "3.12.8"
       - key: DEBUG
         value: false
       - key: SECRET_KEY
