@@ -19,6 +19,8 @@ import { AppNavigator } from './navigation/AppNavigator';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loginSuccess } from './store/slices/authSlice';
+import { useSelector } from 'react-redux';
+import { usePushNotifications } from './hooks/usePushNotifications';
 
 
 // Disable debugger connections to prevent registration errors
@@ -66,11 +68,16 @@ function AuthPersistenceWrapper({ children }: { children: React.ReactNode }) {
 // Component that uses theme context for status bar
 function AppContent() {
   const { currentTheme } = useTheme();
-  
+  // We need to check auth state from Redux
+  const isAuthenticated = useSelector((state: any) => !!state.auth.token);
+
+  // Initialize push notifications
+  usePushNotifications(isAuthenticated);
+
   return (
     <AuthPersistenceWrapper>
-      <StatusBar 
-        barStyle={currentTheme === 'dark' ? 'light-content' : 'dark-content'} 
+      <StatusBar
+        barStyle={currentTheme === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={currentTheme === 'dark' ? '#000000' : '#FFFFFF'}
       />
       <AppNavigator />
