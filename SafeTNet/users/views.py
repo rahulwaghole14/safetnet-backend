@@ -648,6 +648,32 @@ def generate_report(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsSuperAdmin])
+class UpdateFCMTokenView(APIView):
+    """
+    Update the FCM device token for the authenticated user.
+    Tokens are stored in a JSON array.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+        
+        # Initialize list if None or not a list (defensive programming)
+        if not isinstance(user.fcm_tokens, list):
+            user.fcm_tokens = []
+            
+        # Add token if not already in the list
+        if token not in user.fcm_tokens:
+            user.fcm_tokens.append(token)
+            user.save(update_fields=['fcm_tokens'])
+            
+        return Response({'message': 'FCM token registered successfully'}, status=status.HTTP_200_OK)
+
+
 def download_report(request, report_id):
     """
     Download a generated report as CSV.

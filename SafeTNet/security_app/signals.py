@@ -1,10 +1,6 @@
-"""
-Signals for security_app to handle cross-app data synchronization.
-"""
-
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import Case, SOSAlert, Notification
+from .models import Case, SOSAlert, Notification, OfficerAlert
 from .fcm_service import fcm_service
 import logging
 
@@ -155,6 +151,66 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
             except Exception as e:
                 logger.error(f"Failed to send notification to officer {officer.username}: {str(e)}")
                 # Continue with other officers, don't fail the alert creation
+
+        # Also send user notifications based on role
+        if instance.created_by_role == 'USER':
+            try:
+                fcm_service.send_to_user(
+                    user=instance.user,
+                    title="SOS Alert Received",
+                    body="Your SOS alert has been received and officers are being notified.",
+                    data={
+                        'type': 'sos_alert_confirmation',
+                        'sos_alert_id': str(instance.id),
+                    }
+                )
+            except Exception as e:
+                logger.error(f"Failed to send confirmation to user {instance.user.username}: {str(e)}")
+                
+        elif instance.created_by_role == 'OFFICER':
+            try:
+                # get users in geofence
+                if instance.geofence:
+                    users_to_notify = User.objects.filter(geofences=instance.geofence, is_active=True)
+                else:
+                    users_to_notify = User.objects.filter(is_active=True)
+                fcm_service.send_to_users(
+                    users_queryset=users_to_notify,
+                    title=f"Security Alert: {instance.alert_type}",
+                    body=instance.message[:100],
+                    data={
+                        'type': 'area_security_alert',
+                        'sos_alert_id': str(instance.id),
+                    }
+                )
+            except Exception as e:
+                logger.error(f"Failed to broadcast alert to users: {str(e)}")
+
+
+@receiver(post_save, sender=OfficerAlert)
+def send_officer_alert_broadcast(sender, instance, created, **kwargs):
+    """
+    Send FCM notification when a new OfficerAlert is broadcasted
+    """
+    if created and getattr(instance, 'is_broadcast', False):
+        try:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            
+            # Broadcast to all active users
+            users_to_notify = User.objects.filter(is_active=True)
+                
+            fcm_service.send_to_users(
+                users_queryset=users_to_notify,
+                title=f"🚨 {instance.title}",
+                body=instance.message[:100],
+                data={
+                    'type': 'officer_alert_broadcast',
+                    'officer_alert_id': str(instance.id),
+                }
+            )
+        except Exception as e:
+            logger.error(f"Failed to broadcast OfficerAlert to users: {str(e)}")
 
 
 @receiver(post_save, sender=Case)

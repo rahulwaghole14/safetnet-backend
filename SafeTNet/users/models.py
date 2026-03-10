@@ -35,6 +35,11 @@ class User(AbstractUser):
         choices=ROLE_CHOICES,
         default='USER'
     )
+    fcm_tokens = models.JSONField(
+        default=list, 
+        blank=True, 
+        help_text="FCM device tokens for push notifications"
+    )
     organization = models.ForeignKey(
         Organization,
         on_delete=models.SET_NULL,

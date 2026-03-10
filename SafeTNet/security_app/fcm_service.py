@@ -87,6 +87,40 @@ class FCMService:
         
         return self.send_notification(registration_tokens, title, body, data)
 
+    def send_to_user(self, user, title, body, data=None):
+        """
+        Send notification to a specific user
+        """
+        registration_tokens = getattr(user, 'fcm_tokens', [])
+        if not registration_tokens:
+            return False
+            
+        return self.send_notification(registration_tokens, title, body, data)
+        
+    def send_to_users(self, users_queryset, title, body, data=None):
+        """
+        Send notification to multiple users
+        """
+        all_tokens = []
+        for user in users_queryset:
+            tokens = getattr(user, 'fcm_tokens', [])
+            if tokens and isinstance(tokens, list):
+                all_tokens.extend(tokens)
+                
+        if not all_tokens:
+            return False
+            
+        # Optional: chunking tokens if they exceed FCM max limit (500)
+        chunk_size = 500
+        success = True
+        for i in range(0, len(all_tokens), chunk_size):
+            chunk = all_tokens[i:i + chunk_size]
+            result = self.send_notification(chunk, title, body, data)
+            if not result:
+                success = False
+                
+        return success
+
 
 # Global FCM service instance
 fcm_service = FCMService()

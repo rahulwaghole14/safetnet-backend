@@ -19,7 +19,7 @@ getAsyncStorage().then((storage) => {
 });
 
 // API Base URL configuration - use live server
-const API_BASE_URL = 'https://safetnet.onrender.com/api/user';
+const API_BASE_URL = 'https://safetnet-backend-1.onrender.com/api/user';
 
 // Get the working API base URL
 let cachedApiBaseUrl: string | null = null;
@@ -86,16 +86,16 @@ class ApiService {
    * Check backend connectivity (optional - for diagnostic purposes)
    * Note: This is a simple connectivity test, not a full health check
    */
-  async checkBackendHealth(): Promise<{isHealthy: boolean; message: string; details?: any}> {
+  async checkBackendHealth(): Promise<{ isHealthy: boolean; message: string; details?: any }> {
     // Use the login endpoint itself as a simple connectivity test
     // We'll just try to reach it (without actually logging in)
     const baseUrl = await getApiBaseUrl();
     const healthCheckUrl = `${baseUrl}/login/`;
     const timeoutMs = 3000; // 3 second timeout for quick check
-    
+
     try {
       console.log(`[Health Check] Testing backend connectivity at: ${healthCheckUrl}`);
-      
+
       // Create an AbortController for timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -115,7 +115,7 @@ class ApiService {
 
       const text = await response.text();
       console.log(`[Health Check] Response status: ${response.status}`);
-      
+
       // Any response (even 400/401) means backend is reachable
       // 400 = validation error (backend is up)
       // 401 = auth error (backend is up but requires auth)
@@ -124,30 +124,30 @@ class ApiService {
         return {
           isHealthy: true,
           message: 'Backend is reachable and responding',
-          details: {status: response.status, url: healthCheckUrl},
+          details: { status: response.status, url: healthCheckUrl },
         };
       } else {
         return {
           isHealthy: false,
           message: `Backend responded with server error: ${response.status} ${response.statusText}`,
-          details: {status: response.status, text: text.substring(0, 200)},
+          details: { status: response.status, text: text.substring(0, 200) },
         };
       }
     } catch (error: any) {
       console.error('[Health Check] Error:', error);
-      
+
       const errorMessage = error?.message || error?.toString() || 'Unknown error';
       const errorName = error?.name || '';
-      
+
       const baseUrl = await getApiBaseUrl();
       if (error.name === 'AbortError' || errorMessage.includes('timeout')) {
         return {
           isHealthy: false,
           message: `Backend timeout: Server at ${baseUrl} did not respond within ${timeoutMs}ms. Is the backend running?`,
-          details: {url: healthCheckUrl, timeout: timeoutMs},
+          details: { url: healthCheckUrl, timeout: timeoutMs },
         };
       }
-      
+
       if (
         errorMessage.includes('Network request failed') ||
         errorMessage.includes('Failed to fetch') ||
@@ -156,14 +156,14 @@ class ApiService {
         return {
           isHealthy: false,
           message: `Cannot connect to backend at ${baseUrl}. Please check: 1) Backend server is running, 2) Network connection is active, 3) Device is on the same network (for local development)`,
-          details: {url: healthCheckUrl, error: errorMessage},
+          details: { url: healthCheckUrl, error: errorMessage },
         };
       }
-      
+
       return {
         isHealthy: false,
         message: `Backend health check failed: ${errorMessage}`,
-        details: {url: healthCheckUrl, error: errorMessage},
+        details: { url: healthCheckUrl, error: errorMessage },
       };
     }
   }
@@ -240,7 +240,7 @@ class ApiService {
 
     try {
       console.log(`[API Request] ${options.method || 'GET'} ${url}`);
-      
+
       const response = await fetch(url, {
         ...options,
         headers,
@@ -251,7 +251,7 @@ class ApiService {
 
       // Read response text first (can only read once)
       const text = await response.text();
-      
+
       if (!response.ok) {
         // Try to parse error response
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
@@ -266,8 +266,8 @@ class ApiService {
             } else if (errorData.error) {
               errorMessage = errorData.error;
             } else if (errorData.non_field_errors) {
-              errorMessage = Array.isArray(errorData.non_field_errors) 
-                ? errorData.non_field_errors[0] 
+              errorMessage = Array.isArray(errorData.non_field_errors)
+                ? errorData.non_field_errors[0]
                 : errorData.non_field_errors;
             } else if (typeof errorData === 'object') {
               // Get first error message from object
@@ -282,7 +282,7 @@ class ApiService {
           // If parsing fails, use the text as error message
           errorMessage = text || errorMessage;
         }
-        
+
         // Only try token refresh for authenticated endpoints (not login/register)
         // Login endpoints should never have 401 (they return 400 for invalid credentials)
         const isAuthEndpoint = endpoint.includes('/login/') || endpoint.includes('/register/') || endpoint === '/';
@@ -308,12 +308,12 @@ class ApiService {
             return retryText ? JSON.parse(retryText) : {};
           }
         }
-        
+
         // For login/register endpoints, 401 shouldn't happen - backend returns 400 for invalid credentials
         if (response.status === 401 && isAuthEndpoint) {
           console.warn('[API Request] Received 401 on auth endpoint - this is unusual, backend should return 400 for invalid credentials');
         }
-        
+
         throw new Error(errorMessage);
       }
 
@@ -323,7 +323,7 @@ class ApiService {
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
-      
+
       // For SOS endpoint, don't log detailed errors (they're expected and non-critical)
       const isSOSEndpoint = endpoint.includes('/sos/');
       if (!isSOSEndpoint) {
@@ -335,13 +335,13 @@ class ApiService {
           endpoint: endpoint,
         });
       }
-      
+
       // Handle network errors specifically
       // Check error message, name, and string representation
       const errorMessage = error?.message || error?.toString() || '';
       const errorName = error?.name || '';
       const errorString = String(error || '');
-      
+
       // Timeout errors (check first)
       // For SOS endpoint, don't log timeout errors as they're expected and non-critical
       // Reuse isSOSEndpoint declared above
@@ -364,7 +364,7 @@ class ApiService {
           throw new Error(`Request timeout after ${timeoutMs}ms. The server at ${baseUrl} took too long to respond. Please check if the backend is running.`);
         }
       }
-      
+
       // Network request failed - common in React Native
       if (
         errorMessage.includes('Network request failed') ||
@@ -375,7 +375,7 @@ class ApiService {
         useNetworkToastStore.getState().show();
         const baseUrl = await getApiBaseUrl();
         throw new Error(`Cannot connect to backend at ${baseUrl}. Please check: 1) Backend server is running, 2) Network connection is active, 3) Device is on the same network (for local development).`);
-      } 
+      }
       // Failed to fetch - common in web browsers
       else if (
         errorMessage.includes('Failed to fetch') ||
@@ -386,7 +386,7 @@ class ApiService {
         useNetworkToastStore.getState().show();
         const baseUrl = await getApiBaseUrl();
         throw new Error(`Failed to connect to server at ${baseUrl}. Please check if the backend is running.`);
-      } 
+      }
       // Connection refused
       else if (
         errorMessage.includes('ECONNREFUSED') ||
@@ -405,7 +405,7 @@ class ApiService {
         const baseUrl = await getApiBaseUrl();
         throw new Error(`Network error connecting to ${baseUrl}. Please check: 1) Backend server is running, 2) Network connection is active, 3) Device network connection. Error: ${errorMessage || 'Unknown TypeError'}`);
       }
-      
+
       // For other errors, re-throw as-is but log details
       console.error('[API Request Error] Other error:', error);
       throw error;
@@ -455,12 +455,12 @@ class ApiService {
     try {
       const baseUrl = await getApiBaseUrl();
       console.log('[Login] Attempting login with:', { email, url: `${baseUrl}/login/` });
-      
+
       // Note: We don't do a separate health check before login because:
       // 1. The login request itself will fail fast if backend is unreachable
       // 2. Health check endpoints often require authentication
       // 3. It adds unnecessary latency to the login flow
-      
+
       const response = await this.request('/login/', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
@@ -487,7 +487,7 @@ class ApiService {
         name: error.name,
         stack: error.stack,
       });
-      
+
       // Provide user-friendly error messages
       if (error.message && error.message.includes('400')) {
         throw new Error('Invalid email or password. Please check your credentials and try again.');
@@ -495,7 +495,7 @@ class ApiService {
         // This shouldn't happen for login, but handle it gracefully
         throw new Error('Authentication failed. Please check your credentials and try again.');
       }
-      
+
       // Re-throw the error as-is if it's already a user-friendly message
       throw error;
     }
@@ -704,7 +704,7 @@ class ApiService {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         return {
           valid: false,
@@ -777,12 +777,12 @@ class ApiService {
    */
   async getGeofences(userId: number, forceRefresh: boolean = false): Promise<any> {
     const cacheKey = `geofences_${userId}`;
-    
+
     // If force refresh, invalidate cache first
     if (forceRefresh) {
       await cacheService.invalidate(cacheKey);
     }
-    
+
     return cacheService.getOrFetch(
       cacheKey,
       () => this.request(`/${userId}/geofences/`),
@@ -889,7 +889,7 @@ class ApiService {
     return cacheService.getOrFetch(
       cacheKey,
       () => this.request(`/security_officers/?latitude=${latitude}&longitude=${longitude}`),
-      {compareByHash: true, ttl: 5 * 60 * 1000},
+      { compareByHash: true, ttl: 5 * 60 * 1000 },
     );
   }
 
@@ -916,8 +916,8 @@ class ApiService {
     includeOtherGeofences?: boolean;
     search?: string;
   }): Promise<any> {
-    const {geofenceOnly = true, includeOtherGeofences = false, search = ''} = options || {};
-    
+    const { geofenceOnly = true, includeOtherGeofences = false, search = '' } = options || {};
+
     // Build query string
     const params = new URLSearchParams();
     params.append('geofence_only', geofenceOnly.toString());
@@ -925,17 +925,17 @@ class ApiService {
     if (search.trim()) {
       params.append('search', search.trim());
     }
-    
+
     // Create cache key with sanitized search term
     const searchTerm = (search || '').trim().toLowerCase().substring(0, 20); // Limit search term length
     const cacheKey = `available_users_${geofenceOnly}_${includeOtherGeofences}_${searchTerm}`;
-    
+
     try {
       return await cacheService.getOrFetch(
-      cacheKey,
-      () => this.request(`/available_users/?${params.toString()}`),
-      { compareByHash: true, ttl: 2 * 60 * 1000 } // Cache for 2 minutes (shorter due to search)
-    );
+        cacheKey,
+        () => this.request(`/available_users/?${params.toString()}`),
+        { compareByHash: true, ttl: 2 * 60 * 1000 } // Cache for 2 minutes (shorter due to search)
+      );
     } catch (error: any) {
       console.error('Error fetching available users:', error);
       // If it's a network error, return empty array instead of throwing
@@ -1054,7 +1054,7 @@ class ApiService {
       });
 
       const text = await response.text();
-      
+
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
         try {
@@ -1069,12 +1069,12 @@ class ApiService {
       }
 
       const result = text ? JSON.parse(text) : {};
-      
+
       // Invalidate messages cache after sending
       await cacheService.invalidate(`chat_messages_${groupId}`);
       await cacheService.invalidate(`chat_group_${groupId}`);
       await cacheService.invalidate(`chat_groups_${userId}`);
-      
+
       return result;
     } catch (error: any) {
       if (error.message && error.message.includes('Failed to fetch')) {
@@ -1115,7 +1115,7 @@ class ApiService {
   async addGroupMembers(userId: number, groupId: number, memberIds: number[]): Promise<any> {
     const result = await this.request(`/${userId}/chat_groups/${groupId}/members/`, {
       method: 'POST',
-      body: JSON.stringify({member_ids: memberIds}),
+      body: JSON.stringify({ member_ids: memberIds }),
     });
     await cacheService.invalidate(`chat_group_${groupId}`);
     await cacheService.invalidate(`chat_groups_${userId}`);
@@ -1179,11 +1179,11 @@ class ApiService {
     console.log(`🌍 Latitude: ${latitude}`);
     console.log(`🌍 Longitude: ${longitude}`);
     console.log(`🔗 Endpoint: /${userId}/live_location/${sessionId}/`);
-    console.log(`📦 Payload:`, JSON.stringify({latitude, longitude}, null, 2));
+    console.log(`📦 Payload:`, JSON.stringify({ latitude, longitude }, null, 2));
     console.log(`🕐 Time: ${new Date().toISOString()}`);
     console.log('═══════════════════════════════════════════════════════════');
-    
-    const payload = {latitude, longitude};
+
+    const payload = { latitude, longitude };
     return this.request(`/${userId}/live_location/${sessionId}/`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
@@ -1202,5 +1202,5 @@ class ApiService {
 
 export const apiService = new ApiService();
 
-export type {LoginResponse, RegisterResponse};
+export type { LoginResponse, RegisterResponse };
 
