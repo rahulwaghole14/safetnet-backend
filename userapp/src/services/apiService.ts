@@ -556,6 +556,23 @@ class ApiService {
   }
 
   /**
+   * Update FCM token for push notifications
+   */
+  async updateFCMToken(token: string): Promise<any> {
+    try {
+      const response = await this.request('/profile/update-fcm-token/', {
+        method: 'POST',
+        body: JSON.stringify({ token }),
+      });
+      console.log('[API] FCM token updated successfully');
+      return response;
+    } catch (error) {
+      console.error('[API Error] Failed to update FCM token', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get family contacts (with caching)
    */
   async getFamilyContacts(userId: number): Promise<any> {

@@ -14,6 +14,7 @@ urlpatterns = [
     path('incidents/', views.IncidentsView.as_view(), name='security-incidents'),
     path('login/', views.OfficerLoginView.as_view(), name='security-login'),
     path('profile/', views.OfficerProfileView.as_view(), name='security-profile'),
+    path('profile/update-fcm-token/', __import__('users.views').views.UpdateFCMTokenView.as_view(), name='security-update-fcm-token'),
     path('geofence/', views.GeofenceCurrentView.as_view(), name='security-geofence-current'),
     path('geofence/<int:geofence_id>/', views.GeofenceDetailView.as_view(), name='security-geofence-detail'),
     path('notifications/', views.NotificationView.as_view(), name='security-notifications'),
