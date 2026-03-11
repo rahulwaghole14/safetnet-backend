@@ -239,7 +239,7 @@ class ApiService {
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      console.log(`[API Request] ${options.method || 'GET'} ${url}`);
+      console.log(`[API Request] ${options.method || 'GET'} ${url} (Timeout: ${timeoutMs}ms)`);
 
       const response = await fetch(url, {
         ...options,
@@ -577,11 +577,17 @@ class ApiService {
    */
   async getFamilyContacts(userId: number): Promise<any> {
     const cacheKey = `family_contacts_${userId}`;
-    return cacheService.getOrFetch(
-      cacheKey,
-      () => this.request(`/${userId}/family_contacts/`),
-      { compareByHash: true }
-    );
+    try {
+      const data = await cacheService.getOrFetch(
+        cacheKey,
+        () => this.request(`/${userId}/family_contacts/`),
+        { compareByHash: true }
+      );
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('[API] Error fetching family contacts:', error);
+      return [];
+    }
   }
 
   /**
@@ -589,11 +595,17 @@ class ApiService {
    */
   async getCommunityGroups(userId: number): Promise<any> {
     const cacheKey = `community_groups_${userId}`;
-    return cacheService.getOrFetch(
-      cacheKey,
-      () => this.request(`/${userId}/communities/`),
-      { compareByHash: true }
-    );
+    try {
+      const data = await cacheService.getOrFetch(
+        cacheKey,
+        () => this.request(`/${userId}/communities/`),
+        { compareByHash: true }
+      );
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('[API] Error fetching community groups:', error);
+      return [];
+    }
   }
 
   /**
@@ -650,11 +662,17 @@ class ApiService {
    */
   async getSOSEvents(userId: number): Promise<any> {
     const cacheKey = `sos_events_${userId}`;
-    return cacheService.getOrFetch(
-      cacheKey,
-      () => this.request(`/${userId}/sos_events/`),
-      { compareByHash: true }
-    );
+    try {
+      const data = await cacheService.getOrFetch(
+        cacheKey,
+        () => this.request(`/${userId}/sos_events/`),
+        { compareByHash: true }
+      );
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('[API] Error fetching SOS events:', error);
+      return [];
+    }
   }
 
   /**
@@ -791,13 +809,14 @@ class ApiService {
   async getCommunityAlerts(userId: number): Promise<any> {
     const cacheKey = `community_alerts_${userId}`;
     try {
-      return await cacheService.getOrFetch(
+      const data = await cacheService.getOrFetch(
         cacheKey,
         () => this.request(`/${userId}/community_alerts/`),
         { compareByHash: true }
       );
+      return Array.isArray(data) ? data : [];
     } catch (error: any) {
-      console.error('Error fetching community alerts:', error);
+      console.error('[API] Error fetching community alerts:', error);
       // Return empty array on error instead of throwing
       return [];
     }

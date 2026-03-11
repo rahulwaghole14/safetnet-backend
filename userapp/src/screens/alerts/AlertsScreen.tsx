@@ -1,4 +1,4 @@
-import React, {useMemo, useState, useEffect} from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,14 +8,14 @@ import {
   StatusBar,
   ActivityIndicator,
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useTheme} from '@react-navigation/native';
-import type {Theme} from '@react-navigation/native';
-import {format} from 'date-fns';
-import {useAuthStore} from '../../stores/authStore';
-import {apiService} from '../../services/apiService';
-import {sendAlertNotification} from '../../services/notificationService';
+import { useTheme } from '@react-navigation/native';
+import type { Theme } from '@react-navigation/native';
+import { format } from 'date-fns';
+import { useAuthStore } from '../../stores/authStore';
+import { apiService } from '../../services/apiService';
+import { sendAlertNotification } from '../../services/notificationService';
 
 interface Alert {
   id: string;
@@ -24,7 +24,7 @@ interface Alert {
   message: string;
   timestamp: Date;
   read: boolean;
-  location?: {lat: number; lng: number};
+  location?: { lat: number; lng: number };
 }
 
 const withAlpha = (hex: string, alpha: number) => {
@@ -32,9 +32,9 @@ const withAlpha = (hex: string, alpha: number) => {
   const expanded =
     sanitized.length === 3
       ? sanitized
-          .split('')
-          .map((char) => char + char)
-          .join('')
+        .split('')
+        .map((char) => char + char)
+        .join('')
       : sanitized;
   const bigint = parseInt(expanded, 16);
   const r = (bigint >> 16) & 255;
@@ -56,7 +56,7 @@ type AlertThemeTokens = {
 const AlertsScreen = () => {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const {colors} = theme;
+  const { colors } = theme;
   const isDarkMode = theme.dark;
   const user = useAuthStore((state) => state.user);
 
@@ -70,7 +70,7 @@ const AlertsScreen = () => {
   }), [colors, isDarkMode]);
 
   const styles = useMemo(() => createStyles(colors, themeTokens, isDarkMode), [colors, themeTokens, isDarkMode]);
-  const {mutedTextColor, secondaryTextColor, iconMutedColor, emptyIconColor} = themeTokens;
+  const { mutedTextColor, secondaryTextColor, iconMutedColor, emptyIconColor } = themeTokens;
 
   const [refreshing, setRefreshing] = useState(false);
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -101,128 +101,138 @@ const AlertsScreen = () => {
       setLoading(false);
       return;
     }
-    
+
     try {
       setLoading(true);
       const userId = parseInt(user.id);
-      
+
       console.log('[AlertsScreen] Loading alerts for user:', user.id);
-      
-      // Get alerts from backend (geofence-based alerts)
-      // Also get SOS events and community alerts for backward compatibility
-      const [backendAlertsData, sosEventsData, communityAlertsData] = await Promise.allSettled([
-        apiService.getAlerts().catch((err) => {
-          console.error('[AlertsScreen] Error fetching backend alerts:', err);
-          return [];
-        }),
-        apiService.getSOSEvents(userId).catch((err) => {
-          console.error('[AlertsScreen] Error fetching SOS events:', err);
-          return [];
-        }),
-        apiService.getCommunityAlerts(userId).catch((err) => {
-          console.error('[AlertsScreen] Error fetching community alerts:', err);
-          return [];
-        }),
-      ]);
-      
-      const backendAlerts = backendAlertsData.status === 'fulfilled' ? backendAlertsData.value : [];
-      const sosEvents = sosEventsData.status === 'fulfilled' ? sosEventsData.value : [];
-      const communityAlerts = communityAlertsData.status === 'fulfilled' ? communityAlertsData.value : [];
-      
-      console.log('[AlertsScreen] Backend alerts received:', backendAlerts.length);
-      console.log('[AlertsScreen] SOS events received:', sosEvents.length);
-      console.log('[AlertsScreen] Community alerts received:', communityAlerts.length);
-      
+
+      // Sequence the calls instead of firing them all at once (Promise.allSettled)
+      // This allows the first request to wake up the server (Render cold start)
+      // and subsequent requests to benefit from a warm instance.
+
+      let backendAlerts: any[] = [];
+      let sosEvents: any[] = [];
+      let communityAlerts: any[] = [];
+
+      try {
+        console.log('[AlertsScreen] Fetching primary alerts...');
+        backendAlerts = await apiService.getAlerts();
+      } catch (err) {
+        console.error('[AlertsScreen] Error fetching primary alerts:', err);
+      }
+
+      try {
+        console.log('[AlertsScreen] Fetching SOS events...');
+        const sosData = await apiService.getSOSEvents(userId);
+        sosEvents = Array.isArray(sosData) ? sosData : [];
+      } catch (err) {
+        console.error('[AlertsScreen] Error fetching SOS events:', err);
+      }
+
+      try {
+        console.log('[AlertsScreen] Fetching community alerts...');
+        const commData = await apiService.getCommunityAlerts(userId);
+        communityAlerts = Array.isArray(commData) ? commData : [];
+      } catch (err) {
+        console.error('[AlertsScreen] Error fetching community alerts:', err);
+      }
+
+      console.log('[AlertsScreen] Backend alerts received:', Array.isArray(backendAlerts) ? backendAlerts.length : 'non-array');
+      console.log('[AlertsScreen] SOS events received:', Array.isArray(sosEvents) ? sosEvents.length : 'non-array');
+      console.log('[AlertsScreen] Community alerts received:', Array.isArray(communityAlerts) ? communityAlerts.length : 'non-array');
+
       // Transform backend alerts to alerts format
       const backendAlertsFormatted: Alert[] = Array.isArray(backendAlerts)
         ? backendAlerts.map((alert: any, index: number) => {
-            // Determine alert type based on alert_type
-            let alertType = 'report';
-            if (alert.alert_type) {
-              const alertTypeLower = alert.alert_type.toLowerCase();
-              if (alertTypeLower.includes('geofence')) {
-                alertType = 'geofence';
-              } else if (alertTypeLower.includes('security') || alertTypeLower.includes('breach') || alertTypeLower.includes('emergency')) {
-                alertType = 'emergency';
-              }
+          // Determine alert type based on alert_type
+          let alertType = 'report';
+          if (alert.alert_type) {
+            const alertTypeLower = alert.alert_type.toLowerCase();
+            if (alertTypeLower.includes('geofence')) {
+              alertType = 'geofence';
+            } else if (alertTypeLower.includes('security') || alertTypeLower.includes('breach') || alertTypeLower.includes('emergency')) {
+              alertType = 'emergency';
             }
-            
-            // Get location from geofences array (new structure) or legacy geofence_details
-            let location: {lat?: number; lng?: number} | undefined = undefined;
-            if (alert.geofences && Array.isArray(alert.geofences) && alert.geofences.length > 0) {
-              // Use first geofence's center_point
-              const firstGeofence = alert.geofences[0];
-              if (firstGeofence?.center_point && Array.isArray(firstGeofence.center_point)) {
-                location = {
-                  lat: firstGeofence.center_point[0], // latitude is first in array
-                  lng: firstGeofence.center_point[1]  // longitude is second in array
-                };
-              }
-            } else if (alert.geofence_details?.center_point) {
-              // Fallback to legacy geofence_details
-              const centerPoint = alert.geofence_details.center_point;
-              if (Array.isArray(centerPoint)) {
-                location = {
-                  lat: centerPoint[0],
-                  lng: centerPoint[1]
-                };
-              }
+          }
+
+          // Get location from geofences array (new structure) or legacy geofence_details
+          let location: { lat: number; lng: number } | undefined = undefined;
+          if (alert.geofences && Array.isArray(alert.geofences) && alert.geofences.length > 0) {
+            // Use first geofence's center_point
+            const firstGeofence = alert.geofences[0];
+            if (firstGeofence?.center_point && Array.isArray(firstGeofence.center_point) && firstGeofence.center_point.length >= 2) {
+              location = {
+                lat: Number(firstGeofence.center_point[0]) || 0, // latitude is first in array
+                lng: Number(firstGeofence.center_point[1]) || 0  // longitude is second in array
+              };
             }
-            
-            return {
-              id: `alert-${alert.id?.toString() || index}`,
-              type: alertType,
-              title: alert.title || 'Alert',
-              message: alert.description || alert.title || 'No description',
-              timestamp: alert.created_at ? new Date(alert.created_at) : new Date(),
-              read: alert.is_resolved || false,
-              location: location,
-            };
-          })
+          } else if (alert.geofence_details?.center_point) {
+            // Fallback to legacy geofence_details
+            const centerPoint = alert.geofence_details.center_point;
+            if (Array.isArray(centerPoint) && centerPoint.length >= 2) {
+              location = {
+                lat: Number(centerPoint[0]) || 0,
+                lng: Number(centerPoint[1]) || 0
+              };
+            }
+          }
+
+          return {
+            id: `alert-${alert.id?.toString() || index}`,
+            type: alertType,
+            title: alert.title || 'Alert',
+            message: alert.description || alert.title || 'No description',
+            timestamp: alert.created_at ? new Date(alert.created_at) : new Date(),
+            read: alert.is_resolved || false,
+            location: location,
+          };
+        })
         : [];
-      
+
       // Transform SOS events to alerts format
-      const sosAlerts: Alert[] = Array.isArray(sosEvents) 
+      const sosAlerts: Alert[] = Array.isArray(sosEvents)
         ? sosEvents.map((event: any, index: number) => ({
-            id: `sos-${event.id?.toString() || index}`,
-            type: 'emergency',
-            title: 'SOS Alert',
-            message: event.notes || 'Emergency SOS triggered',
-            timestamp: event.triggered_at ? new Date(event.triggered_at) : (event.created_at ? new Date(event.created_at) : new Date()),
-            read: false,
-            location: event.location ? {
-              lat: typeof event.location === 'object' ? (event.location.latitude || event.location.lat || event.location[1]) : undefined,
-              lng: typeof event.location === 'object' ? (event.location.longitude || event.location.lng || event.location[0]) : undefined
-            } : undefined,
-          }))
+          id: `sos-${event.id?.toString() || index}`,
+          type: 'emergency',
+          title: 'SOS Alert',
+          message: event.notes || 'Emergency SOS triggered',
+          timestamp: event.triggered_at ? new Date(event.triggered_at) : (event.created_at ? new Date(event.created_at) : new Date()),
+          read: false,
+          location: event.location ? {
+            lat: typeof event.location === 'object' ? (event.location.latitude || event.location.lat || event.location[1]) : undefined,
+            lng: typeof event.location === 'object' ? (event.location.longitude || event.location.lng || event.location[0]) : undefined
+          } : undefined,
+        }))
         : [];
-      
+
       // Transform community alerts to alerts format
       const communityAlertsFormatted: Alert[] = Array.isArray(communityAlerts)
         ? communityAlerts.map((alert: any, index: number) => ({
-            id: `community-${alert.id?.toString() || index}`,
-            type: 'geofence',
-            title: 'Community Alert',
-            message: alert.message || 'Community alert',
-            timestamp: alert.sent_at ? new Date(alert.sent_at) : new Date(),
-            read: false,
-            location: alert.location ? {
-              lat: typeof alert.location === 'object' ? (alert.location.latitude || alert.location.lat || alert.location[1]) : undefined,
-              lng: typeof alert.location === 'object' ? (alert.location.longitude || alert.location.lng || alert.location[0]) : undefined
-            } : undefined,
-          }))
+          id: `community-${alert.id?.toString() || index}`,
+          type: 'geofence',
+          title: 'Community Alert',
+          message: alert.message || 'Community alert',
+          timestamp: alert.sent_at ? new Date(alert.sent_at) : new Date(),
+          read: false,
+          location: alert.location ? {
+            lat: typeof alert.location === 'object' ? (alert.location.latitude || alert.location.lat || alert.location[1]) : undefined,
+            lng: typeof alert.location === 'object' ? (alert.location.longitude || alert.location.lng || alert.location[0]) : undefined
+          } : undefined,
+        }))
         : [];
-      
+
       // Combine and sort by timestamp (newest first)
-      const allAlerts = [...backendAlertsFormatted, ...sosAlerts, ...communityAlertsFormatted].sort((a, b) => 
+      const allAlerts = [...backendAlertsFormatted, ...sosAlerts, ...communityAlertsFormatted].sort((a, b) =>
         b.timestamp.getTime() - a.timestamp.getTime()
       );
-      
+
       console.log('[AlertsScreen] Total alerts to display:', allAlerts.length);
       console.log('[AlertsScreen] Backend alerts formatted:', backendAlertsFormatted.length);
       console.log('[AlertsScreen] SOS alerts formatted:', sosAlerts.length);
       console.log('[AlertsScreen] Community alerts formatted:', communityAlertsFormatted.length);
-      
+
       setAlerts(allAlerts);
     } catch (error: any) {
       console.error('Failed to load alerts:', error);
@@ -305,17 +315,17 @@ const AlertsScreen = () => {
           },
         ]}>
         <View style={styles.alertHeader}>
-          <View style={[styles.iconContainer, {backgroundColor: palette.iconBackground}]}>
+          <View style={[styles.iconContainer, { backgroundColor: palette.iconBackground }]}>
             <MaterialIcons name={getAlertIcon(alert.type)} size={20} color={palette.iconColor} />
           </View>
           <View style={styles.alertContent}>
             <View style={styles.alertTitleRow}>
-              <Text style={[styles.alertTitle, {color: palette.textColor}]} numberOfLines={1}>
+              <Text style={[styles.alertTitle, { color: palette.textColor }]} numberOfLines={1}>
                 {alert.title}
               </Text>
-              {!alert.read && <View style={[styles.unreadDot, {backgroundColor: palette.dotColor}]} />}
+              {!alert.read && <View style={[styles.unreadDot, { backgroundColor: palette.dotColor }]} />}
             </View>
-            <Text style={[styles.alertMessage, {color: palette.textColor}]} numberOfLines={2}>
+            <Text style={[styles.alertMessage, { color: palette.textColor }]} numberOfLines={2}>
               {alert.message}
             </Text>
             <Text style={styles.alertTime}>{formatTimeAgo(alert.timestamp)}</Text>
@@ -326,13 +336,13 @@ const AlertsScreen = () => {
   };
 
   return (
-    <View style={[styles.container, {backgroundColor: colors.background, paddingTop: insets.top}]}>
+    <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, {color: mutedTextColor}]}>Loading alerts...</Text>
+          <Text style={[styles.loadingText, { color: mutedTextColor }]}>Loading alerts...</Text>
         </View>
       ) : alerts.length === 0 ? (
         <View style={styles.emptyState}>
@@ -343,7 +353,7 @@ const AlertsScreen = () => {
       ) : (
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={[styles.scrollContent, {paddingBottom: 24 + insets.bottom}]}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: 24 + insets.bottom }]}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -378,7 +388,7 @@ const createStyles = (colors: Theme['colors'], tokens: AlertThemeTokens, isDarkM
       marginBottom: 10,
       borderWidth: 1,
       shadowColor: tokens.cardShadowColor,
-      shadowOffset: {width: 0, height: 1},
+      shadowOffset: { width: 0, height: 1 },
       shadowOpacity: isDarkMode ? 0.22 : 0.08,
       shadowRadius: isDarkMode ? 4 : 2,
       elevation: isDarkMode ? 4 : 2,
