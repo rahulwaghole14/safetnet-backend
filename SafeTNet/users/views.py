@@ -469,28 +469,33 @@ class AlertViewSet(ModelViewSet):
         return AlertSerializer
     
     def get_queryset(self):
-        queryset = super().get_queryset()
-        user = self.request.user
+        try:
+            queryset = super().get_queryset()
+            user = self.request.user
 
-        logger.info(f"[USER ALERTS] User {user.email} (role: {user.role}) requesting alerts")
+            logger.info(f"[USER ALERTS] User {user.email} (role: {user.role}) requesting alerts")
 
-        # SUPER_ADMIN can see all alerts
-        if user.role == 'SUPER_ADMIN':
-            logger.info(f"[USER ALERTS] Super-admin {user.email} sees all alerts")
+            # SUPER_ADMIN can see all alerts
+            if user.role == 'SUPER_ADMIN':
+                logger.info(f"[USER ALERTS] Super-admin {user.email} sees all alerts")
+                return queryset
+
+            # For regular users: show alerts in their geofences (typically USER_SOS alerts)
+            # Users can see alerts in geofences they belong to
+            user_geofences = user.geofences.filter(active=True)
+            geofence_ids = list(user_geofences.values_list('id', flat=True))
+
+            logger.info(f"[USER ALERTS] User {user.email} has {len(geofence_ids)} geofences: {geofence_ids}")
+
+            # Filter alerts by user's geofences
+            queryset = queryset.filter(geofence_id__in=geofence_ids)
+
+            logger.info(f"[USER ALERTS] Found {queryset.count()} alerts for user {user.email}")
             return queryset
-
-        # For regular users: show alerts in their geofences (typically USER_SOS alerts)
-        # Users can see alerts in geofences they belong to
-        user_geofences = user.geofences.filter(active=True)
-        geofence_ids = list(user_geofences.values_list('id', flat=True))
-
-        logger.info(f"[USER ALERTS] User {user.email} has {len(geofence_ids)} geofences: {geofence_ids}")
-
-        # Filter alerts by user's geofences
-        queryset = queryset.filter(geofence_id__in=geofence_ids)
-
-        logger.info(f"[USER ALERTS] Found {queryset.count()} alerts for user {user.email}")
-        return queryset
+        except Exception as e:
+            logger.error(f"[USER ALERTS] Error in get_queryset: {str(e)}", exc_info=True)
+            # Return empty queryset on error to avoid 500
+            return Alert.objects.none()
     
     def get_permissions(self):
         """
@@ -646,8 +651,6 @@ def generate_report(request):
     }, status=status.HTTP_201_CREATED)
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated, IsSuperAdmin])
 class UpdateFCMTokenView(APIView):
     """
     Update the FCM device token for the authenticated user.
