@@ -312,6 +312,7 @@ class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
             # Step 6: Create the alert with backend-authoritative data
             alert = serializer.save(
                 user=officer,  # Officer creates the alert
+                created_by_role='OFFICER',  # Explicitly set role for sync logic
                 priority='high',  # Area-based alerts are always high priority
             )
             

@@ -169,6 +169,7 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 
         elif instance.created_by_role == 'OFFICER':
             try:
+                logger.info(f"🔄 Syncing OFFICER alert {instance.id} to unified feed...")
                 # get users in geofence
                 if instance.geofence:
                     users_to_notify = User.objects.filter(geofences=instance.geofence, is_active=True)

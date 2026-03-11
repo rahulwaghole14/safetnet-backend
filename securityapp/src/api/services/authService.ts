@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // All mock data has been removed - app relies on real API calls only
 
 // Network connectivity test
-export const testBackendConnectivity = async (): Promise<{available: boolean, message: string}> => {
+export const testBackendConnectivity = async (): Promise<{ available: boolean, message: string }> => {
   try {
     console.log('🔍 Testing backend connectivity...');
     console.log('🌐 Testing URL:', `${apiConfig.BASE_URL}/api/security/login/`);
@@ -51,13 +51,9 @@ export const login = async (credentials: LoginPayload, retryCount: number = 0): 
   try {
     console.log('🔍 Attempting login with:', credentials.email);
     console.log('🌐 Backend URL:', `${apiConfig.BASE_URL}/api/security/login/`);
-    
-    // Test backend connectivity first
-    const connectivityTest = await testBackendConnectivity();
-    if (!connectivityTest.available) {
-      throw new Error(`Backend not reachable: ${connectivityTest.message}`);
-    }
-    
+
+    // Simplified login - just try the API call directly
+    // Pre-login connectivity tests are brittle on mobile + Render
     console.log('🔐 Making real API call to backend...');
     const response = await apiClient.post('/login/', {
       username: credentials.email,
@@ -72,19 +68,19 @@ export const login = async (credentials: LoginPayload, retryCount: number = 0): 
     console.error('📊 Error Response:', error.response);
     console.error('🌐 Error Request:', error.request);
     console.error('⚙️ Error Config:', error.config);
-    
+
     // Retry logic for SSL errors (max 2 retries)
     if (error.message && error.message.includes('SSL') && retryCount < 2) {
       console.log(`🔄 SSL error detected, retrying... (${retryCount + 1}/2)`);
       await new Promise(resolve => setTimeout(resolve as any, 2000)); // Wait 2 seconds
       return login(credentials, retryCount + 1);
     }
-    
+
     if (error.response) {
       // Server responded with error status
       console.error('📊 Response Status:', error.response.status);
       console.error('📄 Response Data:', error.response.data);
-      
+
       if (error.response.status === 400) {
         throw new Error('Invalid username or password');
       } else if (error.response.status === 401) {
@@ -103,7 +99,7 @@ export const login = async (credentials: LoginPayload, retryCount: number = 0): 
     } else if (error.request) {
       // No response received
       console.error('🌐 No response received:', error.message);
-      
+
       // Check for SSL/network errors
       if (error.message && error.message.includes('SSL')) {
         throw new Error('SSL connection failed. Backend may be unavailable. Please try again.');
@@ -112,7 +108,7 @@ export const login = async (credentials: LoginPayload, retryCount: number = 0): 
     } else {
       // Other error
       console.error('⚙️ UNKNOWN ERROR:', error.message);
-      
+
       // Check for SSL errors
       if (error.message && error.message.includes('SSL')) {
         throw new Error('SSL connection error. Please try again.');

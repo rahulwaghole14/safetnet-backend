@@ -486,14 +486,33 @@ class AlertViewSet(ModelViewSet):
             geofence_ids = list(user_geofences.values_list('id', flat=True))
 
             logger.info(f"[USER ALERTS] User {user.email} has {len(geofence_ids)} geofences: {geofence_ids}")
+            logger.info(f"[USER ALERTS] User organization: {user.organization_id if user.organization else 'None'}")
+            logger.info(f"[USER ALERTS] Total alerts in DB: {Alert.objects.count()}")
+            logger.info(f"[USER ALERTS] Officer alerts in DB: {Alert.objects.filter(alert_type='OFFICER_ALERT').count()}")
 
-            # Filter alerts by user's geofences
-            # Include alerts where geofence is in user's geofences OR alerts created by the user themselves
-            queryset = queryset.filter(
-                models.Q(geofence_id__in=geofence_ids) |
-                models.Q(user=user)
-            ).distinct()
-
+            # Filter alerts for the user:
+            # 1. Alerts within the user's geofences
+            # 2. Alerts created by the user themselves
+            # 3. Officer alerts from the same organization (ensures safety broadcast visibility)
+            # Visibility logic:
+            # 1. Any alert in user's geofences
+            # 2. Any alert created by the user themselves
+            # 3. Any OFFICER_ALERT from the same organization (or any if user has no org)
+            
+            visibility_query = models.Q(geofence_id__in=geofence_ids) | models.Q(user=user)
+            
+            if user.organization:
+                # If user has an organization, show officer alerts for that organization
+                visibility_query |= models.Q(alert_type='OFFICER_ALERT', user__organization=user.organization)
+            else:
+                # If user has NO organization, show ALL officer alerts (assume public safety)
+                visibility_query |= models.Q(alert_type='OFFICER_ALERT')
+                
+            queryset = queryset.filter(visibility_query).distinct()
+            
+            # Additional fallback: if user has no org and no geofences, show them officer alerts with no org?
+            # Or just show any officer alert for now to verify connectivity?
+            
             logger.info(f"[USER ALERTS] Found {queryset.count()} alerts for user {user.email}")
             return queryset
         except Exception as e:
