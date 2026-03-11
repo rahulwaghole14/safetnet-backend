@@ -183,8 +183,31 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                         'sos_alert_id': str(instance.id),
                     }
                 )
+
+                # Sync to unified users.Alert table so userapp can see it in the feed
+                from users.models import Alert
+                Alert.objects.create(
+                    user=instance.user,
+                    alert_type='OFFICER_ALERT',
+                    title=f"Security Alert: {instance.alert_type.title().replace('_', ' ')}",
+                    description=instance.description or instance.message,
+                    message=instance.message,
+                    location={
+                        'latitude': instance.location_lat,
+                        'longitude': instance.location_long
+                    },
+                    geofence=instance.geofence,
+                    priority=instance.priority,
+                    severity='HIGH' if instance.priority == 'high' else 'MEDIUM',
+                    status='ACTIVE' if instance.status == 'pending' else instance.status.upper(),
+                    metadata={
+                        'sos_alert_id': instance.id,
+                        'original_type': instance.alert_type
+                    }
+                )
+                logger.info(f"Successfully synced SOSAlert {instance.id} to users.Alert table")
             except Exception as e:
-                logger.error(f"Failed to broadcast alert to users: {str(e)}")
+                logger.error(f"Failed to broadcast/sync alert to users: {str(e)}")
 
 
 @receiver(post_save, sender=OfficerAlert)

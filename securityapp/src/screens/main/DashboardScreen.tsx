@@ -89,13 +89,13 @@ export const DashboardScreen = () => {
   // Initial fetch when component mounts
   useEffect(() => {
     console.log('🏠 Dashboard: Component mounted, doing initial fetch...');
-    
+
     const fetchInitialData = async () => {
       try {
-        const timeoutPromise = new Promise((_, reject) => 
+        const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Dashboard fetch timeout')), 10000)
         );
-        
+
         await Promise.race([
           Promise.all([
             fetchDashboardData(),
@@ -103,19 +103,19 @@ export const DashboardScreen = () => {
           ]),
           timeoutPromise
         ]);
-        
+
         console.log('✅ Dashboard: Initial data fetch completed');
       } catch (error) {
         console.error('❌ Dashboard: Initial data fetch failed:', error);
       }
     };
-    
+
     fetchInitialData();
   }, []);
 
   const handleRespond = async (alert: Alert) => {
     console.log('📞 Dashboard: Show respond modal for alert:', alert.id);
-    
+
     // Validate alert data before showing modal
     if (!alert || !alert.id) {
       console.error('❌ Invalid alert data:', alert);
@@ -128,7 +128,7 @@ export const DashboardScreen = () => {
       });
       return;
     }
-    
+
     setSelectedAlertId(String(alert.id));
     setShowRespondModal(true);
   };
@@ -150,10 +150,10 @@ export const DashboardScreen = () => {
 
   // Calculate stats from backend API data
   const stats = dashboardData?.stats;
-  
+
   // Get recent alerts from alertsStore
   const recentAlerts = getRecentAlerts(5);
-  
+
   // CRITICAL: Log exact counts for debugging
   console.log('🔍 CRITICAL DEBUG - Dashboard Analysis:');
   console.log(`   📊 Total alerts in store: ${alerts.length}`);
@@ -161,7 +161,7 @@ export const DashboardScreen = () => {
   console.log(`   📊 Active alerts (backend): ${stats?.active_sos_alerts}`);
   console.log(`   📊 Pending alerts (backend): ${stats?.assigned_cases}`);
   console.log(`   📊 Resolved alerts (backend): ${stats?.resolved_today}`);
-  
+
   if (recentAlerts.length > 0) {
     const newestAlertId = recentAlerts[0]?.id;
     const newestAlertMessage = recentAlerts[0]?.message?.substring(0, 40);
@@ -395,18 +395,8 @@ export const DashboardScreen = () => {
     },
   });
 
-  // Show loading state
-  if (isLoadingDashboard) {
-    return (
-      <View style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Loading dashboard...</Text>
-        <Text style={[styles.loadingText, { fontSize: 12, marginTop: 8, opacity: 0.7 }]}>
-          Fetching dashboard data and alerts from SafeTNet backend
-        </Text>
-      </View>
-    );
-  }
+  // We will show section-level loaders instead of a full-screen loader
+  // This allows the user to see the dashboard structure while data is fetching
 
   // Show error state
   if (dashboardError) {
@@ -457,81 +447,101 @@ export const DashboardScreen = () => {
           <View style={styles.headerSpacer} />
         </View>
 
-      {/* Stats Section */}
-      <View style={styles.statsSection}>
-        <View style={styles.statsCard}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{stats?.active_sos_alerts || 0}</Text>
-            <Text style={styles.statLabel}>Active</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={[styles.statValue, styles.pendingValue]}>{stats?.assigned_cases || 0}</Text>
-            <Text style={styles.statLabel}>Pending</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={[styles.statValue, styles.resolvedValue]}>{stats?.resolved_today || 0}</Text>
-            <Text style={styles.statLabel}>Resolved</Text>
+        {/* Stats Section */}
+        <View style={styles.statsSection}>
+          <View style={styles.statsCard}>
+            {isLoadingDashboard ? (
+              <View style={[styles.statItem, { paddingVertical: 10 }]}>
+                <ActivityIndicator size="small" color={colors.primary} />
+              </View>
+            ) : (
+              <>
+                <View style={styles.statItem}>
+                  <Text style={styles.statValue}>{stats?.active_sos_alerts || 0}</Text>
+                  <Text style={styles.statLabel}>Active</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statItem}>
+                  <Text style={[styles.statValue, styles.pendingValue]}>{stats?.assigned_cases || 0}</Text>
+                  <Text style={styles.statLabel}>Pending</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statItem}>
+                  <Text style={[styles.statValue, styles.resolvedValue]}>{stats?.resolved_today || 0}</Text>
+                  <Text style={styles.statLabel}>Resolved</Text>
+                </View>
+              </>
+            )}
           </View>
         </View>
-      </View>
 
-      {/* Recent Alerts Section */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeaderContainer}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleContainer}>
-              <View style={[styles.iconContainer, styles.alertsIconContainer]}>
-                <Icon name="notifications" size={24} color={colors.emergencyRed} />
+        {/* Recent Alerts Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeaderContainer}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleContainer}>
+                <View style={[styles.iconContainer, styles.alertsIconContainer]}>
+                  <Icon name="notifications" size={24} color={colors.emergencyRed} />
+                </View>
+                <View>
+                  <Text style={styles.sectionTitle}>Recent Alerts</Text>
+                  <Text style={styles.sectionSubtitle}>
+                    {recentAlerts.length > 0 ? `${recentAlerts.length} most recent` : 'No recent alerts'}
+                  </Text>
+                </View>
               </View>
-              <View>
-                <Text style={styles.sectionTitle}>Recent Alerts</Text>
-                <Text style={styles.sectionSubtitle}>
-                  {recentAlerts.length > 0 ? `${recentAlerts.length} most recent` : 'No recent alerts'}
+              <TouchableOpacity
+                style={styles.seeAllButton}
+                onPress={() => {
+                  (navigation as any).navigate('Alerts');
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.seeAllText}>See All</Text>
+                <Text style={styles.seeAllArrow}>→</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.cardsContainer}>
+            {isLoadingAlerts && recentAlerts.length === 0 ? (
+              <View style={styles.emptyStateContainer}>
+                <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={styles.loadingText}>Updating alerts...</Text>
+              </View>
+            ) : recentAlerts.length > 0 ? (
+              <>
+                {isLoadingAlerts && (
+                  <View style={{ padding: 10, alignItems: 'center' }}>
+                    <ActivityIndicator size="small" color={colors.primary} />
+                  </View>
+                )}
+                {recentAlerts.map((alert) => {
+                  console.log('🔑 Dashboard AlertCard key:', alert.id, alert.message?.substring(0, 30));
+                  return (
+                    <AlertCard key={String(alert.id)} alert={alert} onRespond={handleRespond} />
+                  );
+                })}
+              </>
+            ) : (
+              <View style={styles.emptyStateContainer}>
+                <Icon name="notifications-none" size={48} color={colors.lightText} />
+                <Text style={styles.emptyStateTitle}>No Recent Alerts</Text>
+                <Text style={styles.emptyStateText}>
+                  When alerts are received, they will appear here
                 </Text>
               </View>
-            </View>
-            <TouchableOpacity
-              style={styles.seeAllButton}
-              onPress={() => {
-                (navigation as any).navigate('Alerts');
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.seeAllText}>See All</Text>
-              <Text style={styles.seeAllArrow}>→</Text>
-            </TouchableOpacity>
+            )}
           </View>
         </View>
-        <View style={styles.cardsContainer}>
-          {recentAlerts.length > 0 ? (
-            recentAlerts.map((alert) => {
-              console.log('🔑 Dashboard AlertCard key:', alert.id, alert.message?.substring(0, 30));
-              return (
-                <AlertCard key={String(alert.id)} alert={alert} onRespond={handleRespond} />
-              );
-            })
-          ) : (
-            <View style={styles.emptyStateContainer}>
-              <Icon name="notifications-none" size={48} color={colors.lightText} />
-              <Text style={styles.emptyStateTitle}>No Recent Alerts</Text>
-              <Text style={styles.emptyStateText}>
-                When alerts are received, they will appear here
-              </Text>
-            </View>
-          )}
-        </View>
-      </View>
-    </ScrollView>
-    
-    {/* Alert Respond Modal */}
-    <AlertRespondModal
-      visible={showRespondModal}
-      alertId={selectedAlertId || ''}
-      onClose={handleCloseRespondModal}
-      onResponseAccepted={handleResponseAccepted}
-    />
+      </ScrollView>
+
+      {/* Alert Respond Modal */}
+      <AlertRespondModal
+        visible={showRespondModal}
+        alertId={selectedAlertId || ''}
+        onClose={handleCloseRespondModal}
+        onResponseAccepted={handleResponseAccepted}
+      />
     </>
   );
 };

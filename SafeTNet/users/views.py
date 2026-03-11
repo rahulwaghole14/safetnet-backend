@@ -488,7 +488,11 @@ class AlertViewSet(ModelViewSet):
             logger.info(f"[USER ALERTS] User {user.email} has {len(geofence_ids)} geofences: {geofence_ids}")
 
             # Filter alerts by user's geofences
-            queryset = queryset.filter(geofence_id__in=geofence_ids)
+            # Include alerts where geofence is in user's geofences OR alerts created by the user themselves
+            queryset = queryset.filter(
+                models.Q(geofence_id__in=geofence_ids) |
+                models.Q(user=user)
+            ).distinct()
 
             logger.info(f"[USER ALERTS] Found {queryset.count()} alerts for user {user.email}")
             return queryset
