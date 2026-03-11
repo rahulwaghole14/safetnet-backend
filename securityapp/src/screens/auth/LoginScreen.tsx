@@ -34,10 +34,9 @@ type AuthStackParamList = {
 type AuthNavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
 // Safe logo loading - will use image if file exists, otherwise fallback to emoji
-const LOGO_PATH = '../../assets/images/safetnet-logo.png';
 let logoSource = null;
 try {
-  logoSource = require(LOGO_PATH);
+  logoSource = require('../../assets/images/safetnet-logo.png');
 } catch (e) {
   logoSource = null;
 }
@@ -45,12 +44,12 @@ try {
 export const LoginScreen = () => {
   const { colors } = useTheme();
   const { width, height } = Dimensions.get('window');
-  
+
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
-  
+
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -379,7 +378,7 @@ export const LoginScreen = () => {
 
     try {
       setIsLoading(true);
-      
+
       // Make login request
       const res = await authService.login({
         email,
@@ -395,10 +394,10 @@ export const LoginScreen = () => {
       // Extract tokens and user data (optimized - minimal processing)
       const accessToken = res.access;
       const refreshToken = res.refresh;
-      const user = res.user || { 
-        id: 0, 
-        username: '', 
-        email: '', 
+      const user = res.user || {
+        id: 0,
+        username: '',
+        email: '',
         role: '',
         first_name: '',
         last_name: '',
@@ -407,7 +406,7 @@ export const LoginScreen = () => {
         user_image: '',
         status: ''
       };
-      
+
       if (!accessToken) {
         throw new Error("Access token not received from server");
       }
@@ -464,14 +463,14 @@ export const LoginScreen = () => {
       try {
         const { useAlertsStore } = await import('../../store/alertsStore');
         useAlertsStore.getState().fetchAlerts();
-        
+
         // Fetch assigned geofence data after successful login
         const { useGeofenceStore } = await import('../../store/geofenceStore');
         const geofenceStore = useGeofenceStore.getState();
-        
+
         console.log('🎯 Post-login geofence check:');
         console.log('   Officer geofence_id:', officer.geofence_id);
-        
+
         // Fetch geofences if officer has geofence_id assigned
         if (officer.geofence_id) {
           console.log('✅ Officer has geofence assigned, fetching geofence data...');
@@ -498,7 +497,7 @@ export const LoginScreen = () => {
       const status = err.response && err.response.status ? err.response.status : undefined;
       const isNetworkError = err.code === 'ERR_NETWORK' || err.message === 'Network Error' || !err.response;
       let errorMessage = 'Invalid Credentials';
-      
+
       // Handle network errors (no response from server)
       if (isNetworkError) {
         errorMessage = 'Cannot reach server. The backend service may be sleeping (Render free tier takes 30-90 seconds to wake up). Please wait 1-2 minutes and try again.';
@@ -511,7 +510,7 @@ export const LoginScreen = () => {
         // 400 Bad Request - show backend's specific error message
         // Handle Django REST Framework error formats
         const backendError = err.response && err.response.data ? err.response.data : null;
-        
+
         if (backendError) {
           // Format: { "non_field_errors": ["Invalid credentials."] }
           if (backendError.non_field_errors && Array.isArray(backendError.non_field_errors)) {
@@ -540,7 +539,7 @@ export const LoginScreen = () => {
         } else {
           errorMessage = err.message || 'Invalid credentials. Please check your username and password.';
         }
-        
+
         // Log full error details for debugging
         console.error("400 Error Details:", JSON.stringify(backendError, null, 2));
       } else if (status === 401) {
@@ -554,7 +553,7 @@ export const LoginScreen = () => {
       } else {
         errorMessage = (err.response && err.response.data && err.response.data.message) || (err.response && err.response.data && err.response.data.error) || err.message || 'Invalid Credentials';
       }
-      
+
       Alert.alert('Login Failed', errorMessage);
     } finally {
       setIsLoading(false);
@@ -569,9 +568,9 @@ export const LoginScreen = () => {
     >
       <View style={styles.scrollContent}>
         {/* Premium Header Section */}
-        <Animated.View 
+        <Animated.View
           style={[
-            styles.header, 
+            styles.header,
             {
               opacity: fadeAnim,
               transform: [{ translateY: slideAnim }]
@@ -598,7 +597,7 @@ export const LoginScreen = () => {
         </Animated.View>
 
         {/* Premium Form Section */}
-        <Animated.View 
+        <Animated.View
           style={[
             styles.formContainer,
             {
@@ -658,10 +657,10 @@ export const LoginScreen = () => {
                 style={styles.togglePassword}
                 onPress={() => setShowPassword(!showPassword)}
               >
-                <Icon 
-                  name={showPassword ? 'visibility-off' : 'visibility'} 
-                  size={18} 
-                  color={colors.mediumText} 
+                <Icon
+                  name={showPassword ? 'visibility-off' : 'visibility'}
+                  size={18}
+                  color={colors.mediumText}
                 />
               </TouchableOpacity>
             </View>

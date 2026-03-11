@@ -40,7 +40,7 @@ SECRET_KEY = config('SECRET_KEY', default="django-insecure-5xl4(8z1!y&+nsci$=!@n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,10.0.2.2').split(',')
 ALLOWED_HOSTS.append('safetnet.onrender.com')
 ALLOWED_HOSTS.append('safetnet-backend.onrender.com')
 ALLOWED_HOSTS.append('192.168.0.125')  # Local network IP for device testing

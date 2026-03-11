@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import messaging from '@react-native-firebase/messaging';
-import { fcmTokenService } from '../api/services';
+import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
+import * as fcmTokenService from '../api/services/fcmTokenService';
 import { Platform } from 'react-native';
 
 export const usePushNotifications = (isAuthenticated: boolean) => {
@@ -35,7 +35,7 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
 
         requestUserPermission();
 
-        const unsubscribeTokenRefresh = messaging().onTokenRefresh(async token => {
+        const unsubscribeTokenRefresh = messaging().onTokenRefresh(async (token: string) => {
             console.log('[FCM] Token Refreshed:', token);
             try {
                 await fcmTokenService.updateFCMToken(token);
@@ -44,7 +44,7 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
             }
         });
 
-        const unsubscribeMessage = messaging().onMessage(async remoteMessage => {
+        const unsubscribeMessage = messaging().onMessage(async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
             console.log('[FCM] Foreground Message:', JSON.stringify(remoteMessage));
         });
 

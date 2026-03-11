@@ -11,7 +11,7 @@ const isWindows = platform === 'win32';
 
 console.log('🚀 Starting Safe T Net Backend...\n');
 
-const backendPath = path.join(__dirname, 'SafeTNet');
+const backendPath = __dirname;
 const venvPath = path.join(backendPath, 'venv');
 
 // Determine the command based on platform
@@ -38,11 +38,11 @@ const backendProcess = spawn(command, args, {
 
 backendProcess.on('error', (error) => {
   console.error('❌ Error starting backend:', error);
-  
+
   // If venv doesn't exist, run setup
   console.log('\n⚠️  Virtual environment not found. Running setup...\n');
   const { exec } = require('child_process');
-  
+
   exec('node setup.js', (error, stdout, stderr) => {
     if (error) {
       console.error('Setup failed:', error);

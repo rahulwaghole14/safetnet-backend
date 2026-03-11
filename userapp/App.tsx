@@ -20,6 +20,7 @@ import { getAsyncStorage } from './src/utils/asyncStorageInit';
 import { UpgradeModal } from './src/components/common/UpgradeModal';
 import { NetworkErrorToast } from './src/components/common/NetworkErrorToast';
 import { navigationRef } from './src/navigation/navigationRef';
+import { usePushNotifications } from './src/hooks/usePushNotifications';
 
 const RootStack = createStackNavigator();
 

@@ -5,6 +5,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
 from . import views_new_apis
+from users import views as views_user
 
 app_name = 'users'
 
@@ -49,6 +50,7 @@ urlpatterns = [
     # Nearby Help (for map view)
     path('nearby_help/', views_new_apis.nearby_help_map, name='nearby-help'),
     path('security_officers/', views_new_apis.security_officer_locations, name='security-officers'),
+    path('alerts/', views_user.AlertViewSet.as_view({'get': 'list'}), name='user-alerts'),
     path('public/live_location/<uuid:share_token>/', views_new_apis.PublicLiveLocationShareView.as_view(), name='public-live-location'),
     path('public/security_officers/', views_new_apis.public_security_officer_locations, name='public-security-officers'),
     

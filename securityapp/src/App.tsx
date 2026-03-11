@@ -69,7 +69,7 @@ function AuthPersistenceWrapper({ children }: { children: React.ReactNode }) {
 function AppContent() {
   const { currentTheme } = useTheme();
   // We need to check auth state from Redux
-  const isAuthenticated = useSelector((state: any) => !!state.auth.token);
+  const isAuthenticated = useSelector((state: any) => state.auth.isAuthenticated);
 
   // Initialize push notifications
   usePushNotifications(isAuthenticated);
