@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 from . import views
+from users import views as views_user
 
 router = DefaultRouter()
 router.register(r'sos', views.SOSAlertViewSet, basename='security-sos')
