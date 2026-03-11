@@ -16,6 +16,7 @@ urlpatterns = [
     
     # User profile management
     path('profile/', views.UserProfileView.as_view(), name='user-profile-current'),
+    path('profile/update-fcm-token/', views_user.UpdateFCMTokenView.as_view(), name='user-update-fcm-token'),
     path('<int:user_id>/', views.UserProfileView.as_view(), name='user-profile'),
     path('<int:user_id>/location/', views.UserLocationUpdateView.as_view(), name='user-location-update'),
     path('<int:user_id>/stats/', views.user_stats, name='user-stats'),

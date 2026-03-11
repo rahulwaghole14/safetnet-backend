@@ -26,7 +26,7 @@ let cachedApiBaseUrl: string | null = null;
 
 const getApiBaseUrl = async (): Promise<string> => {
   if (!cachedApiBaseUrl) {
-    console.log(`[API] Using local server: ${API_BASE_URL}`);
+    console.log(`[API] Using server: ${API_BASE_URL}`);
     cachedApiBaseUrl = API_BASE_URL;
   }
   return API_BASE_URL;
