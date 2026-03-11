@@ -6,8 +6,6 @@ This module provides safe, production-ready geospatial calculations.
 import math
 from typing import List, Tuple, Optional
 from decimal import Decimal
-from django.contrib.gis.geos import Point, Polygon
-from django.contrib.gis.measure import Distance
 from .models import UserLocation, Geofence
 
 
