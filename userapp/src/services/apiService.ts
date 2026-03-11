@@ -234,7 +234,7 @@ class ApiService {
     }
 
     // Add timeout to fetch request
-    const timeoutMs = 30000; // 30 seconds
+    const timeoutMs = 90000; // 90 seconds (increased for Render cold starts)
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -622,66 +622,25 @@ class ApiService {
     return result;
   }
 
-  /**
-   * Get alerts for user based on their geofences (with caching)
-   */
   async getAlerts(): Promise<any> {
     const cacheKey = 'user_alerts';
     try {
-      // Use the unified alerts endpoint at /api/user/alerts/
-      // This now returns alerts from the users_alert table filtered by user's geofences
-      const baseUrl = await getApiBaseUrl();
-      const url = `${baseUrl}/alerts/`;
-
-      console.log('[getAlerts] Fetching alerts from:', url);
-
+      // Use the internal request method which handles auth, timeouts, and logging consistently
       return await cacheService.getOrFetch(
         cacheKey,
         async () => {
-          const headers: Record<string, string> = {
-            'Content-Type': 'application/json',
-          };
-          if (this.accessToken) {
-            headers['Authorization'] = `Bearer ${this.accessToken}`;
-            console.log('[getAlerts] Using access token');
-          } else {
-            console.warn('[getAlerts] No access token available');
-          }
-
-          const response = await fetch(url, {
-            method: 'GET',
-            headers,
-          });
-
-          console.log('[getAlerts] Response status:', response.status);
-
-          if (!response.ok) {
-            const text = await response.text();
-            let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-            try {
-              const errorData = JSON.parse(text);
-              errorMessage = errorData.message || errorData.detail || errorMessage;
-            } catch {
-              errorMessage = text || errorMessage;
-            }
-            console.error('[getAlerts] Error response:', errorMessage);
-            throw new Error(errorMessage);
-          }
-
-          const data = await response.json();
-          console.log('[getAlerts] Response data type:', Array.isArray(data) ? 'array' : typeof data);
-          console.log('[getAlerts] Has results field:', 'results' in data);
+          const data = await this.request('/alerts/');
 
           // Handle paginated response (results field) or direct array
           const alerts = Array.isArray(data?.results) ? data.results : (Array.isArray(data) ? data : []);
-          console.log('[getAlerts] Returning', alerts.length, 'alerts');
+          console.log('[getAlerts] Successfully reached unified alerts endpoint, returning', alerts.length, 'alerts');
           return alerts;
         },
         { compareByHash: true }
       );
     } catch (error: any) {
-      console.error('[getAlerts] Error fetching alerts:', error);
-      // Return empty array on error instead of throwing
+      console.error('[getAlerts] Failed to fetch alerts:', error.message);
+      // Return empty array on error instead of throwing to avoid UI crash
       return [];
     }
   }
