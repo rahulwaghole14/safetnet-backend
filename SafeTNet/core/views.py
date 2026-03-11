@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
-@require_http_methods(["GET"])
+@require_http_methods(["GET", "HEAD"])
 def root_view(request):
     """
     Root API endpoint - provides API information
