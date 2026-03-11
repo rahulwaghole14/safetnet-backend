@@ -20,9 +20,62 @@ def root_view(request):
             'security_login': '/api/security/login/',
             'auth': '/api/auth/',
             'user_profile': '/api/user/',
+            'create_test_alert': '/api/create-test-alert/',
         },
         'status': 'running'
     })
+
+
+def create_test_alert(request):
+    """
+    Temporary endpoint to create a test alert for User 18
+    """
+    from users.models import User, Alert, Geofence
+    try:
+        user = User.objects.filter(id=18).first()
+        if not user:
+            # Try to find by username if ID fails, or just the first user
+            user = User.objects.first()
+            if not user:
+                return JsonResponse({'error': 'No users found in system'}, status=404)
+        
+        # Ensure user has at least one geofence
+        geofence = user.geofences.filter(active=True).first()
+        if not geofence:
+            # Find any active geofence
+            geofence = Geofence.objects.filter(active=True).first()
+            if not geofence:
+                return JsonResponse({'error': 'No active geofences found in system. Please create one in admin first.'}, status=400)
+            user.geofences.add(geofence)
+            user.save()
+            msg_prefix = f"Added Geofence '{geofence.name}' to user {user.id}. "
+        else:
+            msg_prefix = ""
+
+        # Create the alert
+        alert = Alert.objects.create(
+            user=user,
+            geofence=geofence,
+            title="SYSTEM TEST: High Priority Warning",
+            description="This is a test alert generated to verify the AlertsScreen display. If you see this, the system is working!",
+            status='ACTIVE',
+            alert_type='SYSTEM_ALERT',
+            severity='HIGH',
+            priority='high'
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': f"{msg_prefix}Created test alert: {alert.title}",
+            'alert_id': alert.id,
+            'user_id': user.id,
+            'geofence': geofence.name
+        })
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error creating test alert: {e}", exc_info=True)
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 @csrf_exempt
