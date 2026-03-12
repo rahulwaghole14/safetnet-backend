@@ -152,7 +152,12 @@ const AlertsScreen = () => {
             const alertTypeLower = alert.alert_type.toLowerCase();
             if (alertTypeLower.includes('geofence')) {
               alertType = 'geofence';
-            } else if (alertTypeLower.includes('security') || alertTypeLower.includes('breach') || alertTypeLower.includes('emergency')) {
+            } else if (
+              alertTypeLower.includes('security') || 
+              alertTypeLower.includes('breach') || 
+              alertTypeLower.includes('emergency') ||
+              alertTypeLower.includes('officer')
+            ) {
               alertType = 'emergency';
             }
           }

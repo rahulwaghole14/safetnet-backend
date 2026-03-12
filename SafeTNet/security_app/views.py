@@ -22,8 +22,9 @@ from .models import SOSAlert, Case, Incident, OfficerProfile, Notification, Live
 # SecurityOfficer model removed - using User with role='security_officer' instead
 # from users.models import SecurityOfficer, Geofence
 from django.contrib.auth import get_user_model
-from users.models import Geofence
+from users.models import Geofence, Alert
 from .models import OfficerAlert, AlertRead
+from .fcm_service import fcm_service
 from .serializers import UnifiedAlertSerializer, OfficerAlertSerializer
 
 User = get_user_model()
@@ -126,10 +127,22 @@ class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
             logger.info(f"[SECURITY QUERIES] Super-admin {user.email} sees all alerts")
             return base_queryset
 
-        # For Users → show only their own alerts
+        # For Users → show their own alerts AND officer alerts for their geofences
         elif user.role == 'USER':
-            logger.info(f"[SECURITY QUERIES] User {user.email} sees their own alerts")
-            return base_queryset.filter(user=user, created_by_role='USER')
+            # Users see:
+            # 1. Their own alerts (USER-created)
+            # 2. OFFICER-created alerts in geofences they are part of
+            user_geofences = user.geofences.filter(active=True)
+            geofence_ids = list(user_geofences.values_list('id', flat=True))
+            
+            logger.info(f"[SECURITY QUERIES] User {user.email} has {len(geofence_ids)} geofences: {geofence_ids}")
+            
+            queryset = base_queryset.filter(
+                Q(user=user, created_by_role='USER') |
+                Q(created_by_role='OFFICER', geofence_id__in=geofence_ids)
+            )
+            logger.info(f"[SECURITY QUERIES] Found {queryset.count()} alerts for user {user.email}")
+            return queryset
 
         # For other users → no alerts
         logger.info(f"[SECURITY QUERIES] User {user.email} (role: {user.role}) has no access to alerts")
@@ -362,45 +375,40 @@ class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
         Send high-priority push notifications to affected users.
         This method implements the notification delivery security requirements.
         """
-        from django.utils import timezone
+        from .fcm_service import fcm_service
         
         try:
-            logger.info(f"📱 Sending notifications for alert {alert.id} to {len(affected_users)} users")
+            logger.info(f"📱 Sending real push notifications for alert {alert.id} to {len(affected_users)} users")
             
-            # In a real implementation, this would integrate with your push notification service
-            # For now, we'll simulate the notification sending and update the alert metadata
+            # Extract actual User objects from UserLocation query result
+            users_to_notify = [ul.user for ul in affected_users]
             
-            notification_count = 0
-            failed_notifications = []
+            # Use FCM service to send to multiple users at once
+            success = fcm_service.send_to_users(
+                users_to_notify,
+                title=f"Security Alert: {alert.alert_type.replace('_', ' ').title()}",
+                body=alert.message or "An emergency alert has been issued for your area.",
+                data={
+                    "alert_id": str(alert.id),
+                    "alert_type": alert.alert_type,
+                    "latitude": str(alert.location_lat),
+                    "longitude": str(alert.location_long),
+                    "priority": alert.priority
+                }
+            )
             
-            for user_location in affected_users:
-                user = user_location.user
-                
-                try:
-                    # Simulate push notification sending
-                    # In production, replace this with actual push notification service call
-                    # Example: send_push_notification(user, alert)
-                    
-                    logger.info(f"📤 Notification sent to user: {user.username}")
-                    notification_count += 1
-                    
-                except Exception as e:
-                    logger.error(f"❌ Failed to send notification to {user.username}: {str(e)}")
-                    failed_notifications.append(user.username)
-            
-            # Update alert with notification metadata
-            alert.notification_sent = True
-            alert.notification_sent_at = timezone.now()
-            alert.save(update_fields=['notification_sent', 'notification_sent_at'])
-            
-            logger.info(f"✅ Notifications sent: {notification_count}, Failed: {len(failed_notifications)}")
-            
-            if failed_notifications:
-                logger.warning(f"⚠️ Failed notifications for users: {failed_notifications}")
+            if success:
+                # Update alert with notification metadata
+                alert.notification_sent = True
+                alert.notification_sent_at = timezone.now()
+                alert.save(update_fields=['notification_sent', 'notification_sent_at'])
+                logger.info(f"✅ Real push notifications sent successfully for alert {alert.id}")
+            else:
+                logger.warning(f"⚠️ FCM service reported failure or no tokens for alert {alert.id}")
                 
         except Exception as e:
-            logger.error(f"❌ Critical error in notification sending: {str(e)}")
-            # Don't fail the alert creation if notifications fail, but log the error
+            logger.error(f"❌ Error in real notification sending: {str(e)}")
+            logger.error(traceback.format_exc())
 
     @action(detail=True, methods=['patch'])
     def resolve(self, request, pk=None):
@@ -409,6 +417,7 @@ class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
         # Permission checks are now handled by get_permissions() and IsOwnerAndPendingAlert
         alert.status = 'resolved'
         alert.save()
+
         serializer = self.get_serializer(alert)
         return Response(serializer.data)
 

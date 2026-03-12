@@ -170,14 +170,19 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
         elif instance.created_by_role == 'OFFICER':
             try:
                 logger.info(f"🔄 Syncing OFFICER alert {instance.id} to unified feed...")
-                # get users in geofence
+                
+                # Get users in geofence based on LIVE location, not just static assignment
                 if instance.geofence:
-                    users_to_notify = User.objects.filter(geofences=instance.geofence, is_active=True)
+                    from .geo_utils import get_users_in_geofence
+                    affected_locations = get_users_in_geofence(instance.geofence)
+                    users_to_notify = [ul.user for ul in affected_locations]
+                    logger.info(f"📍 Found {len(users_to_notify)} users currently in geofence {instance.geofence.name}")
                 else:
                     users_to_notify = User.objects.filter(is_active=True)
+
                 fcm_service.send_to_users(
                     users_queryset=users_to_notify,
-                    title=f"Security Alert: {instance.alert_type}",
+                    title=f"Security Alert: {instance.alert_type.replace('_', ' ').title()}",
                     body=instance.message[:100],
                     data={
                         'type': 'area_security_alert',
@@ -209,6 +214,20 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 logger.info(f"Successfully synced SOSAlert {instance.id} to users.Alert table")
             except Exception as e:
                 logger.error(f"Failed to broadcast/sync alert to users: {str(e)}")
+        else:
+            # Handle status updates (sync to users.Alert)
+            if instance.created_by_role == 'OFFICER':
+                try:
+                    from users.models import Alert
+                    from django.utils import timezone
+                    Alert.objects.filter(metadata__sos_alert_id=instance.id).update(
+                        status='RESOLVED' if instance.status == 'resolved' else instance.status.upper(),
+                        is_resolved=(instance.status == 'resolved'),
+                        resolved_at=timezone.now() if instance.status == 'resolved' else None
+                    )
+                    logger.info(f"Successfully synced status update for SOSAlert {instance.id} to users.Alert")
+                except Exception as e:
+                    logger.error(f"Failed to sync status update to users.Alert: {str(e)}")
 
 
 @receiver(post_save, sender=OfficerAlert)

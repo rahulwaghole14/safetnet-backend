@@ -237,11 +237,18 @@ class EmergencyService:
         latitude = latitude if latitude is not None else 0.0
         longitude = longitude if longitude is not None else 0.0
 
+        # Note: SOSAlert creation is now handled by the sync_sos_event_to_security_alert signal 
+        # in security_app/signals.py which triggers on SOSEvent.objects.create().
+        # We only need to handle FCM notifications here if we want bypass logic or keep it clean.
+        # However, signals.py also handles notifications for SOSAlert.
+        
+        # Let's get the security alert if it exists (created by signal)
+        from .models import SOSEvent
         try:
-            security_alert = None  # Remove alert creation - handled by security_app
-        except Exception as create_error:
-            logger.error("Security app handles alert creation: %s", create_error)
-            return None
+            from security_app.models import SOSAlert
+            security_alert = SOSAlert.objects.filter(source_sos_event=sos_event).first()
+        except:
+            security_alert = None
 
         User = get_user_model()
         officers_qs = User.objects.filter(role='security_officer', is_active=True)
