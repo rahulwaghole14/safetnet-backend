@@ -104,22 +104,32 @@ class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
 
             logger.info(f"[SECURITY QUERIES] Officer {user.email} has {len(geofence_ids)} assigned geofences: {geofence_ids}")
 
-            # Filter alerts by officer's geofences OR alerts assigned directly to them
+            # Filter alerts by:
+            # 1. Officer's assigned geofences
+            # 2. Alerts assigned directly to them
+            # 3. Alerts from users in their organization (if they have one)
+            org_filter = Q(user__organization=user.organization) if user.organization else Q()
+            
             queryset = base_queryset.filter(
-                Q(geofence_id__in=geofence_ids) | Q(assigned_officer=user)
-            )
+                Q(geofence_id__in=geofence_ids) | 
+                Q(assigned_officer=user) |
+                org_filter
+            ).distinct()
 
             logger.info(f"[SECURITY QUERIES] Found {queryset.count()} alerts for officer {user.email}")
             return queryset
 
-        # For Sub-Admins → show alerts in their organization's geofences
+        # For Sub-Admins → show alerts in their organization's geofences OR for users in their organization
         elif user.role == 'SUB_ADMIN' and hasattr(user, 'organization') and user.organization:
             org_geofences = user.organization.geofences.filter(active=True)
             geofence_ids = list(org_geofences.values_list('id', flat=True))
 
             logger.info(f"[SECURITY QUERIES] Sub-admin {user.email} has {len(geofence_ids)} org geofences")
 
-            queryset = base_queryset.filter(geofence_id__in=geofence_ids)
+            queryset = base_queryset.filter(
+                Q(geofence_id__in=geofence_ids) | 
+                Q(user__organization=user.organization)
+            ).distinct()
             return queryset
 
         # For Super Admins → see all alerts
@@ -149,7 +159,7 @@ class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
         return SOSAlert.objects.none()
 
     def perform_create(self, serializer):
-        """Create SOSAlert in security_app instead of users Alert table."""
+        """Create SOSAlert in security_app using serializer.save()."""
         from users.utils import get_geofence_from_location
 
         request = self.request
@@ -161,12 +171,12 @@ class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
             location_lat = validated_data.get('location_lat')
             location_long = validated_data.get('location_long')
 
-            # Find geofence for this location (officers create alerts for their assigned geofences)
+            # Find geofence for this location
             geofence = None
             if location_lat and location_long:
                 geofence = get_geofence_from_location(float(location_lat), float(location_long))
                 if not geofence:
-                    # If no geofence found, use officer's primary geofence
+                    # If no geofence found, use officer's assigned geofence if available
                     officer_geofences = user.geofences.filter(active=True)
                     if officer_geofences.exists():
                         geofence = officer_geofences.first()
@@ -176,25 +186,18 @@ class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
             # Set created_by_role based on user role
             created_by_role = 'OFFICER' if user.role == 'security_officer' else 'USER'
 
-            # Create alert in security_app SOSAlert table
-            sos_alert = SOSAlert.objects.create(
+            # Save via serializer to set serializer.instance correctly
+            instance = serializer.save(
                 user=user,
                 created_by_role=created_by_role,
-                alert_type=validated_data.get('alert_type', 'security'),
-                message=validated_data.get('message', ''),
-                description=validated_data.get('description', ''),
                 location_lat=float(location_lat) if location_lat else None,
                 location_long=float(location_long) if location_long else None,
                 geofence=geofence,
-                priority=validated_data.get('priority', 'medium'),
-                status='pending',  # SOSAlert uses 'pending' not 'ACTIVE'
+                status='pending',
                 assigned_officer=user if user.role == 'security_officer' else None
             )
 
-            logger.info(f"[OFFICER ALERT] Created SOSAlert ID {sos_alert.id} for user {user.email}")
-
-            # Return the created SOSAlert instance
-            return sos_alert
+            logger.info(f"[OFFICER ALERT] Created SOSAlert ID {instance.id} for user {user.email}")
 
         except Exception as e:
             logger.error(f"[OFFICER ALERT] Error creating SOSAlert: {e}", exc_info=True)

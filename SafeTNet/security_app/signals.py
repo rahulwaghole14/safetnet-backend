@@ -108,8 +108,8 @@ def update_sos_alert_status_on_case_delete(sender, instance, **kwargs):
 def send_sos_alert_notification(sender, instance, created, **kwargs):
     """
     Send FCM notification when a new SOS alert is created
-    """
-    if created:  # Only for new SOS alerts
+    """        # Notification logic for new alerts
+    if created:
         from django.contrib.auth import get_user_model
         User = get_user_model()
         
@@ -150,9 +150,8 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 )
             except Exception as e:
                 logger.error(f"Failed to send notification to officer {officer.username}: {str(e)}")
-                # Continue with other officers, don't fail the alert creation
 
-        # Also send user notifications based on role
+        # Also send user confirmation
         if instance.created_by_role == 'USER':
             try:
                 fcm_service.send_to_user(
@@ -166,12 +165,42 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 )
             except Exception as e:
                 logger.error(f"Failed to send confirmation to user {instance.user.username}: {str(e)}")
-                
-        elif instance.created_by_role == 'OFFICER':
-            try:
-                logger.info(f"🔄 Syncing OFFICER alert {instance.id} to unified feed...")
-                
-                # Get users in geofence based on LIVE location, not just static assignment
+
+        # Sync ALL new SOSAlerts to the unified users.Alert feed
+        # This ensures users see their own SOS and Officer-created alerts in the feed
+        try:
+            from users.models import Alert
+            
+            alert_type = 'USER_SOS' if instance.created_by_role == 'USER' else 'OFFICER_ALERT'
+            title = "Emergency SOS Triggered" if instance.created_by_role == 'USER' else f"Security Alert: {instance.alert_type.title().replace('_', ' ')}"
+            
+            # For area alerts, we might want to notify all users in the geofence (already handled for OFFICER alerts below)
+            # But for User SOS, it just needs to be in their own feed history.
+            
+            Alert.objects.create(
+                user=instance.user,
+                alert_type=alert_type,
+                title=title,
+                description=instance.description or instance.message,
+                message=instance.message,
+                location={
+                    'latitude': instance.location_lat,
+                    'longitude': instance.location_long
+                },
+                geofence=instance.geofence,
+                priority=instance.priority,
+                severity='HIGH' if instance.priority == 'high' else 'MEDIUM',
+                status='ACTIVE' if instance.status == 'pending' else instance.status.upper(),
+                metadata={
+                    'sos_alert_id': instance.id,
+                    'original_type': instance.alert_type
+                }
+            )
+            logger.info(f"Successfully synced SOSAlert {instance.id} ({instance.created_by_role}) to users.Alert table")
+
+            # If this is an OFFICER alert, broadcast to users in the area
+            if instance.created_by_role == 'OFFICER':
+                logger.info(f"🔄 Broadcasting OFFICER alert {instance.id} to users...")
                 if instance.geofence:
                     from .geo_utils import get_users_in_geofence
                     affected_locations = get_users_in_geofence(instance.geofence)
@@ -189,45 +218,25 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                         'sos_alert_id': str(instance.id),
                     }
                 )
+        except Exception as e:
+            logger.error(f"Failed to sync/broadcast alert to users: {str(e)}")
 
-                # Sync to unified users.Alert table so userapp can see it in the feed
-                from users.models import Alert
-                Alert.objects.create(
-                    user=instance.user,
-                    alert_type='OFFICER_ALERT',
-                    title=f"Security Alert: {instance.alert_type.title().replace('_', ' ')}",
-                    description=instance.description or instance.message,
-                    message=instance.message,
-                    location={
-                        'latitude': instance.location_lat,
-                        'longitude': instance.location_long
-                    },
-                    geofence=instance.geofence,
-                    priority=instance.priority,
-                    severity='HIGH' if instance.priority == 'high' else 'MEDIUM',
-                    status='ACTIVE' if instance.status == 'pending' else instance.status.upper(),
-                    metadata={
-                        'sos_alert_id': instance.id,
-                        'original_type': instance.alert_type
-                    }
-                )
-                logger.info(f"Successfully synced SOSAlert {instance.id} to users.Alert table")
-            except Exception as e:
-                logger.error(f"Failed to broadcast/sync alert to users: {str(e)}")
-        else:
-            # Handle status updates (sync to users.Alert)
-            if instance.created_by_role == 'OFFICER':
-                try:
-                    from users.models import Alert
-                    from django.utils import timezone
-                    Alert.objects.filter(metadata__sos_alert_id=instance.id).update(
-                        status='RESOLVED' if instance.status == 'resolved' else instance.status.upper(),
-                        is_resolved=(instance.status == 'resolved'),
-                        resolved_at=timezone.now() if instance.status == 'resolved' else None
-                    )
-                    logger.info(f"Successfully synced status update for SOSAlert {instance.id} to users.Alert")
-                except Exception as e:
-                    logger.error(f"Failed to sync status update to users.Alert: {str(e)}")
+    # Status Update Sync (for both new and existing alerts)
+    else:
+        try:
+            from users.models import Alert
+            from django.utils import timezone
+            
+            # Update the unified feed when SOSAlert status changes
+            num_updated = Alert.objects.filter(metadata__sos_alert_id=instance.id).update(
+                status='RESOLVED' if instance.status == 'resolved' else instance.status.upper(),
+                is_resolved=(instance.status == 'resolved'),
+                resolved_at=timezone.now() if instance.status == 'resolved' else None
+            )
+            if num_updated > 0:
+                logger.info(f"Successfully updated status for SOSAlert {instance.id} in users.Alert feed")
+        except Exception as e:
+            logger.error(f"Failed to sync status update to users.Alert: {str(e)}")
 
 
 @receiver(post_save, sender=OfficerAlert)
