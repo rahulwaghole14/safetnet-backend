@@ -227,7 +227,14 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
             from users.models import Alert
             from django.utils import timezone
             
-            # Update the unified feed when SOSAlert status changes
+            # 1. Handle Soft Deletion: If SOSAlert is marked deleted, remove from User App feed
+            if instance.is_deleted:
+                deleted_count, _ = Alert.objects.filter(metadata__sos_alert_id=instance.id).delete()
+                if deleted_count > 0:
+                    logger.info(f"🗑️ Soft-sync: Deleted {deleted_count} alerts from users.Alert for SOSID {instance.id}")
+                return
+
+            # 2. Update the unified feed when SOSAlert status changes
             num_updated = Alert.objects.filter(metadata__sos_alert_id=instance.id).update(
                 status='RESOLVED' if instance.status == 'resolved' else instance.status.upper(),
                 is_resolved=(instance.status == 'resolved'),
@@ -237,6 +244,20 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 logger.info(f"Successfully updated status for SOSAlert {instance.id} in users.Alert feed")
         except Exception as e:
             logger.error(f"Failed to sync status update to users.Alert: {str(e)}")
+
+
+@receiver(post_delete, sender=SOSAlert)
+def cleanup_user_alert_on_sos_delete(sender, instance, **kwargs):
+    """
+    Ensure users.Alert is removed if SOSAlert is physically deleted
+    """
+    try:
+        from users.models import Alert
+        deleted_count, _ = Alert.objects.filter(metadata__sos_alert_id=instance.id).delete()
+        if deleted_count > 0:
+            logger.info(f"🔥 Hard-sync: Cleaned up {deleted_count} user alerts following SOSAlert {instance.id} deletion")
+    except Exception as e:
+        logger.error(f"Failed to cleanup users.Alert on SOS delete: {str(e)}")
 
 
 @receiver(post_save, sender=OfficerAlert)

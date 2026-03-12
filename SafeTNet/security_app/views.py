@@ -1471,7 +1471,7 @@ class UserAlertViewSet(viewsets.ReadOnlyModelViewSet):
             })
         
         # 2. SOS SAFETY NOTIFICATIONS (User's SOS status updates)
-        sos_alerts = SOSAlert.objects.filter(user=user).order_by('-created_at')[:10]
+        sos_alerts = SOSAlert.objects.filter(user=user, is_deleted=False).order_by('-created_at')[:10]
         
         for sos in sos_alerts:
             all_alerts.append({
