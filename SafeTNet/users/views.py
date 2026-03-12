@@ -499,14 +499,14 @@ class AlertViewSet(ModelViewSet):
             # 2. Any alert created by the user themselves
             # 3. Any OFFICER_ALERT from the same organization (or any if user has no org)
             
-            visibility_query = models.Q(geofence_id__in=geofence_ids) | models.Q(user=user)
+            visibility_query = Q(geofence_id__in=geofence_ids) | Q(user=user)
             
             if user.organization:
                 # If user has an organization, show officer alerts for that organization
-                visibility_query |= models.Q(alert_type='OFFICER_ALERT', user__organization=user.organization)
+                visibility_query |= Q(alert_type='OFFICER_ALERT', user__organization=user.organization)
             else:
                 # If user has NO organization, show ALL officer alerts (assume public safety)
-                visibility_query |= models.Q(alert_type='OFFICER_ALERT')
+                visibility_query |= Q(alert_type='OFFICER_ALERT')
                 
             queryset = queryset.filter(visibility_query).distinct()
             

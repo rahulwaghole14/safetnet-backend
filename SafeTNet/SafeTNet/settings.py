@@ -143,29 +143,23 @@ def get_database_config():
         else:
             print("No DATABASE_URL found, using fallback Neon config")
 
-    # Always use PostgreSQL for multi-platform support
     if database_url:
         print("Configuring PostgreSQL from DATABASE_URL")
         try:
             db_config = dj_database_url.parse(database_url, conn_max_age=600, ssl_require=True)
             print(f"Database config parsed successfully")
-            print(f"   Engine: {db_config.get('ENGINE', 'Unknown')}")
-            print(f"   Host: {db_config.get('HOST', 'Unknown')}")
-            print(f"   Name: {db_config.get('NAME', 'Unknown')}")
             return db_config
         except Exception as e:
             print(f"Error parsing DATABASE_URL: {e}")
-            # Continue to fallback configuration
+            raise e
     else:
-        print("DATABASE_URL not found, using fallback Neon PostgreSQL config")
-
-    # Fallback Neon PostgreSQL configuration
-    print("Using fallback Neon PostgreSQL configuration")
-    return dj_database_url.parse(
-        'postgresql://neondb_owner:npg_Q6V0LwCybNvY@ep-red-queen-ahjbhshv-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
-        conn_max_age=600,
-        ssl_require=True
-    )
+        # If no URL found, use a default local sqlite for safety during builds/tests
+        # but warn that production features require DATABASE_URL
+        print("WARNING: DATABASE_URL not found. Falling back to SQLite.")
+        return {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
 
 DATABASES = {
     'default': get_database_config(),
