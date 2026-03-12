@@ -25,4 +25,4 @@ Thumbs.db
 #other
 *.lock
 *.env
-
+.env

@@ -459,6 +459,19 @@ AUTH_USER_MODEL = 'users.User'
 GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY', default=None)
 
 # Firebase Cloud Messaging Configuration
+FIREBASE_CONFIG = {
+    "type": config('FIREBASE_TYPE', default='service_account'),
+    "project_id": config('FIREBASE_PROJECT_ID', default=None),
+    "private_key_id": config('FIREBASE_PRIVATE_KEY_ID', default=None),
+    "private_key": config('FIREBASE_PRIVATE_KEY', default='').replace('\\n', '\n').strip('"'),
+    "client_email": config('FIREBASE_CLIENT_EMAIL', default=None),
+    "client_id": config('FIREBASE_CLIENT_ID', default=None),
+    "auth_uri": config('FIREBASE_AUTH_URI', default='https://accounts.google.com/o/oauth2/auth'),
+    "token_uri": config('FIREBASE_TOKEN_URI', default='https://oauth2.googleapis.com/token'),
+    "auth_provider_x509_cert_url": config('FIREBASE_AUTH_PROVIDER_CERT_URL', default='https://www.googleapis.com/oauth2/v1/certs'),
+    "client_x509_cert_url": config('FIREBASE_CLIENT_CERT_URL', default=None),
+    "universe_domain": config('FIREBASE_UNIVERSE_DOMAIN', default='googleapis.com'),
+}
 FCM_SERVER_KEY = config('FCM_SERVER_KEY', default=None)
 
 # Email Configuration
