@@ -1,0 +1,5 @@
+<resources>
+    <color name="white">#FFFFFF</color>
+    <color name="primary">#2563EB</color>
+    <color name="emergency_red">#DC2626</color>
+</resources>
