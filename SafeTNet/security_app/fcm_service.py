@@ -64,6 +64,28 @@ class FCMService:
                 for k, v in data.items():
                     data_payload[str(k)] = str(v)
 
+            # Android-specific configuration for high priority and loud alerts
+            android_config = messaging.AndroidConfig(
+                priority='high',
+                notification=messaging.AndroidNotification(
+                    channel_id='sos_alerts',  # App must have this channel configured
+                    priority='max',
+                    sound='default',
+                    click_action='OPEN_SOS_ALERT',
+                )
+            )
+
+            # Apple-specific configuration
+            apns_config = messaging.APNSConfig(
+                payload=messaging.APNSPayload(
+                    aps=messaging.Aps(
+                        sound='default',
+                        content_available=True,
+                        category='SOS_ALERT'
+                    ),
+                ),
+            )
+
             # Convert each token to a Message object
             messages = [
                 messaging.Message(
@@ -72,11 +94,14 @@ class FCMService:
                         body=body,
                     ),
                     data=data_payload,
+                    android=android_config,
+                    apns=apns_config,
                     token=token,
                 ) for token in registration_tokens
             ]
             
-            response = messaging.send_each_for_multicast(messaging.BatchMessage(messages=messages)) if hasattr(messaging, 'BatchMessage') else messaging.send_each(messages)
+            # send_each is the modern batch replacement in Firebase Admin SDK 6.x+
+            response = messaging.send_each(messages)
             
             # Note: messaging.send_each(messages) is the most modern way in SDK 6.x
             # Let's try send_each directly if send_each_for_multicast is tricky

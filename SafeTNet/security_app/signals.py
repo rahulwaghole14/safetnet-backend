@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from .models import Case, SOSAlert, Notification, OfficerAlert
 from .fcm_service import fcm_service
 import logging
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -113,19 +114,31 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
         from django.contrib.auth import get_user_model
         User = get_user_model()
         
-        # Get all active security officers (Users with role='security_officer') in the same organization
-        if instance.user.organization:
+        # Get all active security officers (Users with role='security_officer')
+        user_org = instance.user.organization
+        logger.info(f"--- SOS Alert Signal Debug ---")
+        logger.info(f"Triggered by: {instance.user.username} (Org: {user_org})")
+        logger.info(f"DEBUG Mode: {settings.DEBUG}")
+        
+        # In DEBUG mode, notify ALL active officers regardless of organization to simplify testing
+        if settings.DEBUG:
+            logger.info("DEBUG mode detected - bypassing organization filter for notifications")
+            officers = User.objects.filter(role='security_officer', is_active=True)
+        elif user_org:
             officers = User.objects.filter(
                 role='security_officer',
-                organization=instance.user.organization,
+                organization=user_org,
                 is_active=True
             )
         else:
-            # If no organization, notify all active security officers
+            # If no organization and not in DEBUG, notify all active security officers as fallback
             officers = User.objects.filter(role='security_officer', is_active=True)
+        
+        logger.info(f"Found {officers.count()} security officers to notify")
         
         # Create notifications and send FCM
         for officer in officers:
+            logger.info(f"Attempting to notify officer: {officer.username} (Tokens: {len(getattr(officer, 'fcm_tokens', []))})")
             try:
                 # Create database notification
                 notification = Notification.objects.create(

@@ -8,8 +8,8 @@ export const ENABLE_API_CALLS = true; // Enabled for local development
 // Deployed backend URL: https://safetnet.onrender.com
 // Local development URL: http://localhost:8000 (for emulator/simulator only)
 // Using deployed backend for production
-// const BACKEND_BASE_URL = 'https://safetnet-backend-1.onrender.com';
-const BACKEND_BASE_URL = 'http://10.0.2.2:8000'; // Local backend for emulator
+const BACKEND_BASE_URL = 'https://safetnet-backend-1.onrender.com';
+// const BACKEND_BASE_URL = 'http://10.0.2.2:8081'; // Local backend for emulator
 
 export default {
   BASE_URL: BACKEND_BASE_URL,

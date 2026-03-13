@@ -272,9 +272,10 @@ class EmergencyService:
             except Exception as notification_error:
                 logger.error("Failed to notify officer %s: %s", officer.id, notification_error)
 
+        alert_id = security_alert.id if security_alert else "SYNC_IN_PROGRESS"
         logger.info(
             "Security SOS alert #%s created for %s (officers notified: %s)",
-            security_alert.id,
+            alert_id,
             getattr(user, 'email', 'unknown'),
             notified
         )
