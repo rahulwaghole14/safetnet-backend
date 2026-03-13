@@ -147,7 +147,7 @@ def get_database_config():
         print("Configuring PostgreSQL from DATABASE_URL")
         try:
             db_config = dj_database_url.parse(database_url, conn_max_age=600, ssl_require=True)
-            print(f"Database config parsed successfully")
+            print(f"Database config parsed successfully: {db_config.get('HOST')}")
             return db_config
         except Exception as e:
             print(f"Error parsing DATABASE_URL: {e}")

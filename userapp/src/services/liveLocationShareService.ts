@@ -96,7 +96,7 @@ export const startLiveLocationShareUpdates = async (
         console.log(`🌍 Longitude: ${lng}`);
         console.log(`📊 Accuracy: ${accuracy}m`);
         console.log(`🕐 Timestamp: ${new Date().toISOString()}`);
-        console.log(`📡 Sending to backend: https://safetnet-backend.onrender.com/api/user/${activeSession.userId}/live_location/${activeSession.sessionId}/`);
+        console.log(`📡 Sending to backend: ${apiService.getBaseUrl()}/${activeSession.userId}/live_location/${activeSession.sessionId}/`);
         console.log(`📦 Payload: {"latitude": ${lat}, "longitude": ${lng}}`);
         console.log('═══════════════════════════════════════════════════════════');
         
@@ -200,7 +200,7 @@ export const stopLiveLocationShareUpdates = async () => {
  * Get live share base URL
  */
 const getLiveShareBaseUrl = (): string => {
-  const base = 'https://safetnet-backend.onrender.com/live-share';
+  const base = `${apiService.getBackendBaseUrl()}/live-share`;
   return base.endsWith('/') ? base.slice(0, -1) : base;
 };
 

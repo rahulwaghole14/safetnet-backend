@@ -151,7 +151,7 @@ const {width} = Dimensions.get('window');
 
 // Live share base URL
 const getLiveShareBaseUrl = (): string => {
-  const base = 'https://safetnet-backend.onrender.com/live-share';
+  const base = `${apiService.getBackendBaseUrl()}/live-share`;
   return base.endsWith('/') ? base.slice(0, -1) : base;
 };
 

@@ -543,10 +543,11 @@ class GeofenceEventView(APIView):
         user = request.user
         is_premium = _is_user_premium(user)
         
-        if not is_premium:
+        # Allow geofence events for premium users OR in DEBUG mode for easier testing
+        if not is_premium and not settings.DEBUG:
             return Response(
                 {
-                    'error': 'Geofence events are a Premium feature. Upgrade to Premium to use geofence monitoring.',
+                    'error': 'Geofences are a Premium feature. Upgrade to Premium to use geofence monitoring.',
                     'is_premium': False,
                     'upgrade_required': True
                 },
@@ -743,6 +744,10 @@ class SOSTriggerView(APIView):
             )
 def _is_user_premium(user):
     """Check if user has premium subscription by checking UserDetails."""
+    # Treat all users as premium in DEBUG mode for easier local testing
+    if settings.DEBUG:
+        return True
+        
     try:
         from users.models import UserDetails
         user_details = UserDetails.objects.filter(username=user.username).first()

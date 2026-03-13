@@ -1,0 +1,100 @@
+2026-03-12T10:58:48.240941455Z   File "/opt/render/project/src/SafeTNet/security_app/signals.py", line 4, in <module>
+2026-03-12T10:58:48.240944855Z     from .fcm_service import fcm_service
+2026-03-12T10:58:48.240947545Z   File "/opt/render/project/src/SafeTNet/security_app/fcm_service.py", line 1, in <module>
+2026-03-12T10:58:48.240950046Z     import firebase_admin
+2026-03-12T10:58:48.240952586Z ModuleNotFoundError: No module named 'firebase_admin'
+2026-03-12T10:58:48.240980116Z [2026-03-12 10:58:48 +0000] [55] [INFO] Worker exiting (pid: 55)
+2026-03-12T10:58:48.241170071Z ALLOWED_HOSTS: ['localhost', '127.0.0.1', 'safetnet.onrender.com', 'safetnet-backend.onrender.com', '192.168.0.125', 'safetnet.onrender.com', 'safetnet-backend.onrender.com', 'safetnet-backend-1.onrender.com', '192.168.0.125', '192.168.1.26', '192.168.0.100', 'safetnet-backend-1.onrender.com']
+2026-03-12T10:58:48.241179761Z RENDER environment: true
+2026-03-12T10:58:48.241183351Z DATABASE_URL present: True
+2026-03-12T10:58:48.241186031Z Environment check:
+2026-03-12T10:58:48.241188601Z    DEBUG: True
+2026-03-12T10:58:48.241191871Z    RENDER: True
+2026-03-12T10:58:48.241195111Z    RENDER_SERVICE_ID: srv-d6n9pt5m5p6s7389456g
+2026-03-12T10:58:48.241197841Z    DATABASE_URL present: True
+2026-03-12T10:58:48.241201081Z Using DATABASE_URL: postgresql://neondb_owner:npg_Q6V0LwCybNvY@ep-red-...
+2026-03-12T10:58:48.241203292Z Configuring PostgreSQL from DATABASE_URL
+2026-03-12T10:58:48.241205672Z Database config parsed successfully
+2026-03-12T10:58:48.241207962Z === DATABASE CONFIGURATION (DEBUG MODE) ===
+2026-03-12T10:58:48.241210342Z Database Engine: django.db.backends.postgresql
+2026-03-12T10:58:48.241213052Z Database Name: neondb
+2026-03-12T10:58:48.241215462Z Database Host: ep-red-queen-ahjbhshv-pooler.c-3.us-east-1.aws.neon.tech
+2026-03-12T10:58:48.241217742Z Database Port: 
+2026-03-12T10:58:48.241220102Z Database User: neondb_owner
+2026-03-12T10:58:48.241222412Z SSL Mode: require
+2026-03-12T10:58:48.241224892Z ===========================================
+2026-03-12T10:58:48.283833876Z [2026-03-12 10:58:48 +0000] [54] [ERROR] Exception in worker process
+2026-03-12T10:58:48.283845376Z ALLOWED_HOSTS: ['localhost', '127.0.0.1', 'safetnet.onrender.com', 'safetnet-backend.onrender.com', '192.168.0.125', 'safetnet.onrender.com', 'safetnet-backend.onrender.com', 'safetnet-backend-1.onrender.com', '192.168.0.125', '192.168.1.26', '192.168.0.100', 'safetnet-backend-1.onrender.com']
+2026-03-12T10:58:48.283853987Z Traceback (most recent call last):
+2026-03-12T10:58:48.283857807Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+2026-03-12T10:58:48.283861257Z     worker.init_process()
+2026-03-12T10:58:48.283863447Z     ~~~~~~~~~~~~~~~~~~~^^
+2026-03-12T10:58:48.283865707Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/workers/gthread.py", line 92, in init_process
+2026-03-12T10:58:48.283868237Z     super().init_process()
+2026-03-12T10:58:48.283889388Z     ~~~~~~~~~~~~~~~~~~~~^^
+2026-03-12T10:58:48.283892417Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/workers/base.py", line 134, in init_process
+2026-03-12T10:58:48.283895317Z     self.load_wsgi()
+2026-03-12T10:58:48.283897608Z     ~~~~~~~~~~~~~~^^
+2026-03-12T10:58:48.283899908Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+2026-03-12T10:58:48.283902438Z     self.wsgi = self.app.wsgi()
+2026-03-12T10:58:48.283904578Z                 ~~~~~~~~~~~~~^^
+2026-03-12T10:58:48.283913208Z RENDER environment: true
+2026-03-12T10:58:48.283916758Z DATABASE_URL present: True
+2026-03-12T10:58:48.283919268Z Environment check:
+2026-03-12T10:58:48.283921488Z    DEBUG: True
+2026-03-12T10:58:48.283923708Z    RENDER: True
+2026-03-12T10:58:48.283926468Z    RENDER_SERVICE_ID: srv-d6n9pt5m5p6s7389456g
+2026-03-12T10:58:48.283928668Z    DATABASE_URL present: True
+2026-03-12T10:58:48.283931869Z Using DATABASE_URL: postgresql://neondb_owner:npg_Q6V0LwCybNvY@ep-red-...
+2026-03-12T10:58:48.283934278Z Configuring PostgreSQL from DATABASE_URL
+2026-03-12T10:58:48.283936589Z Database config parsed successfully
+2026-03-12T10:58:48.283938939Z === DATABASE CONFIGURATION (DEBUG MODE) ===
+2026-03-12T10:58:48.283941009Z Database Engine: django.db.backends.postgresql
+2026-03-12T10:58:48.283943119Z Database Name: neondb
+2026-03-12T10:58:48.283945619Z Database Host: ep-red-queen-ahjbhshv-pooler.c-3.us-east-1.aws.neon.tech
+2026-03-12T10:58:48.283947809Z Database Port: 
+2026-03-12T10:58:48.283950729Z Database User: neondb_owner
+2026-03-12T10:58:48.283955219Z SSL Mode: require
+2026-03-12T10:58:48.283957529Z ===========================================
+2026-03-12T10:58:48.283964189Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/app/base.py", line 67, in wsgi
+2026-03-12T10:58:48.283966449Z     self.callable = self.load()
+2026-03-12T10:58:48.283968489Z                     ~~~~~~~~~^^
+2026-03-12T10:58:48.283970619Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+2026-03-12T10:58:48.28397273Z     return self.load_wsgiapp()
+2026-03-12T10:58:48.28397487Z            ~~~~~~~~~~~~~~~~~^^
+2026-03-12T10:58:48.28397767Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+2026-03-12T10:58:48.2839799Z     return util.import_app(self.app_uri)
+2026-03-12T10:58:48.28398205Z            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+2026-03-12T10:58:48.28398418Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/gunicorn/util.py", line 359, in import_app
+2026-03-12T10:58:48.28398623Z     mod = importlib.import_module(module)
+2026-03-12T10:58:48.2839992Z   File "/opt/render/project/python/Python-3.14.3/lib/python3.14/importlib/__init__.py", line 88, in import_module
+2026-03-12T10:58:48.28400238Z     return _bootstrap._gcd_import(name[level:], package, level)
+2026-03-12T10:58:48.28400452Z            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-03-12T10:58:48.28400701Z   File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+2026-03-12T10:58:48.28400923Z   File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+2026-03-12T10:58:48.28401145Z   File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+2026-03-12T10:58:48.284013811Z   File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+2026-03-12T10:58:48.284015991Z   File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+2026-03-12T10:58:48.28401804Z   File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+2026-03-12T10:58:48.284020091Z   File "/opt/render/project/src/SafeTNet/SafeTNet/wsgi.py", line 16, in <module>
+2026-03-12T10:58:48.284022401Z     application = get_wsgi_application()
+2026-03-12T10:58:48.284024721Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/django/core/wsgi.py", line 12, in get_wsgi_application
+2026-03-12T10:58:48.284026821Z     django.setup(set_prefix=False)
+2026-03-12T10:58:48.284028981Z     ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+2026-03-12T10:58:48.284031111Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/django/__init__.py", line 24, in setup
+2026-03-12T10:58:48.284033141Z     apps.populate(settings.INSTALLED_APPS)
+2026-03-12T10:58:48.284035261Z     ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-03-12T10:58:48.284037341Z   File "/opt/render/project/src/.venv/lib/python3.14/site-packages/django/apps/registry.py", line 124, in populate
+2026-03-12T10:58:48.284039401Z     app_config.ready()
+2026-03-12T10:58:48.284041501Z     ~~~~~~~~~~~~~~~~^^
+2026-03-12T10:58:48.284044151Z   File "/opt/render/project/src/SafeTNet/security_app/apps.py", line 10, in ready
+2026-03-12T10:58:48.284046251Z     import security_app.signals
+2026-03-12T10:58:48.284048351Z   File "/opt/render/project/src/SafeTNet/security_app/signals.py", line 4, in <module>
+2026-03-12T10:58:48.284050391Z     from .fcm_service import fcm_service
+2026-03-12T10:58:48.284052471Z   File "/opt/render/project/src/SafeTNet/security_app/fcm_service.py", line 1, in <module>
+2026-03-12T10:58:48.284054581Z     import firebase_admin
+2026-03-12T10:58:48.284056772Z ModuleNotFoundError: No module named 'firebase_admin'
+2026-03-12T10:58:48.284058932Z [2026-03-12 10:58:48 +0000] [54] [INFO] Worker exiting (pid: 54)
+2026-03-12T10:58:49.305594372Z [2026-03-12 10:58:49 +0000] [53] [WARNING] Worker with pid 55 was terminated due to signal 15
+2026-03-12T10:58:49.380352656Z [2026-03-12 10:58:49 +0000] [53] [INFO] Shutting down: Master
+2026-03-12T10:58:49.380578211Z [2026-03-12 10:58:49 +0000] [53] [INFO] Reason: Worker failed to boot.

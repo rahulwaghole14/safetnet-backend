@@ -420,7 +420,7 @@ const getCurrentLocation = (): Promise<{latitude: number; longitude: number} | n
  * Get live share base URL
  */
 const getLiveShareBaseUrl = (): string => {
-  const base = 'https://safetnet-backend.onrender.com/live-share';
+  const base = `${apiService.getBackendBaseUrl()}/live-share`;
   return base.endsWith('/') ? base.slice(0, -1) : base;
 };
 

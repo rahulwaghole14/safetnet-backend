@@ -19,7 +19,9 @@ getAsyncStorage().then((storage) => {
 });
 
 // API Base URL configuration - use live server
-const API_BASE_URL = 'https://safetnet-backend-1.onrender.com/api/user';
+// const API_BASE_URL = 'https://safetnet-backend-1.onrender.com/api/user';
+export const API_BASE_URL = 'http://10.0.2.2:8000/api/user'; // Local backend for emulator
+export const BACKEND_BASE_URL = 'http://10.0.2.2:8000'; // Local backend base
 
 // Get the working API base URL
 let cachedApiBaseUrl: string | null = null;
@@ -1192,6 +1194,20 @@ class ApiService {
     return this.request(`/${userId}/live_location/${sessionId}/`, {
       method: 'DELETE',
     });
+  }
+
+  /**
+   * Get the current API base URL
+   */
+  getBaseUrl(): string {
+    return API_BASE_URL;
+  }
+
+  /**
+   * Get the current backend base URL
+   */
+  getBackendBaseUrl(): string {
+    return BACKEND_BASE_URL;
   }
 }
 

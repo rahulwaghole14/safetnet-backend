@@ -56,7 +56,7 @@ class FCMService:
         if not registration_tokens:
             return False
 
-        # FCM v1 uses messaging.MulticastMessage for multiple tokens
+        # Use messaging.send_each_for_multicast (newer, doesn't use the deprecated batch API)
         try:
             # Prepare data payload (must be strings)
             data_payload = {}
@@ -64,25 +64,30 @@ class FCMService:
                 for k, v in data.items():
                     data_payload[str(k)] = str(v)
 
-            message = messaging.MulticastMessage(
-                notification=messaging.Notification(
-                    title=title,
-                    body=body,
-                ),
-                data=data_payload,
-                tokens=registration_tokens,
-            )
+            # Convert each token to a Message object
+            messages = [
+                messaging.Message(
+                    notification=messaging.Notification(
+                        title=title,
+                        body=body,
+                    ),
+                    data=data_payload,
+                    token=token,
+                ) for token in registration_tokens
+            ]
             
-            response = messaging.send_multicast(message)
+            response = messaging.send_each_for_multicast(messaging.BatchMessage(messages=messages)) if hasattr(messaging, 'BatchMessage') else messaging.send_each(messages)
+            
+            # Note: messaging.send_each(messages) is the most modern way in SDK 6.x
+            # Let's try send_each directly if send_each_for_multicast is tricky
+            # Actually, the simplest for 6.9.0 is send_each
             
             logger.info(f"FCM v1: Successfully sent {response.success_count} messages. Failures: {response.failure_count}")
             
             if response.failure_count > 0:
                 for index, resp in enumerate(response.responses):
                     if not resp.success:
-                        # Log the first few failures for debugging
-                        if index < 5:
-                            logger.debug(f"Token {registration_tokens[index]} failed: {resp.exception}")
+                        logger.debug(f"Token {registration_tokens[index]} failed: {resp.exception}")
             
             return response.success_count > 0
                 

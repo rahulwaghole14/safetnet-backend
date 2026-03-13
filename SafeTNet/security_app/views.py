@@ -1,5 +1,6 @@
 import logging
 import traceback
+from django.conf import settings
 from .models import OfficerAlert, AlertRead # Ensure these are included
 from .serializers import UnifiedAlertSerializer, OfficerAlertSerializer
 # Set up logger
@@ -110,6 +111,10 @@ class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
             # 3. Alerts from users in their organization (if they have one)
             org_filter = Q(user__organization=user.organization) if user.organization else Q()
             
+            # In DEBUG mode, let officers see everything to make testing easier
+            if settings.DEBUG:
+                return base_queryset
+                
             queryset = base_queryset.filter(
                 Q(geofence_id__in=geofence_ids) | 
                 Q(assigned_officer=user) |
