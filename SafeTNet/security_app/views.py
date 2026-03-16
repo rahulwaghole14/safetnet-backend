@@ -1,12 +1,7 @@
 import logging
 import traceback
 from django.conf import settings
-from .models import OfficerAlert, AlertRead # Ensure these are included
-from .serializers import UnifiedAlertSerializer, OfficerAlertSerializer
-# Set up logger
-logger = logging.getLogger(__name__)
-
-from rest_framework import viewsets, status, serializers,permissions
+from rest_framework import viewsets, status, serializers, permissions
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -17,25 +12,20 @@ from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from django.utils import timezone
 from datetime import timedelta
-import math
-from users.permissions import IsSuperAdminOrSubAdmin, IsOwnerAndPendingAlert, IsLiveLocationOwner
-from .models import SOSAlert, Case, Incident, OfficerProfile, Notification, LiveLocation
-# SecurityOfficer model removed - using User with role='security_officer' instead
-# from users.models import SecurityOfficer, Geofence
-from django.contrib.auth import get_user_model
-from users.models import Geofence, Alert
-from .models import OfficerAlert, AlertRead
-from .fcm_service import fcm_service
-from .serializers import UnifiedAlertSerializer, OfficerAlertSerializer
-
-User = get_user_model()
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+import math
+
+# Internal imports
+from .models import SOSAlert, Case, Incident, OfficerProfile, Notification, LiveLocation, OfficerAlert, AlertRead
+from .fcm_service import fcm_service
+from .permissions import IsSecurityOfficer
+from users.models import Geofence, Alert, OfficerGeofenceAssignment
+from users.permissions import IsSuperAdminOrSubAdmin, IsOwnerAndPendingAlert, IsLiveLocationOwner
 from users_profile.models import LiveLocationShare, LiveLocationTrackPoint
 from users_profile.serializers import LiveLocationShareSerializer, LiveLocationShareCreateSerializer
-from users.models import Geofence
-from users.serializers import GeofenceSerializer
 
-from .permissions import IsSecurityOfficer
+# Import serializers
 from .serializers import (
     SOSAlertSerializer,
     SOSAlertCreateSerializer,
@@ -47,11 +37,14 @@ from .serializers import (
     NotificationAcknowledgeSerializer,
     OfficerLoginSerializer,
     LiveLocationSerializer,
-    GeofenceSerializer,
+    GeofenceSerializer,  # This is the security_app one
+    UnifiedAlertSerializer,
+    OfficerAlertSerializer
 )
-# Import Alert serializers from users app
-from users.serializers import GeofenceSerializer
+from users.serializers import GeofenceSerializer as UserGeofenceSerializer
 
+User = get_user_model()
+logger = logging.getLogger(__name__)
 
 class OfficerOnlyMixin:
     permission_classes = [IsAuthenticated, IsSecurityOfficer]
@@ -977,9 +970,18 @@ class DashboardView(OfficerOnlyMixin, APIView):
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         week_ago = now - timedelta(days=7)
         
+        # Get officer's geofences from both sources
+        geofence_ids = list(officer.geofences.all().values_list('id', flat=True))
+        assignment_geofence_ids = OfficerGeofenceAssignment.objects.filter(
+            officer=officer, 
+            is_active=True
+        ).values_list('geofence_id', flat=True)
+        
+        all_geofence_ids = list(set(geofence_ids) | set(assignment_geofence_ids))
+
         # 1. PENDING: New SOS alerts in officer's geofences (ready for response)
         pending_alerts_count = SOSAlert.objects.filter(
-            geofence__in=officer.geofences.all(),
+            geofence_id__in=all_geofence_ids,
             status='pending',
             is_deleted=False
         ).count()
@@ -1009,13 +1011,13 @@ class DashboardView(OfficerOnlyMixin, APIView):
         
         # Average response time
         response_times = []
-        resolved_cases = Case.objects.filter(
+        resolved_cases_list = Case.objects.filter(
             officer=officer,
             status='resolved',
             sos_alert__isnull=False
         ).select_related('sos_alert')
         
-        for case in resolved_cases:
+        for case in resolved_cases_list:
             if case.sos_alert and case.updated_at:
                 response_time = (case.updated_at - case.sos_alert.created_at).total_seconds() / 60
                 response_times.append(response_time)
@@ -1027,11 +1029,10 @@ class DashboardView(OfficerOnlyMixin, APIView):
         
         # Get recent alerts for dashboard
         recent_alerts = SOSAlert.objects.filter(
-            Q(assigned_officer=officer) | Q(geofence__in=officer.geofences.all()),
+            Q(assigned_officer=officer) | Q(geofence_id__in=all_geofence_ids),
             is_deleted=False
         ).order_by('-created_at')[:5]
         
-        from .serializers import SOSAlertSerializer
         recent_alerts_data = SOSAlertSerializer(recent_alerts, many=True).data
         
         return Response({
@@ -1205,22 +1206,38 @@ class GeofenceCurrentView(OfficerOnlyMixin, APIView):
             officer = request.user
             logger.info(f"Geofence request for officer: {officer.username} (ID: {officer.id})")
 
-            # Get the most recently created geofence assigned to the officer
-            geofences = officer.geofences.all()
-            logger.info(f"Found {geofences.count()} geofences for officer {officer.username}")
+            # 1. Check direct M2M relation (Legacy/Primary)
+            geofences = list(officer.geofences.all())
+            
+            # 2. Check OfficerGeofenceAssignment table (Fallback/Strict)
+            assignment_ids = OfficerGeofenceAssignment.objects.filter(
+                officer=officer, 
+                is_active=True
+            ).values_list('geofence_id', flat=True)
+            
+            if assignment_ids:
+                assigned_geofences = Geofence.objects.filter(id__in=assignment_ids)
+                for g in assigned_geofences:
+                    if g not in geofences:
+                        geofences.append(g)
 
-            if not geofences.exists():
+            logger.info(f"Found {len(geofences)} geofences for officer {officer.username}")
+
+            if not geofences:
                 logger.info(f"No geofence assigned to officer {officer.username}")
                 return Response({
                     'data': None,
                     'message': 'No geofence assigned to this officer'
                 }, status=status.HTTP_200_OK)
 
-            # Return the most recently created geofence (ordered by creation date)
-            geofence = geofences.order_by('-created_at').first()
+            # Sort by created_at desc to get most recent
+            geofences.sort(key=lambda x: x.created_at, reverse=True)
+            geofence = geofences[0]
+            
             logger.info(f"Returning geofence: {geofence.name} (ID: {geofence.id}) for officer {officer.username}")
 
-            serializer = GeofenceSerializer(geofence)
+            # Use UserGeofenceSerializer to provide raw GeoJSON format expected by the frontend
+            serializer = UserGeofenceSerializer(geofence)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -1228,7 +1245,7 @@ class GeofenceCurrentView(OfficerOnlyMixin, APIView):
             logger.error(f"Traceback: {traceback.format_exc()}")
             return Response({
                 'error': 'An error occurred',
-                'detail': 'Internal server error while fetching geofence'
+                'detail': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
