@@ -564,9 +564,13 @@ export const LoginScreen = () => {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <View style={styles.scrollContent}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Premium Header Section */}
         <Animated.View
           style={[
@@ -691,7 +695,7 @@ export const LoginScreen = () => {
 
           <Text style={styles.versionText}>Version 2.2.0</Text>
         </Animated.View>
-      </View>
+      </ScrollView>
 
       {/* Loading Overlay */}
       {isLoading && (

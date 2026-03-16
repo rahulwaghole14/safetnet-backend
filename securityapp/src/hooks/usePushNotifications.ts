@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import * as fcmTokenService from '../api/services/fcmTokenService';
-import { Platform } from 'react-native';
+import { Platform, Alert } from 'react-native';
 
 export const usePushNotifications = (isAuthenticated: boolean) => {
     useEffect(() => {
@@ -46,6 +46,25 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
 
         const unsubscribeMessage = messaging().onMessage(async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
             console.log('[FCM] Foreground Message:', JSON.stringify(remoteMessage));
+            
+            // If it's an SOS alert, show a high-visibility alert
+            if (remoteMessage.data?.type === 'sos_alert') {
+                Alert.alert(
+                    "🚨 EMERGENCY SOS",
+                    remoteMessage.notification?.body || "New SOS Alert received!",
+                    [
+                        { 
+                            text: "VIEW ALERT", 
+                            onPress: () => {
+                                // You can add navigation logic here if needed
+                                console.log("User clicked View Alert from Foreground");
+                            }
+                        },
+                        { text: "DISMISS", style: "cancel" }
+                    ],
+                    { cancelable: false }
+                );
+            }
         });
 
         return () => {

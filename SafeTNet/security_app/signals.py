@@ -134,11 +134,16 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
             # If no organization and not in DEBUG, notify all active security officers as fallback
             officers = User.objects.filter(role='security_officer', is_active=True)
         
-        logger.info(f"Found {officers.count()} security officers to notify")
+        logger.info(f"Found {officers.count()} security officers to notify: {[o.email for o in officers]}")
         
         # Create notifications and send FCM
         for officer in officers:
-            logger.info(f"Attempting to notify officer: {officer.username} (Tokens: {len(getattr(officer, 'fcm_tokens', []))})")
+            tokens = getattr(officer, 'fcm_tokens', [])
+            logger.info(f"==> Notifying officer: {officer.email} (Org: {officer.organization.name if officer.organization else 'None'})")
+            logger.info(f"    Tokens found: {len(tokens)}")
+            if not tokens:
+                logger.warning(f"    SKIPPING: No tokens for {officer.email}")
+                continue
             try:
                 # Create database notification
                 notification = Notification.objects.create(

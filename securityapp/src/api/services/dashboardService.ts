@@ -42,9 +42,9 @@ export const dashboardService = {
       // Transform the response to match our interface - only use backend data
       const dashboardData: DashboardData = {
         stats: {
-          active_sos_alerts: response.data.metrics?.total_sos_handled ?? 0,
-          assigned_cases: response.data.metrics?.active_cases ?? 0,
-          resolved_today: response.data.metrics?.resolved_cases_this_week ?? 0,
+          active_sos_alerts: response.data.metrics?.active_alerts ?? 0,
+          assigned_cases: response.data.metrics?.pending_alerts ?? 0,
+          resolved_today: response.data.metrics?.resolved_today ?? 0,
           on_duty_status: true, // Default to true since backend doesn't provide this
           total_alerts: response.data.metrics?.total_sos_handled ?? 0,
         },

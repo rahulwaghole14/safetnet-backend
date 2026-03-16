@@ -809,131 +809,7 @@ class LiveLocationViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]
 
 
-class DashboardView(OfficerOnlyMixin, APIView):
-    """
-    Dashboard API for security officers.
-    GET /api/security/dashboard/
-    Returns alert counts and officer info.
-    """
 
-    def get(self, request):
-        user = request.user
-
-        # Get base queryset (same logic as SOSAlertViewSet.get_queryset)
-        base_queryset = SOSAlert.objects.filter(is_deleted=False).select_related('user', 'geofence', 'assigned_officer')
-
-        # Apply role-based filtering (same as SOSAlertViewSet)
-        if user.role == 'security_officer':
-            # Get officer's assigned geofences
-            officer_geofences = user.geofences.filter(active=True)
-            geofence_ids = list(officer_geofences.values_list('id', flat=True))
-
-            # Filter alerts by officer's geofences OR alerts assigned directly to them
-            queryset = base_queryset.filter(
-                Q(geofence_id__in=geofence_ids) | Q(assigned_officer=user)
-            )
-        elif user.role == 'SUB_ADMIN' and hasattr(user, 'organization') and user.organization:
-            org_geofences = user.organization.geofences.filter(active=True)
-            geofence_ids = list(org_geofences.values_list('id', flat=True))
-            queryset = base_queryset.filter(geofence_id__in=geofence_ids)
-        elif user.role == 'SUPER_ADMIN':
-            queryset = base_queryset
-        else:
-            queryset = SOSAlert.objects.none()
-
-        # Count alerts by status
-        pending_count = queryset.filter(status='pending').count()
-        accepted_count = queryset.filter(status='accepted').count()
-        resolved_count = queryset.filter(status='resolved').count()
-
-        # Recent alerts (last 5)
-        recent_alerts = queryset.order_by('-created_at')[:5]
-        recent_alerts_data = []
-        for alert in recent_alerts:
-            recent_alerts_data.append({
-                'id': alert.id,
-                'message': alert.message,
-                'status': alert.status,
-                'priority': alert.priority,
-                'created_at': alert.created_at.isoformat(),
-                'user_name': alert.user.get_full_name() or alert.user.username,
-            })
-
-        # Officer info
-        officer_info = {
-            'id': user.id,
-            'name': user.get_full_name() or user.username,
-            'email': user.email,
-            'badge_number': getattr(user, 'badge_number', None),
-            'on_duty': True,  # Assume on duty
-            'organization': user.organization.name if hasattr(user, 'organization') and user.organization else None,
-        }
-
-        data = {
-            'stats': {
-                'active_sos_alerts': accepted_count,
-                'assigned_cases': pending_count,
-                'resolved_today': resolved_count,
-                'total_alerts': pending_count + accepted_count + resolved_count,
-                'on_duty_status': True,
-            },
-            'recent_alerts': recent_alerts_data,
-            'officer_info': officer_info,
-        }
-
-        return Response(data)
-
-
-    """
-    ViewSet for LiveLocation with strict write permissions.
-    Only users can create/update their own live locations for pending/accepted alerts.
-    """
-    serializer_class = LiveLocationSerializer
-    permission_classes = [IsAuthenticated, IsLiveLocationOwner]
-    
-    def get_queryset(self):
-        """
-        Filter queryset based on user role:
-        - Users: read own LiveLocation only
-        - Officers: read LiveLocation of USER-created alerts assigned to them OR within their geofence
-        """
-        user = self.request.user
-        
-        if user.role == 'USER':
-            # Users can only see their own live locations
-            return LiveLocation.objects.filter(user=user)
-        
-        elif user.role == 'security_officer':
-            # Officers can read LiveLocation of USER-created alerts:
-            # 1. Assigned to them (via SOSAlert.assigned_officer)
-            # 2. Within their geofence areas
-            from django.db.models import Q
-            
-            # Get officer's assigned geofences
-            officer_geofences = user.geofences.all()
-            
-            return LiveLocation.objects.filter(
-                Q(sos_alert__created_by_role='USER') &  # Only USER-created alerts
-                (
-                    Q(sos_alert__assigned_officer=user) |  # Assigned to officer
-                    Q(sos_alert__geofence__in=officer_geofences)  # Within officer's geofence
-                )
-            ).distinct()
-        
-        # Default: empty queryset
-        return LiveLocation.objects.none()
-    
-    def perform_create(self, serializer):
-        """Set the user and SOS alert relationship on creation."""
-        serializer.save(user=self.request.user)
-    
-    def get_permissions(self):
-        """Apply different permissions for different actions."""
-        if self.action in ['create']:
-            return [IsAuthenticated(), IsLiveLocationOwner()]
-        elif self.action in ['update', 'partial_update', 'destroy']:
-            return [IsAuthenticated(), IsLiveLocationOwner()]
-        return [IsAuthenticated()]
 
 
 class OfficerLoginView(APIView):
@@ -1097,30 +973,41 @@ class DashboardView(OfficerOnlyMixin, APIView):
             return Response({'detail': 'Only officers can view dashboard.'}, status=status.HTTP_403_FORBIDDEN)
         
         officer = request.user
-
-        from django.utils import timezone
-        from datetime import timedelta
-        
         now = timezone.now()
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         week_ago = now - timedelta(days=7)
         
-        # Total SOS alerts handled by this officer (only active, non-deleted)
-        total_sos_handled = SOSAlert.objects.filter(
-            assigned_officer=officer, 
+        # 1. PENDING: New SOS alerts in officer's geofences (ready for response)
+        pending_alerts_count = SOSAlert.objects.filter(
+            geofence__in=officer.geofences.all(),
+            status='pending',
             is_deleted=False
         ).count()
         
-        # Active cases assigned to this officer
-        active_cases = Case.objects.filter(officer=officer, status__in=['open', 'accepted']).count()
+        # 2. ACTIVE: Alerts currently handled by this officer
+        active_alerts_count = SOSAlert.objects.filter(
+            assigned_officer=officer,
+            status='accepted',
+            is_deleted=False
+        ).count()
         
-        # Resolved cases this week
+        # 3. RESOLVED: Alerts resolved by this officer today
+        resolved_today_count = SOSAlert.objects.filter(
+            assigned_officer=officer,
+            status='resolved',
+            updated_at__gte=today_start,
+            is_deleted=False
+        ).count()
+
+        # Extra metrics
+        active_cases = Case.objects.filter(officer=officer, status__in=['open', 'accepted']).count()
         resolved_cases_week = Case.objects.filter(
             officer=officer,
             status='resolved',
             updated_at__gte=week_ago
         ).count()
         
-        # Average response time (time from SOS creation to case acceptance)
+        # Average response time
         response_times = []
         resolved_cases = Case.objects.filter(
             officer=officer,
@@ -1130,15 +1017,12 @@ class DashboardView(OfficerOnlyMixin, APIView):
         
         for case in resolved_cases:
             if case.sos_alert and case.updated_at:
-                response_time = (case.updated_at - case.sos_alert.created_at).total_seconds() / 60  # minutes
+                response_time = (case.updated_at - case.sos_alert.created_at).total_seconds() / 60
                 response_times.append(response_time)
         
         avg_response_time = sum(response_times) / len(response_times) if response_times else 0
-        
-        # Unread notifications count
         unread_notifications = Notification.objects.filter(officer=officer, is_read=False).count()
         
-        # Get officer name
         officer_name = f"{officer.first_name} {officer.last_name}".strip() or officer.username
         
         # Get recent alerts for dashboard
@@ -1147,14 +1031,15 @@ class DashboardView(OfficerOnlyMixin, APIView):
             is_deleted=False
         ).order_by('-created_at')[:5]
         
-        # Serialize recent alerts
         from .serializers import SOSAlertSerializer
         recent_alerts_data = SOSAlertSerializer(recent_alerts, many=True).data
         
         return Response({
             'officer_name': officer_name,
             'metrics': {
-                'total_sos_handled': total_sos_handled,
+                'pending_alerts': pending_alerts_count,
+                'active_alerts': active_alerts_count,
+                'resolved_today': resolved_today_count,
                 'active_cases': active_cases,
                 'resolved_cases_this_week': resolved_cases_week,
                 'average_response_time_minutes': round(avg_response_time, 1),

@@ -68,10 +68,8 @@ class FCMService:
             android_config = messaging.AndroidConfig(
                 priority='high',
                 notification=messaging.AndroidNotification(
-                    channel_id='sos_alerts',  # App must have this channel configured
                     priority='max',
                     sound='default',
-                    click_action='OPEN_SOS_ALERT',
                 )
             )
 
@@ -112,7 +110,7 @@ class FCMService:
             if response.failure_count > 0:
                 for index, resp in enumerate(response.responses):
                     if not resp.success:
-                        logger.debug(f"Token {registration_tokens[index]} failed: {resp.exception}")
+                        logger.warning(f"Token {registration_tokens[index][:15]}... failed: {resp.exception}")
             
             return response.success_count > 0
                 
