@@ -33,34 +33,8 @@ if (__DEV__) {
 
 // Component that checks for persisted auth data
 function AuthPersistenceWrapper({ children }: { children: React.ReactNode }) {
-  const dispatch = useDispatch();
-
-  // COMMENTED OUT: Auto-restore authentication to force login screen first
-  // useEffect(() => {
-  //   const checkPersistedAuth = async () => {
-  //     try {
-  //       const token = await AsyncStorage.getItem('token');
-  //       const refreshToken = await AsyncStorage.getItem('refresh_token');
-  //
-  //       if (token && refreshToken) {
-  //         console.log('[App] Found persisted auth tokens, restoring authentication...');
-  //         dispatch(loginSuccess({
-  //           token,
-  //           officer: null, // Will be fetched when needed
-  //         }));
-  //         console.log('[App] Authentication restored, should show main app');
-  //       } else {
-  //         console.log('[App] No persisted tokens found, showing login');
-  //       }
-  //     } catch (error) {
-  //       console.error('[App] Error checking persisted auth:', error);
-  //     }
-  //   };
-  //
-  //   checkPersistedAuth();
-  // }, [dispatch]);
-
-  console.log('[App] Login screen will appear first (auto-auth disabled)');
+  // Authentication is now handled automatically by Redux Persist via store.ts and PersistGate
+  console.log('[App] Auth persistence managed by Redux Persist');
 
   return <>{children}</>;
 }

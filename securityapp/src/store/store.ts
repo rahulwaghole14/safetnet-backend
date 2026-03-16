@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import {
   persistStore,
   persistReducer,
@@ -12,24 +12,24 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authReducer from './slices/authSlice';
 import alertsReducer from './slices/alertsSlice';
-// Location tracking removed - frontend no longer handles location
 import settingsReducer from './slices/settingsSlice';
+
+const rootReducer = combineReducers({
+  auth: authReducer,
+  alerts: alertsReducer,
+  settings: settingsReducer,
+});
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['auth', 'settings'], // Only persist these
+  whitelist: ['auth', 'settings'], // Persist these entire slices
 };
 
-const persistedAuthReducer = persistReducer(persistConfig, authReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: {
-    auth: persistedAuthReducer,
-    alerts: alertsReducer,
-    // Location tracking removed - frontend no longer handles location
-    settings: settingsReducer,
-  },
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
