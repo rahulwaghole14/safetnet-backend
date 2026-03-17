@@ -1,4 +1,4 @@
-package com.userapp
+package com.safetnet.userapp
 
 import android.app.Activity
 import android.content.Intent
@@ -29,7 +29,7 @@ class IntentModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
                 }
                 
                 // Clear the intent action after reading to prevent re-triggering
-                if (action == "com.userapp.TRIGGER_SOS_FROM_SHAKE") {
+                if (action == "com.safetnet.userapp.TRIGGER_SOS_FROM_SHAKE") {
                     intent?.action = ""
                 }
                 

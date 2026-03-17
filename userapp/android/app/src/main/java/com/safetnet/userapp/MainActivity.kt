@@ -1,4 +1,4 @@
-package com.userapp
+package com.safetnet.userapp
 
 import android.content.Intent
 import android.os.Bundle
@@ -28,7 +28,7 @@ class MainActivity : ReactActivity() {
    * Handle shake intent - called from both onCreate and onNewIntent
    */
   private fun handleShakeIntent(intent: Intent?) {
-    if (intent?.action == "com.userapp.TRIGGER_SOS_FROM_SHAKE" || 
+    if (intent?.action == "com.safetnet.userapp.TRIGGER_SOS_FROM_SHAKE" || 
         intent?.getStringExtra("triggerSource") == "shake") {
       android.util.Log.d("MainActivity", "Shake intent detected in onCreate/onNewIntent")
       // Intent will be read by HomeScreen when it mounts

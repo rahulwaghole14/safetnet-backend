@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
@@ -6,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('users_profile', '0017_live_share_plan_and_reason'),
-        ('users', '0001_initial'),  # Adjust if needed based on your users app migrations
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
@@ -27,11 +28,12 @@ class Migration(migrations.Migration):
             name='security_officer',
             field=models.ForeignKey(
                 blank=True,
-                help_text='Security officer sharing their location (null if user is set)',
+                help_text="Security officer sharing their location (User with role='security_officer', null if user is set)",
+                limit_choices_to={'role': 'security_officer'},
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name='live_location_sessions',
-                to='users.securityofficer'
+                related_name='officer_live_location_sessions',
+                to=settings.AUTH_USER_MODEL
             ),
         ),
         migrations.AddConstraint(

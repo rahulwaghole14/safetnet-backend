@@ -10,20 +10,25 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='sosevent',
-            name='audio_recording_url',
-        ),
-        migrations.RemoveField(
-            model_name='sosevent',
-            name='cloud_backup_url',
-        ),
-        migrations.RemoveField(
-            model_name='sosevent',
-            name='is_premium_event',
-        ),
-        migrations.RemoveField(
-            model_name='sosevent',
-            name='video_recording_url',
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.RemoveField(
+                    model_name='sosevent',
+                    name='audio_recording_url',
+                ),
+                migrations.RemoveField(
+                    model_name='sosevent',
+                    name='cloud_backup_url',
+                ),
+                migrations.RemoveField(
+                    model_name='sosevent',
+                    name='is_premium_event',
+                ),
+                migrations.RemoveField(
+                    model_name='sosevent',
+                    name='video_recording_url',
+                ),
+            ],
         ),
     ]

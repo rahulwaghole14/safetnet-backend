@@ -3,6 +3,8 @@ apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 apply plugin: "com.google.gms.google-services"
 
+import java.util.Properties
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -64,7 +66,7 @@ task generateAutolinkingJson {
     autolinkingFile.text = """{
   "project": {
     "android": {
-      "packageName": "com.userapp"
+      "packageName": "com.safetnet.userapp"
     }
   },
   "dependencies": {}
@@ -101,18 +103,42 @@ def mapApiKey = project.hasProperty("MAPS_API_KEY")
         ? project.property("MAPS_API_KEY")
         : (System.getenv("MAPS_API_KEY") ?: "")
 
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+def releaseStoreFile = keystoreProperties.getProperty("storeFile") ?: System.getenv("RELEASE_STORE_FILE")
+def releaseStorePassword = keystoreProperties.getProperty("storePassword") ?: System.getenv("RELEASE_STORE_PASSWORD")
+def releaseKeyAlias = keystoreProperties.getProperty("keyAlias") ?: System.getenv("RELEASE_KEY_ALIAS")
+def releaseKeyPassword = keystoreProperties.getProperty("keyPassword") ?: System.getenv("RELEASE_KEY_PASSWORD")
+def hasReleaseSigning = [releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword].every { it }
+def requestedTasks = gradle.startParameter.taskNames.collect { it.toLowerCase() }
+def isReleaseBuildRequested = requestedTasks.any { taskName ->
+    taskName.contains("release") || taskName.contains("publish")
+}
+
+if (isReleaseBuildRequested && !hasReleaseSigning) {
+    throw new GradleException(
+        "Missing release signing config. Create android/keystore.properties or set " +
+        "RELEASE_STORE_FILE, RELEASE_STORE_PASSWORD, RELEASE_KEY_ALIAS, and RELEASE_KEY_PASSWORD."
+    )
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.userapp"
+    namespace "com.safetnet.userapp"
     defaultConfig {
-        applicationId "com.userapp"
+        applicationId "com.safetnet.userapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        missingDimensionStrategy 'store', 'play'
         manifestPlaceholders = [
             usesCleartextTraffic: true,
             MAPS_API_KEY: mapApiKey
@@ -125,15 +151,21 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        if (hasReleaseSigning) {
+            release {
+                storeFile rootProject.file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig hasReleaseSigning ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -161,9 +193,12 @@ dependencies {
     implementation(project(':react-native-linear-gradient'))
     // Manually add AsyncStorage dependency
     implementation(project(':react-native-async-storage_async-storage'))
-    // Geolocation should be autolinked - removed manual dependency to avoid conflicts
+    // Manually add geolocation to avoid broken RN 0.82 codegen autolinking metadata
+    implementation(project(':react-native-community_geolocation'))
     // Manually add react-native-sensors dependency
     implementation(project(':react-native-sensors'))
+    // Manually add react-native-iap to avoid broken RN 0.82 codegen autolinking metadata
+    implementation(project(':react-native-iap'))
 
     // Google Play Services location provider for react-native-geolocation-service
     implementation("com.google.android.gms:play-services-location:21.0.1")

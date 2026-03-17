@@ -2,6 +2,7 @@
 API views for User models.
 """
 import logging
+from decimal import Decimal
 from django.conf import settings
 from django.http import Http404
 from django.db import models
@@ -28,14 +29,21 @@ from .serializers import (
     FamilyContactSerializer, FamilyContactCreateSerializer,
     CommunityMembershipSerializer, CommunityMembershipCreateSerializer,
     SOSEventSerializer, SOSTriggerSerializer, UserLocationUpdateSerializer,
-    SubscriptionSerializer, LiveLocationShareSerializer, LiveLocationShareCreateSerializer,
+    SubscriptionSerializer, GooglePlayPurchaseSerializer, LiveLocationShareSerializer, LiveLocationShareCreateSerializer,
     CommunityAlertSerializer, CommunityAlertCreateSerializer,
     ChatGroupSerializer, ChatGroupCreateSerializer,
     ChatMessageSerializer, ChatMessageCreateSerializer
 )
 from .services import SMSService
+from .google_play_utils import (
+    decode_google_play_rtdn_message,
+    process_google_play_rtdn_payload,
+    upsert_google_play_subscription,
+    verify_google_play_subscription,
+)
 
 logger = logging.getLogger(__name__)
+GOOGLE_PLAY_PACKAGE_NAME = getattr(settings, 'GOOGLE_PLAY_PACKAGE_NAME', 'com.safetnet.userapp')
 
 
 class UserRegistrationView(APIView):
@@ -747,7 +755,20 @@ def _is_user_premium(user):
     # Treat all users as premium in DEBUG mode for easier local testing
     if settings.DEBUG:
         return True
-        
+
+    try:
+        from .models import GooglePlaySubscription
+        active_google_play_subscription = GooglePlaySubscription.objects.filter(
+            user=user,
+            subscription_state__in=GooglePlaySubscription.ACCESS_GRANTING_STATES,
+        ).filter(
+            models.Q(expiry_time__isnull=True) | models.Q(expiry_time__gt=timezone.now())
+        ).exists()
+        if active_google_play_subscription:
+            return True
+    except Exception:
+        pass
+
     try:
         from users.models import UserDetails
         user_details = UserDetails.objects.filter(username=user.username).first()
@@ -781,7 +802,34 @@ class SubscriptionView(APIView):
         if serializer.is_valid():
             user = request.user
             plan_type = serializer.validated_data['plan_type']
-            promo_code = serializer.validated_data.get('promo_code', '')
+            promo_code_value = serializer.validated_data.get('promo_code', '').strip().upper()
+
+            if not promo_code_value:
+                return Response({
+                    'success': False,
+                    'error': 'Paid premium plans must be purchased through Google Play. A valid promo code is required for complimentary activation.',
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                promo_code = PromoCode.objects.get(code=promo_code_value)
+            except PromoCode.DoesNotExist:
+                return Response({
+                    'success': False,
+                    'error': 'Invalid promo code',
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if not promo_code.is_valid():
+                if not promo_code.is_active:
+                    error_message = 'This promo code is no longer active'
+                elif timezone.now() >= promo_code.expiry_date:
+                    error_message = 'This promo code has expired'
+                else:
+                    error_message = 'This promo code is invalid'
+
+                return Response({
+                    'success': False,
+                    'error': error_message,
+                }, status=status.HTTP_400_BAD_REQUEST)
             
             # Calculate expiry date
             if plan_type == 'premium-monthly':
@@ -795,6 +843,23 @@ class SubscriptionView(APIView):
             if hasattr(user, 'planexpiry'):
                 user.planexpiry = expiry_date
             user.save()
+
+            try:
+                from users.models import UserDetails
+
+                UserDetails.objects.update_or_create(
+                    username=user.username,
+                    defaults={
+                        'price': (
+                            Decimal('499.00')
+                            if plan_type == 'premium-monthly'
+                            else Decimal('4799.00')
+                        ),
+                        'status': 'ACTIVE',
+                    },
+                )
+            except Exception as exc:
+                logger.warning('Failed to update UserDetails for promo subscription: %s', exc)
             
             logger.info(f"User subscribed to premium: {user.email} - {plan_type}")
             
@@ -802,10 +867,136 @@ class SubscriptionView(APIView):
                 'success': True,
                 'plan_type': 'premium',
                 'planexpiry': expiry_date.isoformat(),
-                'message': f'Successfully subscribed to {plan_type}'
+                'message': f'Successfully activated {plan_type} with promo code {promo_code.code}'
             }, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VerifyGooglePlayPurchaseView(APIView):
+    """
+    Verify a Google Play purchase token and upgrade user to premium.
+    POST /users/verify-google-purchase/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request):
+        """Verify purchase and upgrade user."""
+        serializer = GooglePlayPurchaseSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            purchase_token = serializer.validated_data['purchase_token']
+            subscription_id = serializer.validated_data['subscription_id']
+            package_name = serializer.validated_data.get('package_name', GOOGLE_PLAY_PACKAGE_NAME)
+            
+            # Verify with Google Play API
+            result = verify_google_play_subscription(
+                package_name=package_name,
+                subscription_id=subscription_id,
+                purchase_token=purchase_token
+            )
+            
+            if result:
+                try:
+                    subscription = upsert_google_play_subscription(
+                        user=user,
+                        package_name=package_name,
+                        purchase_token=purchase_token,
+                        normalized_subscription=result,
+                    )
+                except ValueError as exc:
+                    return Response({
+                        'success': False,
+                        'error': str(exc),
+                    }, status=status.HTTP_409_CONFLICT)
+
+                expiry_date = subscription.expiry_time.date() if subscription.expiry_time else None
+
+                if subscription.has_access:
+                    logger.info(
+                        'Google Play Purchase Verified: %s - %s (%s)',
+                        user.email,
+                        subscription.product_id or subscription_id,
+                        subscription.subscription_state,
+                    )
+                    return Response({
+                        'success': True,
+                        'plan_type': 'premium',
+                        'planexpiry': expiry_date.isoformat() if expiry_date else None,
+                        'subscription_state': subscription.subscription_state,
+                        'acknowledgement_state': subscription.acknowledgement_state,
+                        'google_response': result['raw_response'] if settings.DEBUG else None,
+                    }, status=status.HTTP_200_OK)
+
+                logger.warning(
+                    'Google Play Purchase Has No Access: %s - %s',
+                    user.email,
+                    subscription.subscription_state,
+                )
+                return Response({
+                    'success': False,
+                    'error': f'Subscription is not active ({subscription.subscription_state})',
+                    'subscription_state': subscription.subscription_state,
+                    'planexpiry': expiry_date.isoformat() if expiry_date else None,
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({
+                'success': False,
+                'error': 'Could not verify purchase with Google Play. Please ensure the token is correct.',
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GooglePlayRTDNView(APIView):
+    """
+    Handle Google Play Real-time Developer Notifications delivered through Pub/Sub push.
+    POST /users/billing/google-play/rtdn/
+    """
+
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        shared_secret = getattr(settings, 'GOOGLE_PLAY_RTDN_SHARED_SECRET', '')
+        provided_secret = (
+            request.headers.get('X-Google-Play-RTDN-Secret')
+            or request.query_params.get('secret')
+        )
+
+        if shared_secret and provided_secret != shared_secret:
+            return Response({
+                'success': False,
+                'error': 'Invalid RTDN secret.',
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        message = request.data.get('message') or {}
+        encoded_data = message.get('data')
+        if not encoded_data:
+            return Response({
+                'success': False,
+                'error': 'RTDN message.data is required.',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            payload = decode_google_play_rtdn_message(encoded_data)
+            processed = process_google_play_rtdn_payload(payload)
+        except ValueError as exc:
+            return Response({
+                'success': False,
+                'error': str(exc),
+            }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:
+            logger.error('Failed to process Google Play RTDN: %s', exc)
+            return Response({
+                'success': False,
+                'error': 'Failed to process Google Play RTDN payload.',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+            'success': True,
+            'processed': processed,
+        }, status=status.HTTP_202_ACCEPTED)
 
 
 class ValidatePromoCodeView(APIView):
@@ -871,21 +1062,13 @@ class CancelSubscriptionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def post(self, request):
-        """Cancel user's premium subscription."""
-        user = request.user
-        
-        # Downgrade to free
-        if hasattr(user, 'plantype'):
-            user.plantype = 'free'
-        if hasattr(user, 'planexpiry'):
-            user.planexpiry = None
-        user.save()
-        
-        logger.info(f"User cancelled subscription: {user.email}")
-        
+        """Instruct users to cancel Google Play subscriptions in Google Play."""
+        manage_url = f'https://play.google.com/store/account/subscriptions?package={GOOGLE_PLAY_PACKAGE_NAME}'
         return Response({
-            'message': 'Subscription cancelled successfully. You are now on the free plan.'
-        }, status=status.HTTP_200_OK)
+            'success': False,
+            'error': 'Subscriptions purchased through Google Play must be managed in Google Play.',
+            'manage_url': manage_url,
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Live Location Sharing endpoints

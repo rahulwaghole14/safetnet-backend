@@ -11,11 +11,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  Linking,
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {listBillingProducts} from '../../services/billingService';
+import {getGooglePlaySubscriptionsUrl, listBillingProducts} from '../../services/billingService';
 import {useBillingStore} from '../../stores/billingStore';
 import {useAuthStore} from '../../stores/authStore';
 import {apiService} from '../../services/apiService';
@@ -26,6 +27,7 @@ const BillingScreen = () => {
   const products = useMemo(() => listBillingProducts(), []);
   const plan = useAuthStore((state) => state.user?.plan ?? 'free');
   const isPremium = plan === 'premium';
+  const init = useBillingStore((state) => state.init);
   const upgrade = useBillingStore((state) => state.upgrade);
   const restore = useBillingStore((state) => state.restore);
   const isProcessing = useBillingStore((state) => state.isProcessing);
@@ -40,6 +42,10 @@ const BillingScreen = () => {
     message?: string;
     isLoading?: boolean;
   }>({isValid: null});
+
+  useEffect(() => {
+    init();
+  }, [init]);
 
   useEffect(() => {
     if (lastError) {
@@ -110,7 +116,7 @@ const BillingScreen = () => {
     }
   };
 
-  const promoCodeValidationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const promoCodeValidationTimeoutRef = useRef<any>(null);
 
   const handlePromoCodeChange = (code: string) => {
     setPromoCode(code);
@@ -169,26 +175,29 @@ const BillingScreen = () => {
   const showValidateButton = promoCode.trim().length >= 3 && promoCodeValidation.isValid === null && !promoCodeValidation.isLoading;
 
   const handleCancelSubscription = () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert(
+        'Manage Subscription',
+        'This build currently uses Google Play billing on Android. Please manage any iOS subscription from your Apple account.',
+      );
+      return;
+    }
+
     Alert.alert(
-      'Cancel Subscription',
-      'Are you sure you want to cancel your premium subscription? You will lose access to all premium features at the end of your billing period.',
+      'Manage Subscription',
+      'Subscriptions purchased through Google Play must be cancelled in Google Play. We can open the subscription page for you now.',
       [
         {text: 'Keep Premium', style: 'cancel'},
         {
-          text: 'Cancel Subscription',
-          style: 'destructive',
+          text: 'Open Google Play',
           onPress: async () => {
             try {
-              const response = await apiService.cancelSubscription();
-              if (response.error) {
-                Alert.alert('Error', response.error);
-              } else {
-                await useAuthStore.getState().setPlan('free');
-                await useAuthStore.getState().refreshProfile();
-                Alert.alert('Cancelled', 'Your subscription has been cancelled.');
-              }
+              await Linking.openURL(getGooglePlaySubscriptionsUrl());
             } catch (error) {
-              Alert.alert('Error', 'Failed to cancel subscription. Please try again.');
+              Alert.alert(
+                'Error',
+                'Failed to open Google Play. Open the Play Store and go to Payments & subscriptions > Subscriptions.',
+              );
             }
           },
         },

@@ -34,6 +34,8 @@ urlpatterns = [
     path('subscribe/', views.SubscriptionView.as_view(), name='subscribe'),
     path('subscribe/cancel/', views.CancelSubscriptionView.as_view(), name='cancel-subscription'),
     path('validate-promocode/', views.ValidatePromoCodeView.as_view(), name='validate-promocode'),
+    path('verify-google-purchase/', views.VerifyGooglePlayPurchaseView.as_view(), name='verify-google-purchase'),
+    path('billing/google-play/rtdn/', views.GooglePlayRTDNView.as_view(), name='google-play-rtdn'),
     
     # Geofencing (Premium only)
     path('<int:user_id>/geofences/', views.GeofenceListView.as_view(), name='geofences'),

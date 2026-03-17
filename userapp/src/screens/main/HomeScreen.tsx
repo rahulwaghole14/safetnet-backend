@@ -250,7 +250,7 @@ const HomeScreen = ({navigation}: any) => {
           const IntentModule = NativeModules.IntentModule;
           if (IntentModule && typeof IntentModule.getInitialIntent === 'function') {
             const intent = await IntentModule.getInitialIntent();
-            if (intent?.action === 'com.userapp.TRIGGER_SOS_FROM_SHAKE' || intent?.triggerSource === 'shake') {
+            if (intent?.action === 'com.safetnet.userapp.TRIGGER_SOS_FROM_SHAKE' || intent?.triggerSource === 'shake') {
               console.log('[HomeScreen] SOS triggered from shake gesture');
               console.log('[HomeScreen] Intent received - navigating to Home and showing modal');
               

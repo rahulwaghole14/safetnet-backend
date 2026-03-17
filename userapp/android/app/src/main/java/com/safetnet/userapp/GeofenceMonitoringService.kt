@@ -1,4 +1,4 @@
-package com.userapp
+package com.safetnet.userapp
 
 import android.app.*
 import android.content.Context

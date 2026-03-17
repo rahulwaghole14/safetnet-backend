@@ -722,13 +722,24 @@ class ApiService {
   /**
    * Subscribe to premium plan
    */
-  async subscribe(planType: 'premium-monthly' | 'premium-annual', promoCode?: string): Promise<any> {
+  async subscribe(data: { plan_type: string; promo_code?: string }): Promise<any> {
     return this.request('/subscribe/', {
       method: 'POST',
-      body: JSON.stringify({
-        plan_type: planType,
-        promo_code: promoCode || '',
-      }),
+      body: JSON.stringify(data),
+    });
+  }
+
+  /**
+   * Verify Google Play purchase
+   */
+  async verifyGooglePurchase(data: {
+    purchase_token: string;
+    subscription_id: string;
+    package_name?: string;
+  }): Promise<any> {
+    return this.request('/verify-google-purchase/', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   }
 

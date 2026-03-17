@@ -1,4 +1,4 @@
-package com.userapp
+package com.safetnet.userapp
 
 import android.content.Context
 import com.facebook.react.bridge.ReactApplicationContext

@@ -3,7 +3,7 @@ Django admin configuration for users_profile models.
 Avoid registering the User model here because it is already registered in `users/admin.py`.
 """
 from django.contrib import admin
-from .models import FamilyContact, CommunityMembership, SOSEvent
+from .models import FamilyContact, CommunityMembership, GooglePlaySubscription, SOSEvent
 
 
 @admin.register(FamilyContact)
@@ -90,6 +90,42 @@ class SOSEventAdmin(admin.ModelAdmin):  # Removed OSMGeoAdmin inheritance
     def has_add_permission(self, request):
         """Prevent manual creation of SOS events."""
         return False
+
+
+@admin.register(GooglePlaySubscription)
+class GooglePlaySubscriptionAdmin(admin.ModelAdmin):
+    """Admin view for Google Play subscription ledger records."""
+
+    list_display = (
+        'product_id',
+        'user',
+        'subscription_state',
+        'acknowledgement_state',
+        'expiry_time',
+        'updated_at',
+    )
+    list_filter = (
+        'subscription_state',
+        'acknowledgement_state',
+        'auto_renew_enabled',
+        'is_test_purchase',
+    )
+    search_fields = (
+        'product_id',
+        'purchase_token',
+        'linked_purchase_token',
+        'latest_order_id',
+        'user__email',
+        'user__username',
+    )
+    readonly_fields = (
+        'created_at',
+        'updated_at',
+        'last_verified_at',
+        'last_notification_at',
+        'raw_response',
+    )
+    ordering = ('-updated_at',)
 
 
 # Customize admin site

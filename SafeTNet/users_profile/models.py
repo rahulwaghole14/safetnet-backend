@@ -21,6 +21,134 @@ FREE_TIER_LIMITS = {
 }
 
 
+class GooglePlaySubscription(models.Model):
+    """
+    Stores the latest known Google Play subscription status for a purchase token.
+    """
+
+    ACCESS_GRANTING_STATES = (
+        'SUBSCRIPTION_STATE_ACTIVE',
+        'SUBSCRIPTION_STATE_IN_GRACE_PERIOD',
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='google_play_subscriptions',
+        help_text="User currently associated with this Google Play purchase token"
+    )
+    package_name = models.CharField(
+        max_length=255,
+        help_text="Android package name verified with Google Play"
+    )
+    product_id = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Subscription product identifier from Google Play"
+    )
+    purchase_token = models.CharField(
+        max_length=512,
+        unique=True,
+        help_text="Google Play purchase token"
+    )
+    linked_purchase_token = models.CharField(
+        max_length=512,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Previous token linked by Google Play for upgrades, downgrades, or re-subscribe flows"
+    )
+    latest_order_id = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Latest order identifier reported by Google Play"
+    )
+    subscription_state = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="Latest subscription lifecycle state from Google Play"
+    )
+    acknowledgement_state = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="Acknowledgement state returned by Google Play"
+    )
+    auto_renew_enabled = models.BooleanField(
+        default=False,
+        help_text="Whether the subscription is currently set to auto-renew"
+    )
+    line_item_index = models.PositiveIntegerField(
+        default=0,
+        help_text="Index of the line item selected from the subscriptionsv2 response"
+    )
+    expiry_time = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Expiry time reported for the selected subscription line item"
+    )
+    external_account_id = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Obfuscated external account identifier returned by Google Play"
+    )
+    external_profile_id = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Obfuscated external profile identifier returned by Google Play"
+    )
+    is_test_purchase = models.BooleanField(
+        default=False,
+        help_text="Whether Google Play reported this as a test purchase"
+    )
+    last_event_type = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="Last RTDN event type processed for this token"
+    )
+    last_notification_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp of the last processed RTDN event"
+    )
+    last_verified_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp of the last successful verification with Google Play"
+    )
+    raw_response = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Most recent raw subscriptionsv2 payload from Google Play"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'users_google_play_subscription'
+        verbose_name = 'Google Play Subscription'
+        verbose_name_plural = 'Google Play Subscriptions'
+        ordering = ['-updated_at']
+        indexes = [
+            models.Index(fields=['user', 'subscription_state']),
+            models.Index(fields=['product_id', 'subscription_state']),
+            models.Index(fields=['linked_purchase_token']),
+        ]
+
+    def __str__(self):
+        product = self.product_id or 'unknown-product'
+        return f"{product} ({self.subscription_state or 'unknown-state'})"
+
+    @property
+    def has_access(self):
+        if self.subscription_state not in self.ACCESS_GRANTING_STATES:
+            return False
+        if self.expiry_time and self.expiry_time <= timezone.now():
+            return False
+        return True
+
+
 
 
 class FamilyContact(models.Model):

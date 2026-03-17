@@ -1,4 +1,4 @@
-package com.userapp
+package com.safetnet.userapp
 
 import android.app.Application
 import android.util.Log
@@ -14,9 +14,10 @@ import com.th3rdwave.safeareacontext.SafeAreaContextPackage
 import com.swmansion.rnscreens.RNScreensPackage
 import com.BV.LinearGradient.LinearGradientPackage
 import com.reactnativecommunity.geolocation.GeolocationPackage
+import com.dooboolab.rniap.RNIapPackage
 import com.sensors.RNSensorsPackage
-import com.userapp.sms.SmsPackage
-import com.userapp.calls.DirectCallPackage
+import com.safetnet.userapp.sms.SmsPackage
+import com.safetnet.userapp.calls.DirectCallPackage
 
 class MainApplication : Application(), ReactApplication {
 
@@ -94,6 +95,22 @@ class MainApplication : Application(), ReactApplication {
               }
             } else {
               Log.d("MainApplication", "RNSensorsPackage found in autolinked packages")
+            }
+
+            val hasIap = this.any {
+              it.javaClass.name.contains("RNIapPackage") ||
+              it.javaClass.name.contains("rniap")
+            }
+            if (!hasIap) {
+              Log.w("MainApplication", "RNIapPackage not found in autolinked packages, adding manually")
+              try {
+                add(RNIapPackage())
+                Log.d("MainApplication", "RNIapPackage added manually")
+              } catch (e: Exception) {
+                Log.e("MainApplication", "Failed to add RNIapPackage", e)
+              }
+            } else {
+              Log.d("MainApplication", "RNIapPackage found in autolinked packages")
             }
             
             // Add SMS and Direct Call packages

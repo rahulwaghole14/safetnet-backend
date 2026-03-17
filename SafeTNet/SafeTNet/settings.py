@@ -473,6 +473,9 @@ FIREBASE_CONFIG = {
     "universe_domain": config('FIREBASE_UNIVERSE_DOMAIN', default='googleapis.com'),
 }
 FCM_SERVER_KEY = config('FCM_SERVER_KEY', default=None)
+GOOGLE_PLAY_PACKAGE_NAME = config('GOOGLE_PLAY_PACKAGE_NAME', default='com.safetnet.userapp')
+GOOGLE_PLAY_SERVICE_ACCOUNT_JSON = config('GOOGLE_PLAY_SERVICE_ACCOUNT_JSON', default=None)
+GOOGLE_PLAY_RTDN_SHARED_SECRET = config('GOOGLE_PLAY_RTDN_SHARED_SECRET', default='')
 
 # Email Configuration
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')

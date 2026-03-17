@@ -8,6 +8,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import User, FamilyContact, CommunityMembership, SOSEvent, LiveLocationShare, CommunityAlert, ChatGroup, ChatMessage
 
+GOOGLE_PLAY_PACKAGE_NAME = getattr(settings, 'GOOGLE_PLAY_PACKAGE_NAME', 'com.safetnet.userapp')
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
@@ -528,6 +530,25 @@ class SubscriptionSerializer(serializers.Serializer):
         required=False,
         allow_blank=True,
         help_text="Optional promo code"
+    )
+
+
+class GooglePlayPurchaseSerializer(serializers.Serializer):
+    """
+    Serializer for Google Play purchase verification.
+    """
+    purchase_token = serializers.CharField(
+        required=True,
+        help_text="The purchase token received from Google Play"
+    )
+    subscription_id = serializers.CharField(
+        required=True,
+        help_text="The ID of the subscription (e.g. 'premium_monthly')"
+    )
+    package_name = serializers.CharField(
+        required=False,
+        default=GOOGLE_PLAY_PACKAGE_NAME,
+        help_text="The package name of the app"
     )
 
 
