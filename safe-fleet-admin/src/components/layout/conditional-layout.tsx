@@ -12,7 +12,7 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname();
   
   // Auth pages that should not have sidebar/header
-  const authPages = ['/login', '/register', '/forgot-password', '/reset-password'];
+  const authPages = ['/login', '/register', '/forgot-password', '/reset-password', '/privacy-policy'];
   
   const isAuthPage = authPages.includes(pathname);
   

@@ -5,10 +5,10 @@
 
 // Backend API Base URL
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://safetnet-backend.onrender.com',
+  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://safetnet-backend-1.onrender.com',
   AUTH_BASE_URL: process.env.NEXT_PUBLIC_API_URL 
     ? `${process.env.NEXT_PUBLIC_API_URL}/api/auth` 
-    : 'https://safetnet-backend.onrender.com/api/auth',
+    : 'https://safetnet-backend-1.onrender.com/api/auth',
   TIMEOUT: 30000, // 30 seconds
 };
 

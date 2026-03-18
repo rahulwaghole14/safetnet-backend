@@ -21,14 +21,15 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   useEffect(() => {
     if (!isClient) return;
 
-    // Public routes that don't require authentication
-    const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+    const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+    const publicRoutes = [...authRoutes, '/privacy-policy'];
     const isPublicRoute = publicRoutes.includes(pathname);
+    const isAuthRoute = authRoutes.includes(pathname);
 
     if (!isAuthenticated && !isPublicRoute) {
       // Not authenticated and trying to access protected route
       router.push('/login');
-    } else if (isAuthenticated && isPublicRoute) {
+    } else if (isAuthenticated && isAuthRoute) {
       // Already authenticated and trying to access login/register
       router.push('/');
     }
@@ -40,7 +41,14 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   // Show loading while redirecting
-  if (!isAuthenticated && pathname !== '/login' && pathname !== '/register' && pathname !== '/forgot-password' && pathname !== '/reset-password') {
+  if (
+    !isAuthenticated &&
+    pathname !== '/login' &&
+    pathname !== '/register' &&
+    pathname !== '/forgot-password' &&
+    pathname !== '/reset-password' &&
+    pathname !== '/privacy-policy'
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
