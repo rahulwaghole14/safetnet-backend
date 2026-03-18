@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -212,9 +213,16 @@ export default function LoginPage() {
           <div className="mt-6 pt-6 border-t border-border/50 text-center">
             <p className="text-xs text-white/70">
               Don&apos;t have an account?{' '}
-              <a href="/register" className="text-indigo-400 hover:text-indigo-300 font-medium">
+              <Link href="/register" className="text-indigo-400 hover:text-indigo-300 font-medium">
                 Register
-              </a>
+              </Link>
+            </p>
+            <p className="mt-3 text-xs text-white/60">
+              By continuing, you agree to the platform&apos;s{' '}
+              <Link href="/privacy-policy" className="text-sky-300 hover:text-sky-200 font-medium">
+                Privacy Policy
+              </Link>
+              .
             </p>
           </div>
 
