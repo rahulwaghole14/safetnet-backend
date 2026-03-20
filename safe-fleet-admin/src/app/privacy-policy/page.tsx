@@ -231,7 +231,7 @@ export default function PrivacyPolicyPage() {
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-100 sm:text-base">
             Questions about this privacy policy or personal data handling can be sent to{" "}
             <a href="mailto:support@safetnet.site" className="font-semibold text-sky-200 underline underline-offset-4">
-              support@safetnet.com
+              support@safetnet.site
             </a>.
           </p>
         </section>
