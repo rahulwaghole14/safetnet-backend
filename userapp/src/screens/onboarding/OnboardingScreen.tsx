@@ -8,11 +8,13 @@ import {
   TouchableOpacity,
   StatusBar,
   Image,
+  Linking,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {useAuthStore} from '../../stores/authStore';
 import LinearGradient from 'react-native-linear-gradient';
+import { PRIVACY_POLICY_URL } from '../../constants/links';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -239,7 +241,7 @@ const OnboardingScreen = () => {
           index,
         })}
         onScrollToIndexFailed={(info) => {
-          const wait = new Promise((resolve) => setTimeout(resolve, 500));
+          const wait = new Promise((resolve) => setTimeout(() => resolve(null), 500));
           wait.then(() => {
             flatListRef.current?.scrollToIndex({index: info.index, animated: true});
           });
@@ -255,7 +257,11 @@ const OnboardingScreen = () => {
               By clicking Get Started, you agree to our{' '}
               <Text style={styles.termsServiceLink}>Terms of Service</Text>
               {' '}and{' '}
-              <Text style={styles.termsServiceLink}>Privacy Policy</Text>
+              <Text 
+                style={styles.termsServiceLink}
+                onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}>
+                Privacy Policy
+              </Text>
             </Text>
           </View>
         )}

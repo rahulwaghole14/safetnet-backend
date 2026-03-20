@@ -7,10 +7,12 @@ import {
   Dimensions,
   TouchableOpacity,
   StatusBar,
+  Linking,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {useAuthStore} from '../../stores/authStore';
+import { PRIVACY_POLICY_URL } from '../../constants/links';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -192,7 +194,11 @@ const HowItWorksScreen = () => {
               By clicking Continue, you agree to our{' '}
               <Text style={styles.termsServiceLink}>Terms of Service</Text>
               {' '}and{' '}
-              <Text style={styles.termsServiceLink}>Privacy Policy</Text>
+              <Text 
+                style={styles.termsServiceLink}
+                onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}>
+                Privacy Policy
+              </Text>
             </Text>
           </View>
         )}

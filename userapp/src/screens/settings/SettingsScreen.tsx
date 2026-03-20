@@ -9,12 +9,14 @@ import {
   TextInput,
   Alert,
   Modal,
+  Linking,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '@react-navigation/native';
 import {useSettingsStore, DEFAULT_SOS_MESSAGES} from '../../stores/settingsStore';
 import type {ThemeMode, SosAudience} from '../../stores/settingsStore';
 import {shakeDetectionService} from '../../services/shakeDetectionService';
+import { PRIVACY_POLICY_URL } from '../../constants/links';
 
 const SettingsScreen = () => {
   const shakeToSendSOS = useSettingsStore((state) => state.shakeToSendSOS);
@@ -294,6 +296,28 @@ const SettingsScreen = () => {
           </View>
         </View>
       </Modal>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, {color: theme.colors.text}]}>About & Legal</Text>
+        <TouchableOpacity
+          style={[
+            styles.settingItem,
+            {backgroundColor: theme.colors.card, borderColor: theme.colors.border},
+          ]}
+          onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}>
+          <View style={styles.settingInfo}>
+            <MaterialIcons name="security" size={24} color="#2563EB" />
+            <View style={styles.settingTextContainer}>
+              <Text style={[styles.settingTitle, {color: theme.colors.text}]}>Privacy Policy</Text>
+              <Text style={[styles.settingDescription, {color: theme.colors.notification}]}>View our commitment to your privacy</Text>
+            </View>
+          </View>
+          <MaterialIcons name="chevron-right" size={24} color={theme.colors.text} />
+        </TouchableOpacity>
+        
+        <View style={styles.appVersionContainer}>
+          <Text style={[styles.appVersionText, {color: theme.colors.notification}]}>Version 1.0.1 (Build 2)</Text>
+        </View>
+      </View>
     </ScrollView>
   );
 };
@@ -487,6 +511,14 @@ const styles = StyleSheet.create({
   },
   modalBody: {
     marginTop: 8,
+  },
+  appVersionContainer: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  appVersionText: {
+    fontSize: 12,
+    opacity: 0.7,
   },
 });
 
