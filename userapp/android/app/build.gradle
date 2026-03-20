@@ -84,7 +84,7 @@ tasks.named('generateAutolinkingPackageList').configure {
 /**
  * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
@@ -120,7 +120,7 @@ def isReleaseBuildRequested = requestedTasks.any { taskName ->
 }
 
 if (isReleaseBuildRequested && !hasReleaseSigning) {
-    throw new GradleException(
+    throw new RuntimeException(
         "Missing release signing config. Create android/keystore.properties or set " +
         "RELEASE_STORE_FILE, RELEASE_STORE_PASSWORD, RELEASE_KEY_ALIAS, and RELEASE_KEY_PASSWORD."
     )
@@ -131,14 +131,18 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     namespace "com.safetnet.userapp"
     defaultConfig {
         applicationId "com.safetnet.userapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
-        missingDimensionStrategy 'store', 'play'
+        versionCode 5
+        versionName "1.0.4"
         manifestPlaceholders = [
             usesCleartextTraffic: true,
             MAPS_API_KEY: mapApiKey
@@ -163,11 +167,13 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            matchingFallbacks = ['debug', 'release']
         }
         release {
             signingConfig hasReleaseSigning ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            matchingFallbacks = ['release']
         }
     }
 }

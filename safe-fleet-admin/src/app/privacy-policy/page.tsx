@@ -112,10 +112,10 @@ export default function PrivacyPolicyPage() {
                   <div>
                     <p className="text-xs uppercase tracking-[0.22em] text-slate-400">Contact</p>
                     <a
-                      href="mailto:support@safetnet.com"
+                      href="mailto:support@safetnet.site"
                       className="mt-2 inline-block text-base font-medium text-white transition hover:text-sky-300"
                     >
-                      support@safetnet.com
+                      support@safetnet.site
                     </a>
                   </div>
                 </div>
@@ -230,7 +230,7 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-2xl font-semibold text-white">Contact SafeTNet</h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-100 sm:text-base">
             Questions about this privacy policy or personal data handling can be sent to{" "}
-            <a href="mailto:support@safetnet.com" className="font-semibold text-sky-200 underline underline-offset-4">
+            <a href="mailto:support@safetnet.site" className="font-semibold text-sky-200 underline underline-offset-4">
               support@safetnet.com
             </a>.
           </p>
