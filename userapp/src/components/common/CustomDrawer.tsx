@@ -1,11 +1,12 @@
 import React, {useState, useEffect, useMemo} from 'react';
-import {View, Text, TouchableOpacity, Modal, BackHandler, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, TouchableOpacity, Modal, BackHandler, StyleSheet, ScrollView, Linking} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useTheme} from '@react-navigation/native';
 import type {Theme} from '@react-navigation/native';
 import {useAuthStore} from '../../stores/authStore';
 import {useSubscription} from '../../lib/hooks/useSubscription';
+import { PRIVACY_POLICY_URL } from '../../constants/links';
 
 interface CustomDrawerProps {
   visible: boolean;
@@ -145,6 +146,11 @@ const CustomDrawer = ({visible, onClose, navigation, showLoginModal}: CustomDraw
     }
   };
 
+  const handlePrivacyPolicy = () => {
+    onClose();
+    Linking.openURL(PRIVACY_POLICY_URL);
+  };
+
   const handleSettings = () => {
     if (!isAuthenticated) {
       onClose();
@@ -244,14 +250,24 @@ const CustomDrawer = ({visible, onClose, navigation, showLoginModal}: CustomDraw
             })}
           </ScrollView>
 
-          {/* Settings Button */}
-          <TouchableOpacity
-            style={styles.settingsButton}
-            onPress={handleSettings}
-            activeOpacity={0.7}>
-            <MaterialIcons name="settings" size={24} color={colors.primary} style={styles.menuIcon} />
-            <Text style={styles.settingsText}>Settings</Text>
-          </TouchableOpacity>
+          {/* Settings & Privacy - White background matching bottom layout */}
+          <View style={styles.footerContainer}>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={handleSettings}
+              activeOpacity={0.7}>
+              <MaterialIcons name="settings" size={24} color={colors.primary} style={styles.menuIcon} />
+              <Text style={styles.footerText}>Settings</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={handlePrivacyPolicy}
+              activeOpacity={0.7}>
+              <MaterialIcons name="security" size={24} color={colors.primary} style={styles.menuIcon} />
+              <Text style={styles.footerText}>Privacy</Text>
+            </TouchableOpacity>
+          </View>
         </View>
         
         {/* Overlay - Right Side */}
@@ -379,16 +395,19 @@ const createStyles = (colors: Theme['colors'], tokens: DrawerThemeTokens, isDark
       fontSize: 10,
       fontWeight: '600',
     },
-    settingsButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 14,
-      paddingHorizontal: 20,
+    footerContainer: {
       marginTop: 'auto',
       borderTopWidth: 1,
       borderTopColor: tokens.borderColor,
+      paddingVertical: 8,
     },
-    settingsText: {
+    footerButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+    },
+    footerText: {
       fontSize: 16,
       color: colors.primary,
       fontWeight: '600',
