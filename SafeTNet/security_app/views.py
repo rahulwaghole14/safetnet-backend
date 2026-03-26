@@ -416,7 +416,13 @@ class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
         alert = self.get_object()
         
         # Permission checks are now handled by get_permissions() and IsOwnerAndPendingAlert
+        
+        # Update status and ensure officer assignment for dashboard accuracy
         alert.status = 'resolved'
+        if not alert.assigned_officer and request.user.role == 'security_officer':
+            logger.info(f"👮 Auto-assigning officer {request.user.username} to alert {alert.id} during resolution")
+            alert.assigned_officer = request.user
+            
         alert.save()
 
         serializer = self.get_serializer(alert)
@@ -979,12 +985,15 @@ class DashboardView(OfficerOnlyMixin, APIView):
         
         all_geofence_ids = list(set(geofence_ids) | set(assignment_geofence_ids))
 
-        # 1. PENDING: New SOS alerts in officer's geofences (ready for response)
+        # 1. PENDING: New SOS alerts in officer's geofences OR organization fallback
+        # This ensures alerts outside geofences are still visible to relevant officers
+        pending_alerts_q = Q(status='pending', is_deleted=False)
+        geofence_filter = Q(geofence_id__in=all_geofence_ids)
+        org_fallback = Q(geofence__isnull=True, user__organization=officer.organization)
+        
         pending_alerts_count = SOSAlert.objects.filter(
-            geofence_id__in=all_geofence_ids,
-            status='pending',
-            is_deleted=False
-        ).count()
+            pending_alerts_q & (geofence_filter | org_fallback)
+        ).distinct().count()
         
         # 2. ACTIVE: Alerts currently handled by this officer
         active_alerts_count = SOSAlert.objects.filter(
@@ -993,7 +1002,8 @@ class DashboardView(OfficerOnlyMixin, APIView):
             is_deleted=False
         ).count()
         
-        # 3. RESOLVED: Alerts resolved by this officer today
+        # 3. RESOLVED: Alerts resolved by this officer today (Localized)
+        today_start = timezone.localtime(now).replace(hour=0, minute=0, second=0, microsecond=0)
         resolved_today_count = SOSAlert.objects.filter(
             assigned_officer=officer,
             status='resolved',
