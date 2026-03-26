@@ -3,6 +3,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegistrationScreen from '../screens/auth/RegistrationScreen';
+import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
+import TermsOfUseScreen from '../screens/auth/TermsOfUseScreen';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
 import HowItWorksScreen from '../screens/howitworks/HowItWorksScreen';
 import HomeScreen from '../screens/main/HomeScreen';
@@ -35,6 +37,8 @@ const AuthNavigator = () => {
         }}>
         <Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}} />
         <Stack.Screen name="Registration" component={RegistrationScreen} options={{headerShown: false}} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{headerShown: false}} />
+        <Stack.Screen name="TermsOfUse" component={TermsOfUseScreen} options={{headerShown: false}} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{headerShown: false}} />
         <Stack.Screen name="HowItWorks" component={HowItWorksScreen} options={{headerShown: false}} />
         <Stack.Screen name="Home" component={HomeScreen} />

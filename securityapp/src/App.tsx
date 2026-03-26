@@ -52,7 +52,8 @@ function AppContent() {
     <AuthPersistenceWrapper>
       <StatusBar
         barStyle={currentTheme === 'dark' ? 'light-content' : 'dark-content'}
-        backgroundColor={currentTheme === 'dark' ? '#000000' : '#FFFFFF'}
+        backgroundColor="transparent"
+        translucent={true}
       />
       <AppNavigator />
     </AuthPersistenceWrapper>

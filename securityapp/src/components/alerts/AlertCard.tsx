@@ -12,9 +12,10 @@ interface AlertCardProps {
   onDelete?: (alert: Alert) => void;
   onSolve?: (alert: Alert) => void;
   onUpdate?: (alert: Alert) => void;
+  onViewLocation?: (alert: Alert) => void;
 }
 
-export const AlertCard: React.FC<AlertCardProps> = ({ alert, onRespond, onDelete, onSolve, onUpdate }) => {
+export const AlertCard: React.FC<AlertCardProps> = ({ alert, onRespond, onDelete, onSolve, onUpdate, onViewLocation }) => {
   const colors = useColors();
   // Check if emergency based on original_alert_type or alert_type
   const isEmergency = alert.original_alert_type === 'emergency' ||
@@ -274,27 +275,40 @@ export const AlertCard: React.FC<AlertCardProps> = ({ alert, onRespond, onDelete
           </View>
         ) : isAccepted ? (
           <View style={styles(colors).acceptedActions}>
-            {onSolve ? (
-              <TouchableOpacity
-                style={styles(colors).solveButton}
-                onPress={() => onSolve(alert)}
-                activeOpacity={0.7}
-              >
-                <Icon name="check-circle" size={18} color={colors.white} />
-                <Text style={styles(colors).solveButtonText}>MARK SOLVED</Text>
-              </TouchableOpacity>
-            ) : (
-              <View style={styles(colors).acceptedBadge}>
-                <Icon name="check-circle" size={18} color={colors.successGreen} />
-                <Text style={styles(colors).acceptedText}>RESPOND ACCEPTED</Text>
-              </View>
-            )}
+            <View style={styles(colors).respondButtonContainer}>
+              {onSolve && !isOfficerCreated ? (
+                <TouchableOpacity
+                  style={styles(colors).solveButtonSmall}
+                  onPress={() => onSolve(alert)}
+                  activeOpacity={0.7}
+                >
+                  <Icon name="check-circle" size={18} color={colors.white} />
+                  <Text style={styles(colors).solveButtonText}>MARK SOLVED</Text>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles(colors).acceptedBadge}>
+                  <Icon name="check-circle" size={18} color={colors.successGreen} />
+                  <Text style={styles(colors).acceptedText}>ACCEPTED</Text>
+                </View>
+              )}
+              
+              {onViewLocation && !isOfficerCreated && (
+                <TouchableOpacity
+                  style={styles(colors).mapButtonBottom}
+                  onPress={() => onViewLocation(alert)}
+                  activeOpacity={0.7}
+                >
+                  <Icon name="map" size={18} color={colors.white} />
+                  <Text style={styles(colors).mapButtonBottomText}>MAP</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         ) : (
           <>
-            {/* Top row: Delete button only */}
+            {/* Top row: Delete button only - Hide for officer-created alerts if we want NO buttons */}
             <View style={styles(colors).topButtonsContainer}>
-              {onDelete && (
+              {onDelete && !isOfficerCreated && (
                 <TouchableOpacity
                   style={styles(colors).deleteButtonTop}
                   onPress={handleDelete}
@@ -306,19 +320,32 @@ export const AlertCard: React.FC<AlertCardProps> = ({ alert, onRespond, onDelete
               )}
             </View>
             
-            {/* Bottom row: Respond button - Show for all pending alerts */}
-            <View style={styles(colors).respondButtonContainer}>
-              <TouchableOpacity
-                style={[
-                  styles(colors).respondButtonBottom,
-                  isEmergency && styles(colors).respondButtonBottomEmergency,
-                ]}
-                onPress={() => onRespond(alert)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles(colors).respondButtonBottomText}>RESPOND</Text>
-              </TouchableOpacity>
-            </View>
+            {/* Bottom row: Respond and Map buttons - Show for all pending alerts (unless officer created) */}
+            {!isOfficerCreated && (
+              <View style={styles(colors).respondButtonContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles(colors).respondButtonBottom,
+                    isEmergency && styles(colors).respondButtonBottomEmergency,
+                  ]}
+                  onPress={() => onRespond(alert)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles(colors).respondButtonBottomText}>RESPOND</Text>
+                </TouchableOpacity>
+                
+                {onViewLocation && (
+                  <TouchableOpacity
+                    style={styles(colors).mapButtonBottom}
+                    onPress={() => onViewLocation(alert)}
+                    activeOpacity={0.7}
+                  >
+                    <Icon name="map" size={18} color={colors.white} />
+                    <Text style={styles(colors).mapButtonBottomText}>MAP</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
           </>
         )}
       </View>
@@ -475,7 +502,25 @@ const styles = (colors: any) => StyleSheet.create({
   respondButtonBottomText: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.darkText,
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  mapButtonBottom: {
+    flex: 0.4, // Map button is smaller than Respond button
+    height: 44,
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  mapButtonBottomText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.white,
     letterSpacing: 0.5,
   },
   deleteButtonBottom: {
@@ -592,7 +637,9 @@ const styles = (colors: any) => StyleSheet.create({
     textShadowRadius: 2,
   },
   respondButtonContainer: {
-    marginTop: 8,
+    marginTop: 12,
+    flexDirection: 'row',
+    gap: 12,
   },
   completedActions: {
     flexDirection: 'row',
@@ -648,6 +695,17 @@ const styles = (colors: any) => StyleSheet.create({
   },
   solveButton: {
     width: '100%',
+    height: 44,
+    backgroundColor: '#10B981',
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    ...shadows.md,
+  },
+  solveButtonSmall: {
+    flex: 1,
     height: 44,
     backgroundColor: '#10B981',
     borderRadius: 8,

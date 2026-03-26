@@ -28,6 +28,21 @@ export const AppNavigator = () => {
     }
   }, [isAuthenticated, shouldNavigateToSOS, dispatch]);
 
+    // Listen for notification navigation events
+  useEffect(() => {
+    const navSubscription = DeviceEventEmitter.addListener('notification:navigate', (data) => {
+      console.log('[AppNavigator] Notification navigation event received:', data);
+      if (navigationRef.current && data.alertId) {
+        // Navigate to AlertRespondMap with alertId
+        navigationRef.current.navigate('AlertRespondMap', { alertId: data.alertId });
+      }
+    });
+
+    return () => {
+      navSubscription.remove();
+    };
+  }, []);
+
   // Listen for auth logout events from API client
   useEffect(() => {
     const logoutSubscription = DeviceEventEmitter.addListener('auth:logout', (data) => {

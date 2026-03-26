@@ -64,3 +64,10 @@ coverage/
 .DS_Store
 Thumbs.db
 
+# Gradle
+.gradle-user-home/
+.gradle-user-home-2/
+.gradle/
+**/build/
+**/bin/
+

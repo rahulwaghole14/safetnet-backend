@@ -76,9 +76,14 @@ export const alertServiceWithGeofenceFilter = {
 
       // Handle different response structures
       console.log('🔍 Backend Response Analysis:');
+      if (!response.data) {
+        console.warn('⚠️ API returned null or undefined data');
+        return [];
+      }
+      
       console.log(`   📊 Response type: ${typeof response.data}`);
       console.log(`   📊 Response keys: ${Object.keys(response.data)}`);
-      console.log(`   📊 Has results: ${!!response.data.results}`);
+      console.log(`   📊 Has results: ${!!response.data?.results}`);
       console.log(`   📊 Is array: ${Array.isArray(response.data)}`);
       
       // Handle paginated response (Django REST Framework style)
@@ -159,6 +164,13 @@ export const alertServiceWithGeofenceFilter = {
           return null;
         }
         
+        // Robust GPS parsing
+        const nestedLat = alert.location?.latitude || alert.location?.lat;
+        const nestedLng = alert.location?.longitude || alert.location?.lng;
+        
+        const lat = nestedLat ?? alert.location_lat ?? alert.latitude ?? 0;
+        const lng = nestedLng ?? alert.location_long ?? alert.longitude ?? 0;
+        
         return {
           ...alert,
           id: typeof alert.id === 'number' ? alert.id : parseInt(alert.id) || alert.pk || alert.alert_id,
@@ -167,17 +179,17 @@ export const alertServiceWithGeofenceFilter = {
           user_name: alert.user_name || alert.user || 'Unknown User',
           user_email: alert.user_email || '',
           user_phone: alert.user_phone || '',
-          created_by_role: alert.created_by_role || 'USER', // Default to 'USER' if missing
+          created_by_role: alert.created_by_role || 'USER',
           alert_type: alert.alert_type || 'security',
           priority: alert.priority || 'medium',
           message: alert.message || 'Alert message',
-          location: alert.location || {
-            latitude: alert.latitude || alert.location_lat || 0,
-            longitude: alert.longitude || alert.location_long || 0,
-            address: alert.address || 'Unknown location'
+          location: {
+            latitude: lat,
+            longitude: lng,
+            address: alert.location_address || alert.address || alert.location?.address || 'Unknown location'
           },
-          location_lat: alert.location_lat || alert.latitude || 0,
-          location_long: alert.location_long || alert.longitude || 0,
+          location_lat: lat,
+          location_long: lng,
         };
       }).filter(alert => alert !== null); // Filter out any null alerts
 
@@ -268,28 +280,39 @@ export const alertServiceWithGeofenceFilter = {
       }
 
       // Transform the alerts
-      const transformedAlerts = alertsData.map((alert: any) => ({
-        ...alert,
-        id: typeof alert.id === 'number' ? alert.id : parseInt(alert.id) || alert.pk || alert.alert_id,
-        log_id: alert.log_id || '',
-        user_id: alert.user_id || '',
-        user_name: alert.user_name || alert.user || 'Unknown User',
-        user_email: alert.user_email || '',
-        user_phone: alert.user_phone || '',
-        alert_type: alert.alert_type || 'security',
-        priority: alert.priority || 'medium',
-        message: alert.message || 'Alert message',
-        location: alert.location || {
-          latitude: alert.latitude || alert.location_lat || 0,
-          longitude: alert.longitude || alert.location_long || 0,
-          address: alert.address || 'Unknown location'
-        },
-        timestamp: alert.timestamp || alert.created_at || new Date().toISOString(),
-        status: alert.status || 'pending',
-        geofence_id: alert.geofence_id || '',
-        created_at: alert.created_at || alert.timestamp || new Date().toISOString(),
-        updated_at: alert.updated_at
-      }));
+      const transformedAlerts = alertsData.map((alert: any) => {
+        // Robust GPS parsing
+        const nestedLat = alert.location?.latitude || alert.location?.lat;
+        const nestedLng = alert.location?.longitude || alert.location?.lng;
+        
+        const lat = nestedLat ?? alert.location_lat ?? alert.latitude ?? 0;
+        const lng = nestedLng ?? alert.location_long ?? alert.longitude ?? 0;
+
+        return {
+          ...alert,
+          id: typeof alert.id === 'number' ? alert.id : parseInt(alert.id) || alert.pk || alert.alert_id,
+          log_id: alert.log_id || '',
+          user_id: alert.user_id || '',
+          user_name: alert.user_name || alert.user || 'Unknown User',
+          user_email: alert.user_email || '',
+          user_phone: alert.user_phone || '',
+          alert_type: alert.alert_type || 'security',
+          priority: alert.priority || 'medium',
+          message: alert.message || 'Alert message',
+          location: {
+            latitude: lat,
+            longitude: lng,
+            address: alert.location_address || alert.address || alert.location?.address || 'Unknown location'
+          },
+          location_lat: lat,
+          location_long: lng,
+          timestamp: alert.timestamp || alert.created_at || new Date().toISOString(),
+          status: alert.status || 'pending',
+          geofence_id: alert.geofence_id || '',
+          created_at: alert.created_at || alert.timestamp || new Date().toISOString(),
+          updated_at: alert.updated_at
+        };
+      });
 
     // Sort alerts by created_at in descending order (most recent first)
       transformedAlerts.sort((a, b) => {
@@ -359,39 +382,57 @@ export const alertServiceWithGeofenceFilter = {
       console.log('🔍 Raw backend alert data:', alertData);
       
       // Transform location fields to location object
-      if (alertData.location_lat && alertData.location_long) {
-        const lat = parseFloat(String(alertData.location_lat));
-        const lng = parseFloat(String(alertData.location_long));
+      const nestedLat = alertData.location?.latitude || alertData.location?.lat;
+      const nestedLng = alertData.location?.longitude || alertData.location?.lng;
+      
+      const rawLat = nestedLat ?? alertData.location_lat ?? alertData.latitude ?? alertData.lat;
+      const rawLng = nestedLng ?? alertData.location_long ?? alertData.longitude ?? alertData.lng;
+      
+      if (rawLat !== undefined && rawLat !== null && rawLng !== undefined && rawLng !== null) {
+        const lat = parseFloat(String(rawLat));
+        const lng = parseFloat(String(rawLng));
         
         // Validate GPS coordinates
-        if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180 || (lat === 0 && lng === 0)) {
           console.error('❌ Invalid GPS coordinates in alert data:', { 
-            original_lat: alertData.location_lat,
-            original_lng: alertData.location_long,
+            original_lat: rawLat,
+            original_lng: rawLng,
             parsed_lat: lat,
             parsed_lng: lng
           });
-          alertData.location = {
-            latitude: 0,
-            longitude: 0,
-            address: 'Invalid GPS coordinates'
-          };
+          
+          if (!alertData.location?.latitude) {
+            alertData.location = {
+              latitude: 0,
+              longitude: 0,
+              address: 'Invalid GPS coordinates'
+            };
+            alertData.location_lat = 0;
+            alertData.location_long = 0;
+          }
         } else {
           alertData.location = {
             latitude: lat,
             longitude: lng,
-            address: alertData.location_address || `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}`
+            address: alertData.location_address || alertData.location?.address || `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}`
           };
+          
+          alertData.location_lat = lat;
+          alertData.location_long = lng;
           
           console.log('✅ Transformed location object:', alertData.location);
         }
       } else {
         console.warn('⚠️ No location coordinates found in alert data');
-        alertData.location = {
-          latitude: 0,
-          longitude: 0,
-          address: 'Unknown location - GPS coordinates missing'
-        };
+        if (!alertData.location?.latitude) {
+          alertData.location = {
+            latitude: 0,
+            longitude: 0,
+            address: 'Unknown location - GPS coordinates missing'
+          };
+          alertData.location_lat = 0;
+          alertData.location_long = 0;
+        }
       }
       
       return alertData;
@@ -433,7 +474,7 @@ export const alertServiceWithGeofenceFilter = {
       location_lat?: number; // Add location fields to API payload
       location_long?: number;
     } = {
-      alert_type: alertData.alert_type,
+      alert_type: alertData.alert_type === 'general' ? 'normal' : alertData.alert_type,
       message: alertData.message,
       description: alertData.description || alertData.message,
       priority: alertData.priority || 'medium',
@@ -477,6 +518,13 @@ export const alertServiceWithGeofenceFilter = {
       console.log('📥 POST /sos/ response:', response.data);
       console.log('✅ Alert created, response:', response.data);
 
+      // Robust GPS parsing for response
+      const nestedLat = response.data.location?.latitude || response.data.location?.lat;
+      const nestedLng = response.data.location?.longitude || response.data.location?.lng;
+      
+      const resLat = nestedLat ?? response.data.location_lat ?? response.data.latitude ?? apiData.location_lat ?? 0;
+      const resLng = nestedLng ?? response.data.location_long ?? response.data.longitude ?? apiData.location_long ?? 0;
+
       // Transform the response to ensure it matches our Alert interface
       const createdAlert = {
         ...response.data,
@@ -489,13 +537,13 @@ export const alertServiceWithGeofenceFilter = {
         alert_type: response.data.alert_type || apiData.alert_type,
         priority: response.data.priority || (apiData.alert_type === 'emergency' || apiData.alert_type === 'area_user_alert' ? 'high' : 'medium'),
         message: response.data.message || apiData.message,
-        location: response.data.location || {
-          latitude: apiData.location_lat || 0,
-          longitude: apiData.location_long || 0,
-          address: 'Backend assigned location'
+        location: {
+          latitude: resLat,
+          longitude: resLng,
+          address: response.data.location_address || response.data.location?.address || 'Backend assigned location'
         },
-        location_lat: response.data.location_lat || apiData.location_lat || 0,
-        location_long: response.data.location_long || apiData.location_long || 0,
+        location_lat: resLat,
+        location_long: resLng,
         timestamp: response.data.timestamp || response.data.created_at || new Date().toISOString(),
         status: response.data.status || 'pending',
         geofence_id: response.data.geofence_id || '',
@@ -651,6 +699,13 @@ export const alertServiceWithGeofenceFilter = {
       
       const response = await apiClient.patch(API_ENDPOINTS.UPDATE_SOS.replace('{id}', String(alertId)), apiData);
       
+      // Robust GPS parsing
+      const nestedLat = response.data.location?.latitude || response.data.location?.lat;
+      const nestedLng = response.data.location?.longitude || response.data.location?.lng;
+      
+      const resLat = nestedLat ?? response.data.location_lat ?? response.data.latitude ?? 0;
+      const resLng = nestedLng ?? response.data.location_long ?? response.data.longitude ?? 0;
+
       const updatedAlert = {
         ...response.data,
         id: typeof response.data.id === 'number' ? response.data.id : parseInt(response.data.id) || response.data.pk || response.data.alert_id,
@@ -662,11 +717,13 @@ export const alertServiceWithGeofenceFilter = {
         alert_type: response.data.alert_type || updateData.alert_type || 'security',
         priority: response.data.priority || updateData.priority || 'medium',
         message: response.data.message || updateData.message || 'Alert message',
-        location: response.data.location || {
-          latitude: response.data.location_lat || 0,
-          longitude: response.data.location_long || 0,
-          address: response.data.location || 'Current Location'
+        location: {
+          latitude: resLat,
+          longitude: resLng,
+          address: response.data.location_address || response.data.location?.address || 'Current Location'
         },
+        location_lat: resLat,
+        location_long: resLng,
         timestamp: response.data.timestamp || response.data.created_at || new Date().toISOString(),
         status: response.data.status || updateData.status || 'pending',
         geofence_id: response.data.geofence_id || '',

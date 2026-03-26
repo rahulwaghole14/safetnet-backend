@@ -32,6 +32,8 @@ interface AuthState {
   logout: () => Promise<void>;
   load: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  resetPassword: (email: string, otp: string, newPassword: string) => Promise<void>;
 }
 
 const resetUserScopedData = () => {
@@ -49,6 +51,8 @@ const convertApiUserToUser = (apiUser: LoginResponse['user']): User => {
     name: fullName,
     phone: apiUser.phone || '',
     plan: apiUser.is_premium ? 'premium' : 'free',
+    role: 'user',
+    status: 'online',
   };
 };
 
@@ -78,7 +82,7 @@ export const useAuthStore = create<AuthState>((set) => ({
               ...user,
           name: response.user.name || user.name,
           phone: response.user.phone || user.phone,
-          plan: response.user.is_premium ? 'premium' : 'free',
+          plan: (response.user.is_premium ? 'premium' : 'free') as 'premium' | 'free',
             };
         set({user: updatedUser, isAuthenticated: true, isLoading: false, showOnboarding: true});
         const storage = await getStorage();
@@ -94,18 +98,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (email: string, password: string, name: string, phone: string) => {
     try {
       // Backend expects name, email, phone, password, password_confirm, plantype
-      const response = await apiService.register({
+      const response = await apiService.register(
         name,
         email,
         phone,
         password,
-        passwordConfirm: password,
-      });
+        password // passwordConfirm is also the same password here
+      );
       
-      if (response.error) {
-        throw new Error(response.error);
-      }
-
       if (response.user && response.tokens) {
         resetUserScopedData();
         const user = convertApiUserToUser(response.user);
@@ -134,6 +134,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       email: plan === 'premium' ? 'premium@test.safetnet.app' : 'free@test.safetnet.app',
       phone: '+1234567890',
       plan,
+      role: 'user',
+      status: 'online',
     };
     set({user: testUser, isAuthenticated: true, isLoading: false, showOnboarding: true});
     const storage = await getStorage();
@@ -321,7 +323,7 @@ export const useAuthStore = create<AuthState>((set) => ({
             ...currentUser,
             name: profileData.name || profileData.first_name || currentUser.name,
             phone: profileData.phone || currentUser.phone,
-            plan: profileData.is_premium || profileData.plantype === 'premium' ? 'premium' : 'free',
+            plan: (profileData.is_premium || profileData.plantype === 'premium' ? 'premium' : 'free') as 'premium' | 'free',
           };
           set({user: updatedUser});
           const storage = await getStorage();
@@ -339,6 +341,24 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (!isNetworkError) {
         console.warn('Failed to refresh profile:', error);
       }
+    }
+  },
+  requestPasswordReset: async (email: string) => {
+    try {
+      console.log(`[AuthStore] Requesting password reset for: ${email}`);
+      await apiService.requestPasswordReset(email);
+    } catch (error: any) {
+      console.error('[AuthStore] Request password reset error:', error);
+      throw error;
+    }
+  },
+  resetPassword: async (email: string, otp: string, newPassword: string) => {
+    try {
+      console.log(`[AuthStore] Resetting password for: ${email}`);
+      await apiService.resetPassword(email, otp, newPassword);
+    } catch (error: any) {
+      console.error('[AuthStore] Reset password error:', error);
+      throw error;
     }
   },
 }));

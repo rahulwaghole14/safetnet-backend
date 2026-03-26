@@ -55,6 +55,30 @@ react {
     autolinkLibrariesWithApp()
 }
 
+// Pre-build task to generate autolinking.json before it's needed - matches userapp stabilization pattern
+task generateAutolinkingJson {
+    def autolinkingDir = file("${buildDir}/generated/autolinking")
+    autolinkingDir.mkdirs()
+    def autolinkingFile = file("${autolinkingDir}/autolinking.json")
+    // Create a minimal valid autolinking.json
+    autolinkingFile.text = """{
+  "project": {
+    "android": {
+      "packageName": "com.safetnet.securityapp"
+    }
+  },
+  "dependencies": {}
+}"""
+    doLast {
+        println "Generated autolinking.json"
+    }
+}
+
+// Make sure autolinking.json is generated before the package list task
+tasks.named('generateAutolinkingPackageList').configure {
+    dependsOn 'generateAutolinkingJson'
+}
+
 /**
  * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
  */
@@ -73,18 +97,37 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+import java.util.Properties
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+def releaseStoreFile = keystoreProperties.getProperty("storeFile") ?: System.getenv("RELEASE_STORE_FILE")
+def releaseStorePassword = keystoreProperties.getProperty("storePassword") ?: System.getenv("RELEASE_STORE_PASSWORD")
+def releaseKeyAlias = keystoreProperties.getProperty("keyAlias") ?: System.getenv("RELEASE_KEY_ALIAS")
+def releaseKeyPassword = keystoreProperties.getProperty("keyPassword") ?: System.getenv("RELEASE_KEY_PASSWORD")
+def hasReleaseSigning = [releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword].every { it }
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.securityapp"
+    namespace "com.safetnet.securityapp"
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     defaultConfig {
-        applicationId "com.securityapp"
+        applicationId "com.safetnet.securityapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 8
+        versionName "1.4.3"
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", "false"
     }
     signingConfigs {
         debug {
@@ -93,15 +136,21 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        if (hasReleaseSigning) {
+            release {
+                storeFile rootProject.file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig hasReleaseSigning ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -117,4 +166,28 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    // Manually add dependencies to avoid broken RN 0.82 codegen autolinking metadata
+    implementation(project(':react-native-safe-area-context'))
+    implementation(project(':react-native-screens'))
+    implementation(project(':react-native-gesture-handler'))
+    implementation(project(':react-native-async-storage_async-storage'))
+    implementation(project(':react-native-vector-icons'))
+    implementation(project(':react-native-webview'))
+    implementation(project(':react-native-firebase_app'))
+    implementation(project(':react-native-firebase_messaging'))
+    implementation(project(':react-native-geolocation-service'))
+    
+    // Add core Firebase SDK dependencies
+    implementation platform('com.google.firebase:firebase-bom:33.10.0')
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-common'
+
+    // Exclude old support library to avoid conflicts with AndroidX
+    configurations.all {
+        exclude group: 'com.android.support', module: 'support-compat'
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
 }
+
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"

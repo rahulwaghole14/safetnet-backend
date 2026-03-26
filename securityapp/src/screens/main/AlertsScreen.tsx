@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Alert } from '../../types/alert.types';
@@ -22,6 +22,7 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { AlertRespondModal } from '../../components/common/AlertRespondModal';
 import { useColors } from '../../utils/colors';
 import { typography, spacing } from '../../utils';
+import { locationService } from '../../api/services/geofenceService';
 
 interface AlertsScreenProps {}
 
@@ -31,6 +32,7 @@ interface AlertsScreenRef {
 
 export const AlertsScreen = forwardRef<AlertsScreenRef, AlertsScreenProps>((props, ref) => {
   const colors = useColors();
+  const navigation = useNavigation();
 
   // Use Zustand alerts store
   const {
@@ -135,6 +137,11 @@ export const AlertsScreen = forwardRef<AlertsScreenRef, AlertsScreenProps>((prop
     
     setSelectedAlertId(String(alert.id));
     setShowRespondModal(true);
+  };
+
+  const handleViewLocation = (alert: Alert) => {
+    console.log('📍 AlertsScreen: Navigating to map for alert:', alert.id);
+    (navigation as any).navigate('AlertRespondMap', { alertId: String(alert.id) });
   };
 
   // Modal handlers
@@ -283,8 +290,7 @@ export const AlertsScreen = forwardRef<AlertsScreenRef, AlertsScreenProps>((prop
   const handleSolve = async (alert: Alert) => {
     console.log('🔧 AlertsScreen: Solve button pressed for alert:', alert.id);
     try {
-      // TODO: Use storeResolveAlert once TypeScript issue is resolved
-      await storeUpdateAlert(alert.id, { status: 'completed' });
+      await useAlertsStore.getState().resolveAlert(alert.id);
       console.log('✅ Alert resolved successfully');
       showToast('Alert marked as solved!', 'success');
     } catch (resolveError: any) {
@@ -301,26 +307,37 @@ export const AlertsScreen = forwardRef<AlertsScreenRef, AlertsScreenProps>((prop
     }
 
     setCreatingAlert(true);
-    // Location state removed - frontend no longer handles location
-    console.log('🚨 AlertsScreen: Creating new alert without location...');
+    console.log('🚨 AlertsScreen: Capturing GPS for new alert...');
 
     try {
-      // Location handling removed - frontend no longer handles GPS or location data
-      // Backend will handle location assignment based on user context
+      // Step 1: Request location permission and capture GPS
+      const hasPermission = await locationService.requestPermission();
+      if (!hasPermission) {
+        throw new Error('Location permission is required to create an alert');
+      }
+
+      const location = await locationService.getCurrentLocation();
+      if (!location) {
+        throw new Error('Failed to acquire GPS lock. Please ensure your location is enabled.');
+      }
+
+      console.log('📍 AlertsScreen: GPS captured:', location.latitude, location.longitude);
+
+      // Step 2: Create alert with captured GPS
       const alertData = {
         alert_type: alertType,
-        message: alertMessage,
-        description: alertDescription,
+        message: alertMessage.trim(),
+        description: alertDescription.trim(),
         priority: (alertType === 'emergency' ? 'high' : alertType === 'security' ? 'medium' : 'low') as 'high' | 'medium' | 'low',
-        // Location data removed - backend handles location assignment
+        location_lat: location.latitude,
+        location_long: location.longitude,
         expires_at: alertExpiry || undefined
       };
 
-      // Create alert without location data - backend handles location assignment
-      console.log('📤 Creating alert without location data - backend will handle location assignment');
+      console.log('📤 Sending alert data to store:', alertData);
       await storeCreateAlert(alertData);
 
-      console.log('✅ Alert created successfully without location data');
+      console.log('✅ Alert created successfully with GPS');
 
       // Reset form and close modal
       setAlertMessage('');
@@ -329,8 +346,7 @@ export const AlertsScreen = forwardRef<AlertsScreenRef, AlertsScreenProps>((prop
       setAlertExpiry('');
       setCreateModalVisible(false);
 
-      // IMPORTANT: Refresh alerts list after creating to get fresh data
-      console.log('🔄 Refreshing alerts list after creating new alert...');
+      // Refresh alerts list
       await fetchAlerts();
 
       showToast('Alert created successfully!', 'success');
@@ -341,7 +357,6 @@ export const AlertsScreen = forwardRef<AlertsScreenRef, AlertsScreenProps>((prop
       showToast(errorMessage, 'error');
     } finally {
       setCreatingAlert(false);
-      // Location state removed - frontend no longer handles location
     }
   };
 
@@ -354,7 +369,7 @@ export const AlertsScreen = forwardRef<AlertsScreenRef, AlertsScreenProps>((prop
     
     // Log each alert's status and type for debugging
     alerts.forEach((alert, index) => {
-      console.log(`   � Alert ${index + 1}: id=${alert.id}, status='${alert.status}', alert_type='${alert.alert_type}', priority='${alert.priority}'`);
+      console.log(`    Alert ${index + 1}: id=${alert.id}, status='${alert.status}', alert_type='${alert.alert_type}', priority='${alert.priority}'`);
     });
     
     if (selectedFilter === 'all') {
@@ -409,6 +424,7 @@ export const AlertsScreen = forwardRef<AlertsScreenRef, AlertsScreenProps>((prop
       onDelete={handleDelete}
       onSolve={handleSolve}
       onUpdate={handleUpdate}
+      onViewLocation={handleViewLocation}
     />
   );
 

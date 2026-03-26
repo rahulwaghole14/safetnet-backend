@@ -3,6 +3,7 @@ import {
   initConnection,
   getSubscriptions,
   requestPurchase,
+  requestSubscription,
   finishTransaction,
   getAvailablePurchases,
   Subscription,
@@ -29,17 +30,24 @@ export interface BillingProduct {
   localizedPrice?: string;
 }
 
+const ANDROID_SUB_ID = 'premium_annual';
+const BASE_PLAN_MONTHLY = 'monthly';
+const BASE_PLAN_ANNUAL = 'annual';
+
 const SKU_MONTHLY = Platform.select({
   ios: 'premium_monthly',
-  android: 'premium_monthly',
+  android: ANDROID_SUB_ID,
 }) || 'premium_monthly';
 
 const SKU_ANNUAL = Platform.select({
   ios: 'premium_annual',
-  android: 'premium_annual',
+  android: ANDROID_SUB_ID,
 }) || 'premium_annual';
 
-const SKUS = [SKU_MONTHLY, SKU_ANNUAL];
+const SKUS = Platform.select({
+  ios: ['premium_monthly', 'premium_annual'],
+  android: [ANDROID_SUB_ID],
+}) || ['premium_monthly', 'premium_annual'];
 
 /**
  * Static product info to fall back on if store fetch fails
@@ -124,16 +132,42 @@ export const requestStorePurchase = async (
 
   try {
     // 1. Request purchase from store
-    const purchaseResult = await requestPurchase({
-      sku,
-      andDangerouslyFinishTransactionAutomaticallyIOS: false,
-      obfuscatedAccountIdAndroid:
-        Platform.OS === 'android' ? obfuscateBillingIdentifier(identity?.userId) : undefined,
-      obfuscatedProfileIdAndroid:
-        Platform.OS === 'android'
-          ? obfuscateBillingIdentifier(identity?.email?.toLowerCase())
-          : undefined,
-    });
+    let purchaseResult;
+    if (Platform.OS === 'android') {
+      const basePlanId = plan === 'premium-monthly' ? BASE_PLAN_MONTHLY : BASE_PLAN_ANNUAL;
+      
+      // Fetch subscriptions to get the offerToken
+      const subscriptions = await getStoreProducts();
+      const sub = subscriptions.find(s => s.productId === ANDROID_SUB_ID);
+      
+      if (!sub || !('subscriptionOfferDetails' in sub)) {
+        return { success: false, message: 'Subscription not found in store' };
+      }
+      
+      const offer = sub.subscriptionOfferDetails.find(o => o.basePlanId === basePlanId);
+      if (!offer) {
+        return { success: false, message: `Base plan ${basePlanId} not found` };
+      }
+
+      purchaseResult = await requestSubscription({
+        sku: ANDROID_SUB_ID,
+        skus: [ANDROID_SUB_ID],
+        subscriptionOffers: [
+          {
+            sku: ANDROID_SUB_ID,
+            offerToken: offer.offerToken,
+          },
+        ],
+        obfuscatedAccountIdAndroid: obfuscateBillingIdentifier(identity?.userId),
+        obfuscatedProfileIdAndroid: obfuscateBillingIdentifier(identity?.email?.toLowerCase()),
+      } as any);
+    } else {
+      purchaseResult = await requestPurchase({
+        sku,
+        andDangerouslyFinishTransactionAutomaticallyIOS: false,
+      });
+    }
+    
     const purchase = Array.isArray(purchaseResult) ? purchaseResult[0] : purchaseResult;
 
     if (!purchase) {
@@ -143,7 +177,7 @@ export const requestStorePurchase = async (
     // 2. Verify with backend
     const verificationResult = await apiService.verifyGooglePurchase({
       purchase_token: purchase.purchaseToken || '',
-      subscription_id: sku,
+      subscription_id: Platform.OS === 'android' ? ANDROID_SUB_ID : sku,
       package_name: Platform.OS === 'android' ? GOOGLE_PLAY_PACKAGE_NAME : undefined,
     });
 

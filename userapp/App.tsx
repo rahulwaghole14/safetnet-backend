@@ -21,6 +21,7 @@ import { UpgradeModal } from './src/components/common/UpgradeModal';
 import { NetworkErrorToast } from './src/components/common/NetworkErrorToast';
 import { navigationRef } from './src/navigation/navigationRef';
 import { usePushNotifications } from './src/hooks/usePushNotifications';
+import { LocationDisclosureModal } from './src/components/common/LocationDisclosureModal';
 
 const RootStack = createStackNavigator();
 
@@ -32,6 +33,8 @@ function App(): React.JSX.Element {
   const themeMode = useSettingsStore((state) => state.themeMode);
   const loadSettings = useSettingsStore((state) => state.loadSettings);
   const systemScheme = useColorScheme();
+  
+  const [showLocationDisclosure, setShowLocationDisclosure] = React.useState(false);
 
   // Initialize push notifications
   usePushNotifications(isAuthenticated);
@@ -83,14 +86,47 @@ function App(): React.JSX.Element {
           }
 
           // Request all permissions - Android system will show dialogs automatically
-          await PermissionsAndroid.requestMultiple(permissions);
+          const granted = await PermissionsAndroid.requestMultiple(permissions);
+
+          // Check if we need to request background location (Android 10+)
+          if (
+            Platform.OS === 'android' && 
+            Number(Platform.Version) >= 29 && 
+            granted[PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION] === PermissionsAndroid.RESULTS.GRANTED
+          ) {
+            // Check if background location is already granted
+            const hasBackgroundLocation = await PermissionsAndroid.check(
+              'android.permission.ACCESS_BACKGROUND_LOCATION'
+            );
+            
+            if (!hasBackgroundLocation) {
+              // Show prominent disclosure before requesting background location
+              setShowLocationDisclosure(true);
+            }
+          }
         } catch (error) {
           console.warn('Permission request error:', error);
         }
       };
+      
       requestPermissions();
     }
   }, [loadAuth, loadSettings]);
+
+  const handleAcceptLocationDisclosure = async () => {
+    setShowLocationDisclosure(false);
+    try {
+      await PermissionsAndroid.request(
+        'android.permission.ACCESS_BACKGROUND_LOCATION'
+      );
+    } catch (error) {
+      console.warn('Background location request error:', error);
+    }
+  };
+
+  const handleDeclineLocationDisclosure = () => {
+    setShowLocationDisclosure(false);
+  };
 
   const resolvedScheme = themeMode === 'system' ? systemScheme ?? 'light' : themeMode;
 
@@ -107,7 +143,7 @@ function App(): React.JSX.Element {
       <SafeGestureHandlerRootView style={styles.container}>
         <SafeAreaProvider>
           <View style={[styles.loadingContainer, { backgroundColor: navigationTheme.colors.background }]}>
-            <StatusBar barStyle={statusBarStyle} backgroundColor={navigationTheme.colors.background} />
+            <StatusBar barStyle={statusBarStyle} backgroundColor="transparent" translucent={true} />
             {/* You can add a loading spinner here if needed */}
           </View>
         </SafeAreaProvider>
@@ -119,7 +155,7 @@ function App(): React.JSX.Element {
     <SafeGestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>
         <NavigationContainer theme={navigationTheme} ref={navigationRef}>
-          <StatusBar barStyle={statusBarStyle} backgroundColor={navigationTheme.colors.background} />
+          <StatusBar barStyle={statusBarStyle} backgroundColor="transparent" translucent={true} />
           <RootStack.Navigator screenOptions={{ headerShown: false }}>
             {isAuthenticated ? (
               <RootStack.Screen name="AppStack" component={AppNavigator} />
@@ -129,6 +165,11 @@ function App(): React.JSX.Element {
           </RootStack.Navigator>
           <UpgradeModal />
           <NetworkErrorToast />
+          <LocationDisclosureModal 
+            visible={showLocationDisclosure}
+            onAccept={handleAcceptLocationDisclosure}
+            onDecline={handleDeclineLocationDisclosure}
+          />
         </NavigationContainer>
       </SafeAreaProvider>
     </SafeGestureHandlerRootView>

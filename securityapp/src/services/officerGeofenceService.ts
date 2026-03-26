@@ -78,6 +78,25 @@ class OfficerGeofenceService {
         }
       }
       
+      // Robust transformation: Infer geofence_type if missing
+      geofences = geofences.map(g => {
+        if (!g) return g;
+        
+        let inferredType = g.geofence_type;
+        if (!inferredType) {
+          if (g.polygon_json) {
+            inferredType = 'polygon';
+          } else if (g.center_latitude || g.center_point) {
+            inferredType = 'circle';
+          }
+        }
+        
+        return {
+          ...g,
+          geofence_type: inferredType || 'polygon' // Default to polygon if unsure
+        };
+      });
+      
       console.log('✅ Processed geofences:', {
         count: geofences.length,
         items: geofences.map(g => ({

@@ -1,4 +1,7 @@
 {
   "name": "securityapp",
-  "displayName": "securityapp"
+  "displayName": "securityapp",
+  "android": {
+    "package": "com.safetnet.securityapp"
+  }
 }

@@ -33,7 +33,9 @@ interface AlertsState {
   getAlertById: (id: string | number) => Alert | undefined;
   getPendingAlertsCount: () => number;
   getResolvedAlertsCount: () => number;
+  getActiveAlertsCount: () => number;
 }
+
 
 export const useAlertsStore = create<AlertsState>((set, get) => ({
   // Initial state - start with empty array
@@ -160,14 +162,6 @@ export const useAlertsStore = create<AlertsState>((set, get) => ({
 
     if (!originalAlert) {
       throw new Error(`Alert with id ${id} not found`);
-    }
-
-    // SAFETY GUARD: Only allow updates to USER-created alerts
-    if (originalAlert.created_by_role !== 'USER') {
-      console.warn(`🛡️ SAFETY GUARD: Blocked update attempt on ${originalAlert.created_by_role}-created alert ${id}`);
-      console.warn('   Only USER-created alerts can be updated');
-      // Abort locally without API call
-      return;
     }
 
     // Store original for rollback
@@ -360,9 +354,16 @@ export const useAlertsStore = create<AlertsState>((set, get) => ({
   getResolvedAlertsCount: () => {
     const { alerts } = get();
     return alerts.filter(alert => 
-      alert.status === 'completed' || alert.status === 'resolved' || alert.status === 'accepted'
+      alert.status === 'completed' || alert.status === 'resolved'
     ).length;
   },
+
+  getActiveAlertsCount: () => {
+    const { alerts } = get();
+    return alerts.filter(alert => alert.status === 'accepted').length;
+  },
+
+
 }));
 
 // Debug function to track alert persistence issue

@@ -228,8 +228,7 @@ const RegistrationScreen = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    setAgreeTerms(!agreeTerms);
-                    clearError();
+                    navigation.navigate('TermsOfUse');
                   }}
                   style={styles.checkboxLabel}>
                   <Text style={styles.checkboxText}>

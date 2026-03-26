@@ -583,7 +583,7 @@ export const dispatchSOSAlert = async (message: string): Promise<DispatchResult>
         return false;
       }
       
-      console.log(`📤 [SOS SMS Batch] Sending ${messages.length} message(s) to ${label}, recipients:`, recipients);
+      console.log(`📤 [SOS SMS Intent] Opening SMS app for ${label}, recipients:`, recipients);
       
       // Send each message in quick succession
       let allSuccess = true;
@@ -605,7 +605,7 @@ export const dispatchSOSAlert = async (message: string): Promise<DispatchResult>
           
           // Small delay between messages (100ms) to ensure they're sent in order
           if (i < messages.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(() => resolve(null), 100));
           }
         } catch (error) {
           console.error(`❌ [SOS SMS Batch] Error sending message ${i + 1}:`, error);

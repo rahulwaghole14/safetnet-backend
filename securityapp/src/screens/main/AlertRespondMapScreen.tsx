@@ -8,6 +8,7 @@ import {
   Dimensions,
   Platform,
   TextInput,
+  Linking,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp, NavigationProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -64,8 +65,33 @@ export const AlertRespondMapScreen = () => {
   const [showManualLocation, setShowManualLocation] = useState(false);
   const [manualLatitude, setManualLatitude] = useState('');
   const [manualLongitude, setManualLongitude] = useState('');
+
+  const openExternalMaps = () => {
+    if (!alertLocation) return;
+    
+    const { latitude, longitude } = alertLocation;
+    const alertId = alert?.id || 'Alert';
+    const label = `Alert Location (${alertId})`;
+    
+    const url = Platform.select({
+      ios: `maps:0,0?q=${label}@${latitude},${longitude}`,
+      android: `geo:0,0?q=${latitude},${longitude}(${label})`,
+    });
+
+    if (url) {
+      Linking.canOpenURL(url).then(supported => {
+        if (supported) {
+          Linking.openURL(url);
+        } else {
+          // Fallback to web maps
+          Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`);
+        }
+      });
+    }
+  };
   const [geofenceData, setGeofenceData] = useState<any>(null);
   const [isAccepting, setIsAccepting] = useState(false);
+  const [showRoute, setShowRoute] = useState(false);
   
   // Zone tracking state
   const [zoneStatuses, setZoneStatuses] = useState<any[]>([]);
@@ -99,23 +125,45 @@ export const AlertRespondMapScreen = () => {
         console.log('✅ Alert details fetched:', alertData);
         console.log('📍 ALERT GPS FROM API:', alertData.location_lat, alertData.location_long);
         
-        // Rule 1: Validate alert GPS coordinates from API
-        if (!alertData.location_lat || !alertData.location_long) {
-          setError('Alert has no valid GPS location');
+        // Robust GPS parsing - transformed in alertService but hardening here as well
+        const data = alertData as any;
+        const nestedLat = data.location?.latitude || data.location?.lat;
+        const nestedLng = data.location?.longitude || data.location?.lng;
+        
+        const alertLocLat = nestedLat ?? data.location_lat ?? data.latitude ?? data.lat;
+        const alertLocLng = nestedLng ?? data.location_long ?? data.longitude ?? data.lng;
+
+        if (alertLocLat === undefined || alertLocLng === undefined || alertLocLat === null || alertLocLng === null) {
+          setError('Alert has no GPS location (coordinates missing)');
           setIsLoading(false);
           return;
         }
         
-        // Rule 1: Additional GPS accuracy validation for alert location
-        const alertLat = parseFloat(String(alertData.location_lat));
-        const alertLng = parseFloat(String(alertData.location_long));
+        const alertLatRaw = parseFloat(String(alertLocLat));
+        const alertLngRaw = parseFloat(String(alertLocLng));
         
-        // Validate GPS coordinate ranges
+        let alertLat = alertLatRaw;
+        let alertLng = alertLngRaw;
+        
+        const isAreaAlert = alertData.alert_type === 'area_user_alert';
+        const isNullIsland = alertLat === 0 && alertLng === 0;
+
+        // If it's an area alert with no coordinates, try to get them from the geofence
+        if (isNullIsland && isAreaAlert) {
+          const geofenceCoords = getGeofenceCoordinates();
+          if (geofenceCoords && geofenceCoords.length > 0) {
+            alertLat = geofenceCoords[0].latitude;
+            alertLng = geofenceCoords[0].longitude;
+            console.log('📍 Area alert fallback to geofence coordinates:', { alertLat, alertLng });
+          }
+        }
+
+        // Validate GPS coordinate ranges - allow 0,0 for area alerts if we have NO geofence yet
         if (isNaN(alertLat) || isNaN(alertLng) || 
             alertLat < -90 || alertLat > 90 || 
-            alertLng < -180 || alertLng > 180) {
-          console.error('❌ Invalid alert GPS coordinates:', { lat: alertLat, lng: alertLng });
-          setError('Alert has invalid GPS coordinates');
+            alertLng < -180 || alertLng > 180 || (isNullIsland && !isAreaAlert)) {
+          console.error('❌ Invalid alert GPS coordinates received:', { lat: alertLat, lng: alertLng });
+          setError(`Alert has invalid GPS location (${alertLat}, ${alertLng})`);
           setIsLoading(false);
           return;
         }
@@ -223,14 +271,29 @@ export const AlertRespondMapScreen = () => {
         const geofences = await officerGeofenceService.getOfficerGeofences(officerId);
         
         // Implement coordinate logic inline since getAllOfficerGeofenceCoordinates was removed
-        const geofenceCoords = geofences.map((geofence: any) => ({
-          geofenceId: geofence.id,
-          coordinates: geofence.geofence_type === 'circle' && geofence.center_point
-            ? [{ latitude: geofence.center_point[0], longitude: geofence.center_point[1] }]
-            : geofence.geofence_type === 'polygon' && geofence.polygon_json
-            ? geofence.polygon_json.map(([lat, lng]: number[]) => ({ latitude: lat, longitude: lng }))
-            : []
-        }));
+        const geofenceCoords = geofences.map((geofence: any) => {
+          let coords: any[] = [];
+          try {
+            if (geofence.geofence_type === 'circle' && geofence.center_latitude && geofence.center_longitude) {
+              coords = [{ latitude: geofence.center_latitude, longitude: geofence.center_longitude }];
+            } else if (geofence.geofence_type === 'polygon' && geofence.polygon_json) {
+              const poly = typeof geofence.polygon_json === 'string' 
+                ? JSON.parse(geofence.polygon_json) 
+                : geofence.polygon_json;
+              if (poly?.coordinates?.[0]) {
+                coords = poly.coordinates[0].map((coord: number[]) => ({ latitude: coord[1], longitude: coord[0] }));
+              }
+            }
+          } catch (e) {
+            console.error('❌ Error processing officer geofence coords:', e);
+          }
+          
+          return {
+            id: geofence.id,
+            name: geofence.name,
+            coordinates: coords
+          };
+        });
         
         setOfficerGeofences(geofences);
         setOfficerGeofenceCoords(geofenceCoords);
@@ -291,12 +354,56 @@ export const AlertRespondMapScreen = () => {
     setIsZoneTracking(true);
   };
 
-  // Update officer location and check zones
+  // Automatic GPS Tracking - RESTORED
+  useEffect(() => {
+    let watchId: number | null = null;
+
+    const startTracking = async () => {
+      console.log('📡 [MapScreen] Requesting location permission...');
+      const hasPermission = await locationService.requestPermission();
+      
+      if (hasPermission) {
+        console.log('✅ [MapScreen] Location permission granted. Starting watch...');
+        
+        // Get initial position
+        const initialLoc = await locationService.getCurrentLocation();
+        if (initialLoc) {
+          console.log('📍 [MapScreen] Initial position acquired:', initialLoc);
+          setOfficerLocation(initialLoc);
+        }
+
+        // Start watching for updates
+        watchId = locationService.watchLocation(
+          (location) => {
+            console.log('📍 [MapScreen] Location update:', location.latitude, location.longitude);
+            setOfficerLocation(location);
+          },
+          (error) => {
+            console.error('❌ [MapScreen] Geolocation error:', error);
+            // Don't set error state here to avoid blocking the map, 
+            // the UI already shows "GPS unavailable" if officerLocation is null
+          }
+        );
+      } else {
+        console.warn('⚠️ [MapScreen] Location permission denied');
+        showToast('Location permission is required for real-time tracking', 'error');
+      }
+    };
+
+    startTracking();
+
+    return () => {
+      if (watchId !== null) {
+        console.log('🛑 [MapScreen] Stopping location watch...');
+        locationService.stopWatching(watchId);
+      }
+    };
+  }, []);
+
+  // Update zone statuses
   useEffect(() => {
     if (officerLocation && isZoneTracking) {
-      console.log('📍 Updating officer location for zone tracking:', officerLocation);
-      
-      // Update zone tracking service
+      // Existing zone tracking logic...
       const mockOfficerId = 'officer_001';
       zoneTrackingService.updateOfficerLocation(mockOfficerId, {
         latitude: officerLocation.latitude,
@@ -305,7 +412,6 @@ export const AlertRespondMapScreen = () => {
         timestamp: typeof officerLocation.timestamp === 'number' ? officerLocation.timestamp : Date.now(),
       });
       
-      // Update zone statuses
       const updatedStatuses = zoneTrackingService.getOfficerZoneStatus(mockOfficerId);
       setZoneStatuses(updatedStatuses);
     }
@@ -364,26 +470,48 @@ export const AlertRespondMapScreen = () => {
       radius: geofence.radius
     });
 
-    if (geofence.geofence_type === 'polygon' && geofence.polygon_json) {
+    // Support both polygon_json and direct field checks
+    const isPolygon = geofence.geofence_type === 'polygon' || !!geofence.polygon_json;
+    const isCircle = geofence.geofence_type === 'circle' || (!isPolygon && !!geofence.center_latitude);
+
+    if (isPolygon && geofence.polygon_json) {
       // Parse polygon coordinates
-      try {
-        const polygon = JSON.parse(geofence.polygon_json);
-        console.log('📐 Parsed polygon:', polygon);
-        
-        if (polygon.type === 'Polygon' && polygon.coordinates && polygon.coordinates[0]) {
-          const coords = polygon.coordinates[0].map((coord: number[]) => ({
-            latitude: coord[1], // GeoJSON is [longitude, latitude]
-            longitude: coord[0]
-          }));
-          console.log('✅ Polygon coordinates extracted:', coords.length, 'points');
-          return coords;
-        } else {
-          console.log('❌ Invalid polygon structure');
+      let polygon;
+      if (typeof geofence.polygon_json === 'string') {
+        try {
+          polygon = JSON.parse(geofence.polygon_json);
+        } catch (e) {
+          console.error('❌ Error parsing polygon_json string:', e);
+          return null;
         }
-      } catch (error) {
-        console.error('❌ Error parsing polygon coordinates:', error);
+      } else {
+        polygon = geofence.polygon_json;
       }
-    } else if (geofence.geofence_type === 'circle') {
+
+      console.log('📐 Raw polygon data for extraction:', typeof polygon, Array.isArray(polygon));
+      
+      // Handle GeoJSON format: { type: 'Polygon', coordinates: [[[lng, lat], ...]] }
+      if (polygon && polygon.type === 'Polygon' && polygon.coordinates && polygon.coordinates[0]) {
+        const coords = polygon.coordinates[0].map((coord: number[]) => ({
+          latitude: coord[1], 
+          longitude: coord[0]
+        }));
+        console.log('✅ Polygon coordinates extracted:', coords.length, 'points');
+        return coords;
+      } 
+      // Handle Direct Array format: [[lat, lng], [lat, lng], ...]
+      else if (Array.isArray(polygon)) {
+        const coords = polygon.map((coord: any) => ({
+          latitude: coord[0] ?? coord.latitude ?? 0,
+          longitude: coord[1] ?? coord.longitude ?? 0
+        }));
+        console.log('✅ Direct array polygon extracted:', coords.length, 'points');
+        return coords;
+      }
+      else {
+        console.log('❌ Unrecognized polygon structure:', polygon);
+      }
+    } else if (isCircle) {
       // Create a circle approximation using polygon points
       const centerLat = geofence.center_latitude;
       const centerLng = geofence.center_longitude;
@@ -416,11 +544,11 @@ export const AlertRespondMapScreen = () => {
   useEffect(() => {
     console.log('🗺️ GPS Debug Info:');
     console.log('   Alert GPS:', alertLocation?.latitude, alertLocation?.longitude);
-    console.log('   Officer GPS: Not required - officer GPS tracking removed');
+    console.log('   Officer GPS:', officerLocation?.latitude, officerLocation?.longitude);
     console.log('   Alert geofence:', alert?.geofence);
     const geofenceCoordinates = getGeofenceCoordinates();
     console.log('   Geofence coordinates:', geofenceCoordinates);
-  }, [alertLocation, alert, geofenceData, getGeofenceCoordinates]);
+  }, [alertLocation, alert, geofenceData, getGeofenceCoordinates, officerLocation]);
 
   // Toast function for manual location feedback
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -607,12 +735,50 @@ export const AlertRespondMapScreen = () => {
             {/* Location Info Bar */}
             <View style={[styles.locationInfoBar, { backgroundColor: colors.white, borderBottomColor: colors.border }]}>
               <Icon name="location-on" size={16} color={colors.primary} />
-              <Text style={[styles.locationInfoText, { color: colors.darkText }]}>
-                🔴 Alert: {alertLocation.latitude.toFixed(6)}, {alertLocation.longitude.toFixed(6)}
+              <Text 
+                style={[styles.locationInfoText, { color: colors.darkText }]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                🔴 Alert: {alertLocation.latitude.toFixed(4)}, {alertLocation.longitude.toFixed(4)}
               </Text>
-              <Text style={[styles.locationAccuracyText, { color: colors.mediumText }]}>
-                GPS: ±10m accuracy
-              </Text>
+              
+              <View style={styles.buttonGroup}>
+                <TouchableOpacity 
+                  style={[
+                    styles.navigateButton, 
+                    { backgroundColor: showRoute ? colors.success : colors.primary }
+                  ]}
+                  onPress={() => {
+                    if (!officerLocation) {
+                      Toast.show({
+                        type: 'info',
+                        text1: 'GPS Location Required',
+                        text2: 'Enable GPS or set a manual location to see the route.',
+                        visibilityTime: 4000,
+                      });
+                      return;
+                    }
+                    setShowRoute(!showRoute);
+                  }}
+                >
+                  <Icon name={showRoute ? "close" : "directions"} size={14} color={colors.white} />
+                  <Text style={styles.navigateButtonText}>
+                    {showRoute ? "Hide" : "Route"}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={[
+                    styles.navigateButton, 
+                    { backgroundColor: colors.infoBlue || colors.primary }
+                  ]}
+                  onPress={openExternalMaps}
+                >
+                  <Icon name="map" size={14} color={colors.white} />
+                  <Text style={styles.navigateButtonText}>Maps</Text>
+                </TouchableOpacity>
+              </View>
             </View>
             
             <LeafletMap
@@ -632,8 +798,9 @@ export const AlertRespondMapScreen = () => {
                 coordinates: gf.coordinates,
                 color: colors.primary, // Use theme primary color for officer zones
               }))}
-              mapKey={`alert-${alert.id}-${Date.now()}`} // Force re-render
+              mapKey={`alert-${alert.id}-${showRoute ? 'route' : 'map'}-${Date.now()}`} // Force re-render when route toggled
               autoFitBounds={true}
+              showRoute={showRoute}
             />
             
             {/* Officer Location Indicator */}
@@ -712,31 +879,32 @@ export const AlertRespondMapScreen = () => {
         )}
       </View>
 
-      {/* Accept Button */}
-      <View style={[styles.footer, { backgroundColor: colors.white, borderTopColor: colors.border }]}>
-        <TouchableOpacity
-          style={[
-            styles.acceptButton, 
-            { 
-              backgroundColor: colors.success,
-              shadowColor: colors.shadow
-            }, 
-            isAccepting && styles.acceptButtonDisabled
-          ]}
-          onPress={handleAcceptAlert}
-          disabled={isAccepting}
-        >
-          {isAccepting ? (
-            <ActivityIndicator size="small" color={colors.textOnPrimary} />
-          ) : (
-            <>
-              <Icon name="check-circle" size={24} color={colors.textOnPrimary} />
-              <Text style={[styles.acceptButtonText, { color: colors.textOnPrimary }]}>Accept & Respond</Text>
-            </>
-          )}
-        </TouchableOpacity>
-
-      </View>
+      {/* Accept Button - Hide for officer-created alerts */}
+      {alert?.created_by_role !== 'OFFICER' && (
+        <View style={[styles.footer, { backgroundColor: colors.white, borderTopColor: colors.border }]}>
+          <TouchableOpacity
+            style={[
+              styles.acceptButton, 
+              { 
+                backgroundColor: colors.success,
+                shadowColor: colors.shadow
+              }, 
+              isAccepting && styles.acceptButtonDisabled
+            ]}
+            onPress={handleAcceptAlert}
+            disabled={isAccepting}
+          >
+            {isAccepting ? (
+              <ActivityIndicator size="small" color={colors.textOnPrimary} />
+            ) : (
+              <>
+                <Icon name="check-circle" size={24} color={colors.textOnPrimary} />
+                <Text style={[styles.acceptButtonText, { color: colors.textOnPrimary }]}>Accept & Respond</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -917,7 +1085,10 @@ const styles = StyleSheet.create({
     ...typography.caption,
     marginLeft: spacing.xs,
     flex: 1,
-    fontFamily: 'monospace',
+    flexShrink: 1,
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    fontSize: 10,
+    marginRight: 4,
   },
   locationAccuracyText: {
     ...typography.caption,
@@ -976,6 +1147,26 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: spacing.sm,
     borderWidth: 1,
+  },
+  navigateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 6,
+    justifyContent: 'center',
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    gap: 6,
+    marginLeft: 'auto',
+    alignItems: 'center',
+  },
+  navigateButtonText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginLeft: 2,
   },
   manualLocationTitle: {
     ...typography.caption,

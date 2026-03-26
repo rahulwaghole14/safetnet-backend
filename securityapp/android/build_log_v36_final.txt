@@ -1,0 +1,698 @@
+> Task :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:shared:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:shared:compileJava NO-SOURCE
+> Task :gradle-plugin:shared:processResources NO-SOURCE
+> Task :gradle-plugin:shared:classes UP-TO-DATE
+> Task :gradle-plugin:shared:jar UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:settings-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:classes UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:jar UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:react-native-gradle-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:react-native-gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:classes UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:jar UP-TO-DATE
+
+> Configure project :react-native-firebase_app
+:react-native-firebase_app package.json found at C:\Users\ADMIN\Desktop\SafeTNet\safetnet\securityapp\node_modules\@react-native-firebase\app\package.json
+:react-native-firebase_app:firebase.bom using default value: 34.8.0
+:react-native-firebase_app:play.play-services-auth using default value: 21.4.0
+:react-native-firebase_app package.json found at C:\Users\ADMIN\Desktop\SafeTNet\safetnet\securityapp\node_modules\@react-native-firebase\app\package.json
+:react-native-firebase_app:version set from package.json: 23.8.6 (23,8,6 - 23008006)
+:react-native-firebase_app:android.compileSdk using custom value: 36
+:react-native-firebase_app:android.targetSdk using custom value: 36
+:react-native-firebase_app:android.minSdk using custom value: 24
+:react-native-firebase_app:reactNativeAndroidDir C:\Users\ADMIN\Desktop\SafeTNet\safetnet\securityapp\node_modules\react-native
+
+> Configure project :react-native-firebase_messaging
+:react-native-firebase_messaging package.json found at C:\Users\ADMIN\Desktop\SafeTNet\safetnet\securityapp\node_modules\@react-native-firebase\messaging\package.json
+:react-native-firebase_app package.json found at C:\Users\ADMIN\Desktop\SafeTNet\safetnet\securityapp\node_modules\@react-native-firebase\app\package.json
+:react-native-firebase_messaging:firebase.bom using default value: 34.8.0
+:react-native-firebase_messaging package.json found at C:\Users\ADMIN\Desktop\SafeTNet\safetnet\securityapp\node_modules\@react-native-firebase\messaging\package.json
+:react-native-firebase_messaging:version set from package.json: 23.8.6 (23,8,6 - 23008006)
+:react-native-firebase_messaging:android.compileSdk using custom value: 36
+:react-native-firebase_messaging:android.targetSdk using custom value: 36
+:react-native-firebase_messaging:android.minSdk using custom value: 24
+:react-native-firebase_messaging:reactNativeAndroidDir C:\Users\ADMIN\Desktop\SafeTNet\safetnet\securityapp\node_modules\react-native
+
+> Task :app:generateAutolinkingNewArchitectureFiles UP-TO-DATE
+> Task :app:generateAutolinkingPackageList UP-TO-DATE
+> Task :app:generateCodegenSchemaFromJavaScript SKIPPED
+> Task :app:generateCodegenArtifactsFromSchema SKIPPED
+> Task :app:generateReactNativeEntryPoint UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preBuild UP-TO-DATE
+> Task :react-native-firebase_app:preBuild UP-TO-DATE
+> Task :react-native-firebase_messaging:preBuild UP-TO-DATE
+> Task :react-native-geolocation-service:preBuild UP-TO-DATE
+> Task :react-native-gesture-handler:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-gesture-handler:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-gesture-handler:preBuild UP-TO-DATE
+> Task :react-native-safe-area-context:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-safe-area-context:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-safe-area-context:preBuild UP-TO-DATE
+> Task :react-native-screens:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-screens:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-screens:preBuild UP-TO-DATE
+> Task :react-native-vector-icons:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-vector-icons:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-vector-icons:preBuild UP-TO-DATE
+> Task :react-native-webview:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-webview:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-webview:preBuild UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preDebugBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-firebase_app:preDebugBuild UP-TO-DATE
+> Task :react-native-firebase_app:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-firebase_messaging:preDebugBuild UP-TO-DATE
+> Task :react-native-firebase_messaging:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-geolocation-service:preDebugBuild UP-TO-DATE
+> Task :react-native-geolocation-service:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-gesture-handler:preDebugBuild UP-TO-DATE
+> Task :react-native-gesture-handler:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-safe-area-context:preDebugBuild UP-TO-DATE
+> Task :react-native-safe-area-context:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-screens:preDebugBuild UP-TO-DATE
+> Task :react-native-screens:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-vector-icons:preDebugBuild UP-TO-DATE
+> Task :react-native-vector-icons:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-webview:preDebugBuild UP-TO-DATE
+> Task :react-native-webview:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateDebugResValues UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateDebugResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:packageDebugResources UP-TO-DATE
+> Task :react-native-firebase_app:generateDebugResValues UP-TO-DATE
+> Task :react-native-firebase_app:generateDebugResources UP-TO-DATE
+> Task :react-native-firebase_app:packageDebugResources UP-TO-DATE
+> Task :react-native-firebase_messaging:generateDebugResValues UP-TO-DATE
+> Task :react-native-firebase_messaging:generateDebugResources UP-TO-DATE
+> Task :react-native-firebase_messaging:packageDebugResources UP-TO-DATE
+> Task :react-native-geolocation-service:generateDebugResValues UP-TO-DATE
+> Task :react-native-geolocation-service:generateDebugResources UP-TO-DATE
+> Task :react-native-geolocation-service:packageDebugResources UP-TO-DATE
+> Task :react-native-gesture-handler:generateDebugResValues UP-TO-DATE
+> Task :react-native-gesture-handler:generateDebugResources UP-TO-DATE
+> Task :react-native-gesture-handler:packageDebugResources UP-TO-DATE
+> Task :react-native-safe-area-context:generateDebugResValues UP-TO-DATE
+> Task :react-native-safe-area-context:generateDebugResources UP-TO-DATE
+> Task :react-native-safe-area-context:packageDebugResources UP-TO-DATE
+> Task :react-native-screens:generateDebugResValues UP-TO-DATE
+> Task :react-native-screens:generateDebugResources UP-TO-DATE
+> Task :react-native-screens:packageDebugResources UP-TO-DATE
+> Task :react-native-vector-icons:generateDebugResValues UP-TO-DATE
+> Task :react-native-vector-icons:generateDebugResources UP-TO-DATE
+> Task :react-native-vector-icons:packageDebugResources UP-TO-DATE
+> Task :react-native-webview:generateDebugResValues UP-TO-DATE
+> Task :react-native-webview:generateDebugResources UP-TO-DATE
+> Task :react-native-webview:packageDebugResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-async-storage_async-storage:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-async-storage_async-storage:processDebugManifest UP-TO-DATE
+> Task :react-native-firebase_app:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-firebase_app:processDebugManifest UP-TO-DATE
+> Task :react-native-firebase_messaging:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-firebase_messaging:processDebugManifest UP-TO-DATE
+> Task :react-native-geolocation-service:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-geolocation-service:processDebugManifest UP-TO-DATE
+> Task :react-native-gesture-handler:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-gesture-handler:processDebugManifest UP-TO-DATE
+> Task :react-native-safe-area-context:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-safe-area-context:processDebugManifest UP-TO-DATE
+> Task :react-native-screens:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-screens:processDebugManifest UP-TO-DATE
+> Task :react-native-vector-icons:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-vector-icons:processDebugManifest UP-TO-DATE
+> Task :react-native-webview:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-webview:processDebugManifest UP-TO-DATE
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :react-native-async-storage_async-storage:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:parseDebugLocalResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateDebugRFile UP-TO-DATE
+> Task :react-native-firebase_app:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-firebase_app:parseDebugLocalResources UP-TO-DATE
+> Task :react-native-firebase_messaging:compileDebugLibraryResources UP-TO-DATE
+> Task :app:processDebugManifestForPackage
+> Task :react-native-firebase_app:generateDebugRFile
+> Task :react-native-geolocation-service:compileDebugLibraryResources
+> Task :react-native-firebase_messaging:parseDebugLocalResources
+> Task :react-native-geolocation-service:parseDebugLocalResources
+> Task :react-native-gesture-handler:compileDebugLibraryResources
+> Task :react-native-safe-area-context:compileDebugLibraryResources
+> Task :react-native-geolocation-service:generateDebugRFile
+> Task :react-native-gesture-handler:parseDebugLocalResources
+> Task :react-native-safe-area-context:parseDebugLocalResources
+> Task :react-native-gesture-handler:generateDebugRFile
+> Task :react-native-firebase_messaging:generateDebugRFile
+> Task :react-native-vector-icons:compileDebugLibraryResources
+> Task :react-native-safe-area-context:generateDebugRFile
+> Task :react-native-vector-icons:parseDebugLocalResources
+> Task :react-native-screens:parseDebugLocalResources
+> Task :react-native-webview:compileDebugLibraryResources
+> Task :react-native-webview:parseDebugLocalResources
+> Task :react-native-screens:generateDebugRFile
+> Task :react-native-screens:compileDebugLibraryResources
+> Task :react-native-webview:generateDebugRFile
+> Task :react-native-vector-icons:generateDebugRFile
+> Task :react-native-async-storage_async-storage:generateDebugBuildConfig
+> Task :react-native-firebase_app:generateDebugBuildConfig
+> Task :react-native-async-storage_async-storage:javaPreCompileDebug
+> Task :react-native-firebase_app:javaPreCompileDebug
+
+> Task :react-native-async-storage_async-storage:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: C:\Users\ADMIN\Desktop\SafeTNet\safetnet\securityapp\node_modules\@react-native-async-storage\async-storage\android\src\javaPackage\java\com\reactnativecommunity\asyncstorage\AsyncStoragePackage.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :react-native-async-storage_async-storage:bundleLibCompileToJarDebug
+
+> Task :react-native-firebase_app:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :react-native-firebase_messaging:generateDebugBuildConfig
+> Task :react-native-firebase_messaging:javaPreCompileDebug
+> Task :react-native-firebase_app:bundleLibCompileToJarDebug
+> Task :react-native-geolocation-service:generateDebugBuildConfig
+
+> Task :react-native-firebase_messaging:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:processDebugResources
+> Task :react-native-gesture-handler:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-geolocation-service:javaPreCompileDebug
+> Task :react-native-gesture-handler:generateDebugBuildConfig
+> Task :react-native-firebase_messaging:bundleLibCompileToJarDebug
+
+> Task :react-native-geolocation-service:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :react-native-geolocation-service:bundleLibCompileToJarDebug
+> Task :react-native-safe-area-context:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-gesture-handler:javaPreCompileDebug
+> Task :react-native-safe-area-context:generateDebugBuildConfig
+> Task :react-native-screens:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-safe-area-context:javaPreCompileDebug
+> Task :react-native-screens:generateDebugBuildConfig
+> Task :react-native-screens:javaPreCompileDebug
+> Task :react-native-vector-icons:generateDebugBuildConfig
+> Task :react-native-webview:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-vector-icons:javaPreCompileDebug
+> Task :react-native-webview:generateDebugBuildConfig
+
+> Task :react-native-vector-icons:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :react-native-vector-icons:bundleLibCompileToJarDebug
+> Task :react-native-webview:javaPreCompileDebug
+> Task :app:javaPreCompileDebug
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeDebugShaders
+> Task :react-native-async-storage_async-storage:compileDebugShaders NO-SOURCE
+> Task :react-native-async-storage_async-storage:generateDebugAssets UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeDebugAssets
+> Task :react-native-firebase_app:mergeDebugShaders
+> Task :react-native-firebase_app:compileDebugShaders NO-SOURCE
+> Task :react-native-firebase_app:generateDebugAssets UP-TO-DATE
+> Task :react-native-firebase_app:mergeDebugAssets
+> Task :react-native-firebase_messaging:mergeDebugShaders
+> Task :react-native-firebase_messaging:compileDebugShaders NO-SOURCE
+> Task :react-native-firebase_messaging:generateDebugAssets UP-TO-DATE
+> Task :react-native-firebase_messaging:mergeDebugAssets
+> Task :react-native-geolocation-service:mergeDebugShaders
+> Task :react-native-geolocation-service:compileDebugShaders NO-SOURCE
+> Task :react-native-geolocation-service:generateDebugAssets UP-TO-DATE
+> Task :react-native-geolocation-service:mergeDebugAssets
+> Task :react-native-gesture-handler:mergeDebugShaders
+> Task :react-native-gesture-handler:compileDebugShaders NO-SOURCE
+> Task :react-native-gesture-handler:generateDebugAssets UP-TO-DATE
+> Task :react-native-gesture-handler:mergeDebugAssets
+> Task :react-native-safe-area-context:mergeDebugShaders
+> Task :react-native-safe-area-context:compileDebugShaders NO-SOURCE
+> Task :react-native-safe-area-context:generateDebugAssets UP-TO-DATE
+> Task :react-native-safe-area-context:mergeDebugAssets
+> Task :react-native-screens:mergeDebugShaders
+> Task :react-native-screens:compileDebugShaders NO-SOURCE
+> Task :react-native-screens:generateDebugAssets UP-TO-DATE
+> Task :react-native-screens:mergeDebugAssets
+> Task :react-native-vector-icons:mergeDebugShaders
+> Task :react-native-vector-icons:compileDebugShaders NO-SOURCE
+> Task :react-native-vector-icons:generateDebugAssets UP-TO-DATE
+> Task :react-native-vector-icons:mergeDebugAssets
+> Task :react-native-webview:mergeDebugShaders
+> Task :react-native-webview:compileDebugShaders NO-SOURCE
+> Task :react-native-webview:generateDebugAssets UP-TO-DATE
+> Task :react-native-webview:mergeDebugAssets
+> Task :app:mergeDebugAssets
+> Task :react-native-vector-icons:bundleLibRuntimeToJarDebug
+> Task :react-native-firebase_messaging:bundleLibRuntimeToJarDebug
+> Task :react-native-async-storage_async-storage:bundleLibRuntimeToJarDebug
+> Task :app:compressDebugAssets
+> Task :react-native-firebase_app:bundleLibRuntimeToJarDebug
+> Task :react-native-gesture-handler:compileDebugKotlin
+> Task :react-native-safe-area-context:compileDebugKotlin
+> Task :react-native-screens:compileDebugKotlin
+> Task :react-native-webview:compileDebugKotlin
+
+> Task :react-native-safe-area-context:compileDebugKotlin
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:9:8 'class UIManagerModule : ReactContextBaseJavaModule, OnBatchCompleteListener, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:50:54 'class UIManagerModule : ReactContextBaseJavaModule, OnBatchCompleteListener, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:59:23 'val uiImplementation: UIImplementation!' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaViewShadowNode.kt:9:32 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaViewShadowNode.kt:110:61 'class NativeViewHierarchyOptimizer : Any' is deprecated. Deprecated in Java.
+
+> Task :react-native-geolocation-service:bundleLibRuntimeToJarDebug
+
+> Task :react-native-webview:compileDebugKotlin
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:22:8 'object MapBuilder : Any' is deprecated. Use Kotlin's built-in collections extensions.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:82:18 'var allowFileAccessFromFileURLs: Boolean' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:83:18 'var allowUniversalAccessFromFileURLs: Boolean' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:124:21 'fun allowScanningByMediaScanner(): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:161:36 'var systemUiVisibility: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:300:14 'object MapBuilder : Any' is deprecated. Use Kotlin's built-in collections extensions.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:350:34 Condition is always 'true'.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:369:38 'var allowUniversalAccessFromFileURLs: Boolean' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:430:51 Unchecked cast of 'Any?' to 'HashMap<String, String>'.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:486:23 'var savePassword: Boolean' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:487:23 'var saveFormData: Boolean' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:557:23 'var allowFileAccessFromFileURLs: Boolean' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:602:52 'static field FORCE_DARK_ON: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:602:89 'static field FORCE_DARK_OFF: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:603:35 'static fun setForceDark(p0: @NonNull() WebSettings, p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:612:35 'static fun setForceDarkStrategy(p0: @NonNull() WebSettings, p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:614:39 'static field DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:658:65 Unchecked cast of 'ArrayList<Any?>' to 'List<Map<String, String>>'.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManagerImpl.kt:679:23 'var saveFormData: Boolean' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/SubResourceErrorEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/SubResourceErrorEvent.kt:11:3 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/SubResourceErrorEvent.kt:22:16 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/SubResourceErrorEvent.kt:22:42 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/SubResourceErrorEvent.kt:23:21 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopCustomMenuSelectionEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopCustomMenuSelectionEvent.kt:11:3 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopCustomMenuSelectionEvent.kt:22:16 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopCustomMenuSelectionEvent.kt:22:42 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopCustomMenuSelectionEvent.kt:23:21 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopHttpErrorEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopHttpErrorEvent.kt:11:3 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopHttpErrorEvent.kt:22:16 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopHttpErrorEvent.kt:22:42 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopHttpErrorEvent.kt:23:21 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingErrorEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingErrorEvent.kt:11:3 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingErrorEvent.kt:22:16 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingErrorEvent.kt:22:42 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingErrorEvent.kt:23:21 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingFinishEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingFinishEvent.kt:11:3 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingFinishEvent.kt:22:16 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingFinishEvent.kt:22:42 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingFinishEvent.kt:23:21 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingProgressEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingProgressEvent.kt:11:3 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingProgressEvent.kt:22:16 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingProgressEvent.kt:22:42 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingProgressEvent.kt:23:21 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingStartEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingStartEvent.kt:11:3 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingStartEvent.kt:22:16 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingStartEvent.kt:22:42 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopLoadingStartEvent.kt:23:21 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopMessageEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopMessageEvent.kt:10:75 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopMessageEvent.kt:21:16 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopMessageEvent.kt:21:42 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopMessageEvent.kt:22:21 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopNewWindowEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopNewWindowEvent.kt:11:3 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopNewWindowEvent.kt:22:16 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopNewWindowEvent.kt:22:42 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopNewWindowEvent.kt:23:21 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopRenderProcessGoneEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopRenderProcessGoneEvent.kt:12:3 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopRenderProcessGoneEvent.kt:23:16 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopRenderProcessGoneEvent.kt:23:42 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopRenderProcessGoneEvent.kt:24:21 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopShouldStartLoadWithRequestEvent.kt:5:8 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopShouldStartLoadWithRequestEvent.kt:10:89 'constructor<T : Event<T>>(viewTag: Int): Event<T>' is deprecated. Use constructor with explicit surfaceId instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopShouldStartLoadWithRequestEvent.kt:27:16 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopShouldStartLoadWithRequestEvent.kt:27:42 'interface RCTEventEmitter : JavaScriptModule' is deprecated. Use [RCTModernEventEmitter] instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/events/TopShouldStartLoadWithRequestEvent.kt:28:21 'fun receiveEvent(targetTag: Int, eventName: String, params: WritableMap?): Unit' is deprecated. Use [RCTModernEventEmitter.receiveEvent] instead.
+
+> Task :react-native-safe-area-context:compileDebugJavaWithJavac
+> Task :react-native-safe-area-context:bundleLibCompileToJarDebug
+
+> Task :react-native-gesture-handler:compileDebugKotlin
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-gesture-handler/android/src/main/java/com/swmansion/gesturehandler/react/Extensions.kt:8:8 'class UIManagerModule : ReactContextBaseJavaModule, OnBatchCompleteListener, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-gesture-handler/android/src/main/java/com/swmansion/gesturehandler/react/Extensions.kt:13:29 'class UIManagerModule : ReactContextBaseJavaModule, OnBatchCompleteListener, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-gesture-handler/android/src/main/java/com/swmansion/gesturehandler/react/Extensions.kt:14:32 'class UIManagerModule : ReactContextBaseJavaModule, OnBatchCompleteListener, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+
+> Task :react-native-webview:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :react-native-screens:compileDebugKotlin
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:62:9 The corresponding parameter in the supertype 'BaseReactPackage' is named 'name'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:63:9 The corresponding parameter in the supertype 'BaseReactPackage' is named 'reactContext'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:76:17 'constructor(name: String, className: String, canOverrideExistingModule: Boolean, needsEagerInit: Boolean, hasConstants: Boolean, isCxxModule: Boolean, isTurboModule: Boolean): ReactModuleInfo' is deprecated. This constructor is deprecated and will be removed in the future. Use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)].
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:26:8 'class UIManagerModule : ReactContextBaseJavaModule, OnBatchCompleteListener, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:56:77 Unchecked cast of '(CoordinatorLayout.Behavior<View!>?..CoordinatorLayout.Behavior<*>?)' to 'BottomSheetBehavior<Screen>'.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:428:42 'class UIManagerModule : ReactContextBaseJavaModule, OnBatchCompleteListener, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainerViewManager.kt:6:8 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenContainerViewManager.kt:56:78 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:222:31 'var targetElevation: Float' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:225:13 'fun setHasOptionsMenu(p0: Boolean): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:404:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:411:22 'fun onPrepareOptionsMenu(p0: Menu): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:414:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:419:22 'fun onCreateOptionsMenu(p0: Menu, p1: MenuInflater): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.kt:441:22 'val reactNativeHost: ReactNativeHost' is deprecated. You should not use ReactNativeHost directly in the New Architecture. Use ReactHost instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigShadowNode.kt:4:8 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigShadowNode.kt:10:5 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigViewManager.kt:9:8 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfigViewManager.kt:37:78 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackViewManager.kt:6:8 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackViewManager.kt:65:78 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:48:42 'fun replaceSystemWindowInsets(p0: Int, p1: Int, p2: Int, p3: Int): @NonNull() WindowInsetsCompat' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:49:39 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:51:39 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:52:39 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreensShadowNode.kt:4:8 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreensShadowNode.kt:5:8 'class NativeViewHierarchyManager : Any' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreensShadowNode.kt:6:8 'class NativeViewHierarchyOptimizer : Any' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreensShadowNode.kt:7:8 'class UIManagerModule : ReactContextBaseJavaModule, OnBatchCompleteListener, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreensShadowNode.kt:11:5 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreensShadowNode.kt:12:63 'class NativeViewHierarchyOptimizer : Any' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreensShadowNode.kt:14:34 'class UIManagerModule : ReactContextBaseJavaModule, OnBatchCompleteListener, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreensShadowNode.kt:14:106 'class NativeViewHierarchyManager : Any' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:7:8 'object ReactFeatureFlags : Any' is deprecated. Use com.facebook.react.internal.featureflags.ReactNativeFeatureFlags instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:25:13 'object ReactFeatureFlags : Any' is deprecated. Use com.facebook.react.internal.featureflags.ReactNativeFeatureFlags instead.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:32:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'left'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:33:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'top'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:34:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'right'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:35:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'bottom'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:71:9 The corresponding parameter in the supertype 'RootView' is named 'childView'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:72:9 The corresponding parameter in the supertype 'RootView' is named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:79:46 The corresponding parameter in the supertype 'RootView' is named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:83:9 The corresponding parameter in the supertype 'RootView' is named 'childView'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:84:9 The corresponding parameter in the supertype 'RootView' is named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:95:34 The corresponding parameter in the supertype 'RootView' is named 't'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:64:9 The corresponding parameter in the supertype 'ReactCompoundView' is named 'touchX'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:65:9 The corresponding parameter in the supertype 'ReactCompoundView' is named 'touchY'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:69:9 The corresponding parameter in the supertype 'ReactCompoundViewGroup' is named 'touchX'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:70:9 The corresponding parameter in the supertype 'ReactCompoundViewGroup' is named 'touchY'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/gamma/tabs/TabsHostViewManager.kt:37:9 The corresponding parameter in the supertype 'TabsHostViewManager' is named 'view'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/safearea/SafeAreaView.kt:19:8 'class UIManagerModule : ReactContextBaseJavaModule, OnBatchCompleteListener, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/safearea/SafeAreaView.kt:153:45 'fun consumeDisplayCutout(): @NonNull() WindowInsetsCompat' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/safearea/SafeAreaView.kt:194:58 'class UIManagerModule : ReactContextBaseJavaModule, OnBatchCompleteListener, LifecycleEventListener, UIManager' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/safearea/SafeAreaView.kt:201:31 'val uiImplementation: UIImplementation!' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/safearea/paper/SafeAreaViewShadowNode.kt:7:8 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/safearea/paper/SafeAreaViewShadowNode.kt:8:8 'class NativeViewHierarchyOptimizer : Any' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/safearea/paper/SafeAreaViewShadowNode.kt:14:32 'class LayoutShadowNode : ReactShadowNodeImpl' is deprecated. Deprecated in Java.
+w: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/safearea/paper/SafeAreaViewShadowNode.kt:83:63 'class NativeViewHierarchyOptimizer : Any' is deprecated. Deprecated in Java.
+
+> Task :react-native-gesture-handler:compileDebugJavaWithJavac
+> Task :react-native-gesture-handler:bundleLibCompileToJarDebug
+> Task :react-native-screens:compileDebugJavaWithJavac
+> Task :react-native-safe-area-context:bundleLibRuntimeToJarDebug
+> Task :react-native-webview:bundleLibCompileToJarDebug
+> Task :app:desugarDebugFileDependencies
+> Task :react-native-async-storage_async-storage:processDebugJavaRes NO-SOURCE
+> Task :react-native-firebase_app:processDebugJavaRes NO-SOURCE
+> Task :react-native-firebase_messaging:processDebugJavaRes NO-SOURCE
+> Task :react-native-geolocation-service:processDebugJavaRes NO-SOURCE
+> Task :react-native-webview:bundleLibRuntimeToJarDebug
+> Task :react-native-gesture-handler:bundleLibRuntimeToJarDebug
+> Task :react-native-gesture-handler:processDebugJavaRes
+> Task :react-native-safe-area-context:processDebugJavaRes
+> Task :react-native-screens:processDebugJavaRes
+> Task :react-native-vector-icons:processDebugJavaRes NO-SOURCE
+> Task :react-native-screens:bundleLibCompileToJarDebug
+> Task :react-native-webview:processDebugJavaRes
+> Task :react-native-screens:bundleLibRuntimeToJarDebug
+> Task :react-native-vector-icons:bundleLibRuntimeToDirDebug
+> Task :react-native-safe-area-context:bundleLibRuntimeToDirDebug
+> Task :app:checkDebugDuplicateClasses
+> Task :react-native-webview:bundleLibRuntimeToDirDebug
+> Task :react-native-screens:bundleLibRuntimeToDirDebug
+> Task :app:compileDebugKotlin
+> Task :react-native-gesture-handler:bundleLibRuntimeToDirDebug
+> Task :app:compileDebugJavaWithJavac
+> Task :app:dexBuilderDebug
+> Task :app:mergeExtDexDebug
+> Task :app:processDebugJavaRes
+> Task :app:mergeDebugGlobalSynthetics
+> Task :react-native-geolocation-service:bundleLibRuntimeToDirDebug
+> Task :react-native-firebase_messaging:bundleLibRuntimeToDirDebug
+> Task :react-native-async-storage_async-storage:bundleLibRuntimeToDirDebug
+> Task :app:mergeProjectDexDebug
+> Task :react-native-firebase_app:bundleLibRuntimeToDirDebug
+> Task :app:mergeDebugJavaResource
+
+> Task :app:configureCMakeDebug[arm64-v8a]
+C/C++: CMake Warning in C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-gesture-handler/android/build/generated/source/codegen/jni/CMakeLists.txt:
+C/C++:   The object file directory
+C/C++:     C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/android/app/.cxx/Debug/594l1k1n/arm64-v8a/rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/./
+C/C++:   has 193 characters.  The maximum full path to an object file is 250
+C/C++:   characters (see CMAKE_OBJECT_PATH_MAX).  Object file
+C/C++:     react/renderer/components/rngesturehandler_codegen/ComponentDescriptors.cpp.o
+C/C++:   cannot be safely placed under this directory.  The build may not work
+C/C++:   correctly.
+
+> Task :app:mergeLibDexDebug
+> Task :app:buildCMakeDebug[arm64-v8a]
+
+> Task :app:configureCMakeDebug[armeabi-v7a]
+C/C++: CMake Warning in C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-gesture-handler/android/build/generated/source/codegen/jni/CMakeLists.txt:
+C/C++:   The object file directory
+C/C++:     C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/android/app/.cxx/Debug/594l1k1n/armeabi-v7a/rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/./
+C/C++:   has 195 characters.  The maximum full path to an object file is 250
+C/C++:   characters (see CMAKE_OBJECT_PATH_MAX).  Object file
+C/C++:     react/renderer/components/rngesturehandler_codegen/ComponentDescriptors.cpp.o
+C/C++:   cannot be safely placed under this directory.  The build may not work
+C/C++:   correctly.
+
+> Task :app:buildCMakeDebug[armeabi-v7a]
+
+> Task :app:configureCMakeDebug[x86]
+C/C++: CMake Warning in C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-gesture-handler/android/build/generated/source/codegen/jni/CMakeLists.txt:
+C/C++:   The object file directory
+C/C++:     C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/android/app/.cxx/Debug/594l1k1n/x86/rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/./
+C/C++:   has 187 characters.  The maximum full path to an object file is 250
+C/C++:   characters (see CMAKE_OBJECT_PATH_MAX).  Object file
+C/C++:     react/renderer/components/rngesturehandler_codegen/rngesturehandler_codegenJSI-generated.cpp.o
+C/C++:   cannot be safely placed under this directory.  The build may not work
+C/C++:   correctly.
+
+> Task :app:buildCMakeDebug[x86]
+
+> Task :app:configureCMakeDebug[x86_64]
+C/C++: CMake Warning in C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/node_modules/react-native-gesture-handler/android/build/generated/source/codegen/jni/CMakeLists.txt:
+C/C++:   The object file directory
+C/C++:     C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/android/app/.cxx/Debug/594l1k1n/x86_64/rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/./
+C/C++:   has 190 characters.  The maximum full path to an object file is 250
+C/C++:   characters (see CMAKE_OBJECT_PATH_MAX).  Object file
+C/C++:     react/renderer/components/rngesturehandler_codegen/rngesturehandler_codegenJSI-generated.cpp.o
+C/C++:   cannot be safely placed under this directory.  The build may not work
+C/C++:   correctly.
+
+> Task :app:buildCMakeDebug[x86_64]
+> Task :app:mergeDebugJniLibFolders
+> Task :react-native-async-storage_async-storage:mergeDebugJniLibFolders
+> Task :react-native-async-storage_async-storage:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-firebase_app:mergeDebugJniLibFolders
+> Task :react-native-firebase_app:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-firebase_messaging:mergeDebugJniLibFolders
+> Task :react-native-firebase_messaging:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-geolocation-service:mergeDebugJniLibFolders
+> Task :react-native-geolocation-service:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-async-storage_async-storage:copyDebugJniLibsProjectOnly
+> Task :react-native-firebase_app:copyDebugJniLibsProjectOnly
+> Task :react-native-firebase_messaging:copyDebugJniLibsProjectOnly
+> Task :react-native-geolocation-service:copyDebugJniLibsProjectOnly
+> Task :react-native-gesture-handler:configureCMakeDebug[arm64-v8a]
+> Task :react-native-gesture-handler:buildCMakeDebug[arm64-v8a]
+> Task :react-native-gesture-handler:configureCMakeDebug[armeabi-v7a]
+> Task :react-native-gesture-handler:buildCMakeDebug[armeabi-v7a]
+> Task :react-native-gesture-handler:configureCMakeDebug[x86]
+> Task :react-native-gesture-handler:buildCMakeDebug[x86]
+> Task :react-native-gesture-handler:configureCMakeDebug[x86_64]
+> Task :react-native-gesture-handler:buildCMakeDebug[x86_64]
+> Task :react-native-gesture-handler:mergeDebugJniLibFolders
+> Task :react-native-safe-area-context:mergeDebugJniLibFolders
+> Task :react-native-safe-area-context:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-safe-area-context:copyDebugJniLibsProjectOnly
+> Task :react-native-gesture-handler:mergeDebugNativeLibs
+> Task :react-native-screens:configureCMakeDebug[arm64-v8a]
+> Task :react-native-gesture-handler:copyDebugJniLibsProjectOnly
+> Task :react-native-screens:buildCMakeDebug[arm64-v8a]
+> Task :react-native-screens:configureCMakeDebug[armeabi-v7a]
+> Task :react-native-screens:buildCMakeDebug[armeabi-v7a]
+> Task :react-native-screens:configureCMakeDebug[x86]
+> Task :react-native-screens:buildCMakeDebug[x86]
+> Task :react-native-screens:configureCMakeDebug[x86_64]
+> Task :react-native-screens:buildCMakeDebug[x86_64]
+> Task :react-native-screens:mergeDebugJniLibFolders
+> Task :react-native-vector-icons:mergeDebugJniLibFolders
+> Task :react-native-vector-icons:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-vector-icons:copyDebugJniLibsProjectOnly
+> Task :react-native-webview:mergeDebugJniLibFolders
+> Task :react-native-webview:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-webview:copyDebugJniLibsProjectOnly
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :react-native-screens:mergeDebugNativeLibs
+> Task :app:writeDebugSigningConfigVersions
+> Task :react-native-async-storage_async-storage:stripDebugDebugSymbols NO-SOURCE
+> Task :react-native-async-storage_async-storage:copyDebugJniLibsProjectAndLocalJars
+> Task :react-native-screens:copyDebugJniLibsProjectOnly
+> Task :react-native-async-storage_async-storage:extractDebugAnnotations
+> Task :react-native-async-storage_async-storage:extractDeepLinksForAarDebug
+> Task :react-native-async-storage_async-storage:mergeDebugGeneratedProguardFiles
+> Task :react-native-async-storage_async-storage:mergeDebugConsumerProguardFiles
+> Task :react-native-async-storage_async-storage:prepareDebugArtProfile
+> Task :react-native-async-storage_async-storage:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-firebase_app:stripDebugDebugSymbols NO-SOURCE
+> Task :react-native-firebase_app:copyDebugJniLibsProjectAndLocalJars
+> Task :react-native-async-storage_async-storage:mergeDebugJavaResource
+> Task :react-native-firebase_app:extractDebugAnnotations
+> Task :react-native-async-storage_async-storage:syncDebugLibJars
+> Task :react-native-async-storage_async-storage:bundleDebugAar
+> Task :react-native-async-storage_async-storage:assembleDebug
+> Task :react-native-firebase_app:extractDeepLinksForAarDebug
+> Task :react-native-firebase_app:mergeDebugGeneratedProguardFiles
+> Task :react-native-firebase_app:mergeDebugConsumerProguardFiles
+> Task :react-native-firebase_app:prepareDebugArtProfile
+> Task :react-native-firebase_app:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-firebase_messaging:stripDebugDebugSymbols NO-SOURCE
+> Task :react-native-firebase_app:mergeDebugJavaResource
+> Task :react-native-firebase_messaging:copyDebugJniLibsProjectAndLocalJars
+> Task :react-native-firebase_messaging:extractDebugAnnotations
+> Task :react-native-firebase_app:syncDebugLibJars
+> Task :react-native-firebase_app:bundleDebugAar
+> Task :react-native-firebase_app:assembleDebug
+> Task :react-native-firebase_messaging:extractDeepLinksForAarDebug
+> Task :react-native-firebase_messaging:mergeDebugGeneratedProguardFiles
+> Task :react-native-firebase_messaging:mergeDebugConsumerProguardFiles
+> Task :react-native-firebase_messaging:prepareDebugArtProfile
+> Task :react-native-firebase_messaging:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-geolocation-service:stripDebugDebugSymbols NO-SOURCE
+> Task :react-native-firebase_messaging:mergeDebugJavaResource
+> Task :react-native-geolocation-service:copyDebugJniLibsProjectAndLocalJars
+> Task :react-native-firebase_messaging:syncDebugLibJars
+> Task :react-native-firebase_messaging:bundleDebugAar
+> Task :react-native-firebase_messaging:assembleDebug
+> Task :react-native-geolocation-service:extractDebugAnnotations
+> Task :react-native-geolocation-service:extractDeepLinksForAarDebug
+> Task :react-native-geolocation-service:mergeDebugGeneratedProguardFiles
+> Task :react-native-geolocation-service:mergeDebugConsumerProguardFiles
+> Task :react-native-geolocation-service:prepareDebugArtProfile
+> Task :react-native-geolocation-service:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-geolocation-service:mergeDebugJavaResource
+> Task :react-native-geolocation-service:syncDebugLibJars
+> Task :react-native-geolocation-service:bundleDebugAar
+> Task :react-native-geolocation-service:assembleDebug
+> Task :react-native-gesture-handler:extractDebugAnnotations
+> Task :react-native-gesture-handler:extractDeepLinksForAarDebug
+> Task :react-native-gesture-handler:mergeDebugGeneratedProguardFiles
+> Task :react-native-gesture-handler:mergeDebugConsumerProguardFiles
+> Task :react-native-gesture-handler:prepareDebugArtProfile
+> Task :react-native-gesture-handler:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-safe-area-context:stripDebugDebugSymbols NO-SOURCE
+> Task :react-native-safe-area-context:copyDebugJniLibsProjectAndLocalJars
+> Task :react-native-gesture-handler:mergeDebugJavaResource
+> Task :react-native-safe-area-context:extractDebugAnnotations
+> Task :react-native-gesture-handler:syncDebugLibJars
+> Task :react-native-safe-area-context:extractDeepLinksForAarDebug
+> Task :react-native-safe-area-context:mergeDebugGeneratedProguardFiles
+> Task :react-native-safe-area-context:mergeDebugConsumerProguardFiles
+> Task :react-native-safe-area-context:prepareDebugArtProfile
+> Task :react-native-safe-area-context:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-safe-area-context:mergeDebugJavaResource
+> Task :react-native-screens:extractDebugAnnotations
+> Task :react-native-screens:stripDebugDebugSymbols
+> Task :react-native-gesture-handler:stripDebugDebugSymbols
+> Task :react-native-safe-area-context:syncDebugLibJars
+> Task :react-native-gesture-handler:copyDebugJniLibsProjectAndLocalJars
+> Task :react-native-safe-area-context:bundleDebugAar
+> Task :react-native-gesture-handler:bundleDebugAar
+> Task :react-native-gesture-handler:assembleDebug
+> Task :react-native-safe-area-context:assembleDebug
+> Task :react-native-screens:extractDeepLinksForAarDebug
+> Task :react-native-screens:copyDebugJniLibsProjectAndLocalJars
+> Task :react-native-screens:mergeDebugGeneratedProguardFiles
+> Task :react-native-screens:mergeDebugConsumerProguardFiles
+> Task :react-native-screens:prepareDebugArtProfile
+> Task :react-native-screens:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-vector-icons:stripDebugDebugSymbols NO-SOURCE
+> Task :react-native-vector-icons:copyDebugJniLibsProjectAndLocalJars
+> Task :react-native-screens:mergeDebugJavaResource
+> Task :react-native-vector-icons:extractDebugAnnotations
+> Task :react-native-screens:syncDebugLibJars
+> Task :react-native-screens:bundleDebugAar
+> Task :react-native-screens:assembleDebug
+> Task :react-native-vector-icons:extractDeepLinksForAarDebug
+> Task :react-native-vector-icons:mergeDebugGeneratedProguardFiles
+> Task :react-native-vector-icons:mergeDebugConsumerProguardFiles
+> Task :react-native-vector-icons:prepareDebugArtProfile
+> Task :react-native-vector-icons:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-webview:stripDebugDebugSymbols NO-SOURCE
+> Task :react-native-vector-icons:mergeDebugJavaResource
+> Task :react-native-vector-icons:syncDebugLibJars
+> Task :react-native-vector-icons:bundleDebugAar
+> Task :react-native-vector-icons:assembleDebug
+> Task :react-native-webview:copyDebugJniLibsProjectAndLocalJars
+> Task :react-native-webview:extractDebugAnnotations
+> Task :react-native-webview:extractDeepLinksForAarDebug
+> Task :react-native-webview:mergeDebugGeneratedProguardFiles
+> Task :react-native-webview:mergeDebugConsumerProguardFiles
+> Task :react-native-webview:prepareDebugArtProfile
+> Task :react-native-webview:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-webview:mergeDebugJavaResource
+> Task :react-native-webview:syncDebugLibJars
+> Task :react-native-webview:bundleDebugAar
+> Task :react-native-webview:assembleDebug
+> Task :app:mergeDebugNativeLibs
+> Task :app:stripDebugDebugSymbols
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+
+[Incubating] Problems report is available at: file:///C:/Users/ADMIN/Desktop/SafeTNet/safetnet/securityapp/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.0.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 19m 35s
+360 actionable tasks: 255 executed, 105 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.0.0/userguide/configuration_cache_enabling.html

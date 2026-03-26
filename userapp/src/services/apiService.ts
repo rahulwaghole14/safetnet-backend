@@ -1209,6 +1209,50 @@ class ApiService {
   }
 
   /**
+   * Request password reset OTP
+   */
+  async requestPasswordReset(email: string): Promise<{message: string}> {
+    const url = `${BACKEND_BASE_URL}/api/auth/request-password-reset/`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || data.detail || `HTTP ${response.status}`);
+    }
+    return data;
+  }
+
+  /**
+   * Reset password using OTP
+   */
+  async resetPassword(email: string, otp: string, newPassword: string): Promise<{message: string}> {
+    const url = `${BACKEND_BASE_URL}/api/auth/reset-password/`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        email, 
+        otp, 
+        new_password: newPassword 
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || data.detail || `HTTP ${response.status}`);
+    }
+    return data;
+  }
+
+  /**
    * Get the current API base URL
    */
   getBaseUrl(): string {

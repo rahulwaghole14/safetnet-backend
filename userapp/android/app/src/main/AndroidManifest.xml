@@ -25,10 +25,9 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     
-    <!-- Phone and SMS permissions for emergency contacts -->
-    <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.SEND_SMS" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    
+    <!-- Phone and SMS intents no longer require direct permissions for Play Store compliance -->
+    <!-- ACTION_DIAL and ACTION_SENDTO will be used instead -->
     
     <!-- Camera and microphone permissions for evidence recording -->
     <uses-permission android:name="android.permission.CAMERA" />

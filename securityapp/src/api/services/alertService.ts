@@ -241,47 +241,71 @@ export const alertService = {
       const alertData = response.data;
       console.log('🔍 Raw backend alert data:', alertData);
       
-      // Transform location fields to location object
-      if (alertData.location_lat && alertData.location_long) {
-        const lat = parseFloat(String(alertData.location_lat));
-        const lng = parseFloat(String(alertData.location_long));
+      // Transform location fields to location object - supporting multiple field names from backend
+      // Source priority: 1. Nested location object, 2. location_lat/long, 3. latitude/longitude, 4. lat/long
+      const nestedLat = alertData.location?.latitude || alertData.location?.lat;
+      const nestedLng = alertData.location?.longitude || alertData.location?.lng;
+      
+      const rawLat = nestedLat ?? alertData.location_lat ?? alertData.latitude ?? alertData.lat;
+      const rawLng = nestedLng ?? alertData.location_long ?? alertData.longitude ?? alertData.lng;
+      
+      if (rawLat !== undefined && rawLat !== null && rawLng !== undefined && rawLng !== null) {
+        const lat = parseFloat(String(rawLat));
+        const lng = parseFloat(String(rawLng));
         
         // Validate GPS coordinates
-        if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        const isAreaAlert = alertData.alert_type === 'area_user_alert';
+        const isNullIsland = lat === 0 && lng === 0;
+
+        if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180 || (isNullIsland && !isAreaAlert)) {
           console.error('❌ Invalid GPS coordinates in alert data:', { 
-            original_lat: alertData.location_lat,
-            original_lng: alertData.location_long,
+            original_lat: rawLat,
+            original_lng: rawLng,
             parsed_lat: lat,
             parsed_lng: lng
           });
-          // Set to default invalid location
+          
+          // Don't overwrite if we have SOMETHING valid in the record already, 
+          // but if we must default, only do so if it's truly empty
+          if (!alertData.location?.latitude) {
+            alertData.location = {
+              latitude: 0,
+              longitude: 0,
+              address: 'Invalid GPS coordinates'
+            };
+            alertData.location_lat = 0;
+            alertData.location_long = 0;
+          }
+        } else {
+          // Robustly set location object
+          alertData.location = {
+            latitude: lat,
+            longitude: lng,
+            address: alertData.location_address || alertData.location?.address || (isNullIsland && isAreaAlert ? 'Area-based Alert (Geofence)' : `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}`)
+          };
+          
+          // Ensure legacy fields are also set correctly
+          alertData.location_lat = lat;
+          alertData.location_long = lng;
+          
+          if (isNullIsland && isAreaAlert) {
+            console.log('📍 Area-based alert detected, using geofence for location');
+          } else {
+            console.log('✅ Transformed location object:', alertData.location);
+          }
+        }
+      } else {
+        console.warn('⚠️ No location coordinates found in alert data using any known field names');
+        // Only set to zero if there's absolutely no location data
+        if (!alertData.location?.latitude) {
           alertData.location = {
             latitude: 0,
             longitude: 0,
-            address: 'Invalid GPS coordinates'
+            address: 'Unknown location - GPS coordinates missing'
           };
-        } else {
-          alertData.location = {
-            latitude: lat,
-            longitude: lng,
-            address: alertData.location_address || `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}`
-          };
-          
-          console.log('✅ Transformed location object:', alertData.location);
-          console.log('📍 Exact GPS coordinates:', {
-            latitude: lat,
-            longitude: lng,
-            precision: '6 decimal places (≈1m accuracy)',
-            valid: true
-          });
+          alertData.location_lat = 0;
+          alertData.location_long = 0;
         }
-      } else {
-        console.warn('⚠️ No location coordinates found in alert data');
-        alertData.location = {
-          latitude: 0,
-          longitude: 0,
-          address: 'Unknown location - GPS coordinates missing'
-        };
       }
       
       // Ensure geofence data is properly included
@@ -577,16 +601,13 @@ const getMockAlerts = (): Alert[] => {
         center_longitude: 73.8567,
         radius: 500,
         geofence_type: 'polygon',
-        polygon_json: JSON.stringify({
-          type: 'Polygon',
-          coordinates: [[
-            [73.8560, 18.5200], // [longitude, latitude]
-            [73.8570, 18.5200],
-            [73.8570, 18.5210],
-            [73.8560, 18.5210],
-            [73.8560, 18.5200]
-          ]]
-        }),
+        polygon_json: [
+          [18.5200, 73.8560],
+          [18.5200, 73.8570],
+          [18.5210, 73.8570],
+          [18.5210, 73.8560],
+          [18.5200, 73.8560]
+        ],
         status: 'active',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),

@@ -79,6 +79,13 @@ class AdvancedAlertService {
       
       const response = await apiClient.post(API_ENDPOINTS.CREATE_SOS, alertPayload);
       
+      // Robust GPS parsing for response
+      const nestedLat = response.data.location?.latitude || response.data.location?.lat;
+      const nestedLng = response.data.location?.longitude || response.data.location?.lng;
+      
+      const resLat = nestedLat ?? response.data.location_lat ?? response.data.latitude ?? location.latitude;
+      const resLng = nestedLng ?? response.data.location_long ?? response.data.longitude ?? location.longitude;
+
       // Step 3: Transform response to match Alert interface
       const createdAlert: Alert = {
         ...response.data,
@@ -93,12 +100,12 @@ class AdvancedAlertService {
         message: response.data.message,
         description: response.data.description,
         location: {
-          latitude: response.data.location_lat,
-          longitude: response.data.location_long,
-          address: response.data.location_address || `GPS: ${response.data.location_lat.toFixed(6)}, ${response.data.location_long.toFixed(6)}`,
+          latitude: resLat,
+          longitude: resLng,
+          address: response.data.location_address || response.data.location?.address || `GPS: ${resLat.toFixed(6)}, ${resLng.toFixed(6)}`,
         },
-        location_lat: response.data.location_lat,
-        location_long: response.data.location_long,
+        location_lat: resLat,
+        location_long: resLng,
         timestamp: response.data.timestamp || response.data.created_at,
         status: response.data.status || 'pending',
         geofence_id: response.data.geofence_id,
@@ -206,18 +213,25 @@ class AdvancedAlertService {
       
       const response = await apiClient.get(API_ENDPOINTS.GET_SOS.replace('{id}', alertId));
       
+      // Robust GPS parsing
+      const nestedLat = response.data.location?.latitude || response.data.location?.lat;
+      const nestedLng = response.data.location?.longitude || response.data.location?.lng;
+      
+      const resLat = nestedLat ?? response.data.location_lat ?? response.data.latitude ?? 0;
+      const resLng = nestedLng ?? response.data.location_long ?? response.data.longitude ?? 0;
+
       // Transform response to ensure location data is properly structured
       const alert: Alert = {
         ...response.data,
         id: response.data.id || response.data.log_id,
         log_id: response.data.log_id || response.data.id?.toString(),
         location: {
-          latitude: response.data.location_lat,
-          longitude: response.data.location_long,
-          address: response.data.location_address || `GPS: ${response.data.location_lat.toFixed(6)}, ${response.data.location_long.toFixed(6)}`,
+          latitude: resLat,
+          longitude: resLng,
+          address: response.data.location_address || response.data.location?.address || `GPS: ${resLat.toFixed(6)}, ${resLng.toFixed(6)}`,
         },
-        location_lat: response.data.location_lat,
-        location_long: response.data.location_long,
+        location_lat: resLat,
+        location_long: resLng,
         timestamp: response.data.timestamp || response.data.created_at,
         status: response.data.status || 'pending',
         created_at: response.data.created_at,
@@ -248,13 +262,22 @@ class AdvancedAlertService {
         status,
       });
       
+      // Robust GPS parsing
+      const nestedLat = response.data.location?.latitude || response.data.location?.lat;
+      const nestedLng = response.data.location?.longitude || response.data.location?.lng;
+      
+      const resLat = nestedLat ?? response.data.location_lat ?? response.data.latitude ?? 0;
+      const resLng = nestedLng ?? response.data.location_long ?? response.data.longitude ?? 0;
+
       const updatedAlert: Alert = {
         ...response.data,
         location: {
-          latitude: response.data.location_lat,
-          longitude: response.data.location_long,
-          address: response.data.location_address || `GPS: ${response.data.location_lat.toFixed(6)}, ${response.data.location_long.toFixed(6)}`,
+          latitude: resLat,
+          longitude: resLng,
+          address: response.data.location_address || response.data.location?.address || `GPS: ${resLat.toFixed(6)}, ${resLng.toFixed(6)}`,
         },
+        location_lat: resLat,
+        location_long: resLng,
       };
       
       console.log('✅ Alert status updated:', {

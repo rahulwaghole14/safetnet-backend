@@ -1,30 +1,4 @@
-import {Alert, Linking, NativeModules, PermissionsAndroid, Platform} from 'react-native';
-
-const CALL_PERMISSION = PermissionsAndroid.PERMISSIONS.CALL_PHONE;
-
-const ensureCallPermission = async () => {
-  if (Platform.OS !== 'android') {
-    return true;
-  }
-
-  if (!CALL_PERMISSION) {
-    return true;
-  }
-
-  const alreadyGranted = await PermissionsAndroid.check(CALL_PERMISSION);
-  if (alreadyGranted) {
-    return true;
-  }
-
-  const status = await PermissionsAndroid.request(CALL_PERMISSION, {
-    title: 'Allow phone calls',
-    message: 'Enable direct calling for emergency contacts.',
-    buttonPositive: 'Allow',
-    buttonNegative: 'Deny',
-  });
-
-  return status === PermissionsAndroid.RESULTS.GRANTED;
-};
+import {Alert, Linking, NativeModules, Platform} from 'react-native';
 
 const directCallModule = NativeModules.DirectCallModule as
   | {startDirectCall(phoneNumber: string): Promise<boolean>}
@@ -35,20 +9,17 @@ export const requestDirectCall = async (phoneNumber: string): Promise<void> => {
     throw new Error('Missing phone number');
   }
 
-  const hasPermission = await ensureCallPermission();
-  if (!hasPermission) {
-    throw new Error('Call permission denied');
-  }
-
+  // Use native module if available (Android uses ACTION_DIAL)
   if (Platform.OS === 'android' && directCallModule?.startDirectCall) {
     try {
       await directCallModule.startDirectCall(phoneNumber);
       return;
     } catch (error) {
-      console.warn('Direct call module failed, falling back to dialer:', error);
+      console.warn('Direct call module failed, falling back to Linking:', error);
     }
   }
 
+  // Fallback to Linking.openURL with tel:
   const sanitized = phoneNumber.replace(/\s+/g, '');
   const url = `tel:${sanitized}`;
   const supported = await Linking.canOpenURL(url);
@@ -64,5 +35,3 @@ export const requestDirectCall = async (phoneNumber: string): Promise<void> => {
     throw error;
   }
 };
-
-

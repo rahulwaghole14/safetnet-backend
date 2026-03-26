@@ -3,6 +3,7 @@ package com.safetnet.userapp
 import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
+import androidx.activity.enableEdgeToEdge
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultReactActivityDelegate
@@ -19,6 +20,7 @@ class MainActivity : ReactActivity() {
    * Override onCreate to handle intents when app is launched (works when app is closed)
    */
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     // Check for shake intent in onCreate (when app is launched from closed state)
     handleShakeIntent(intent)

@@ -166,7 +166,7 @@ const LoginScreen = () => {
               <View style={styles.forgotPasswordContainer}>
                 <TouchableOpacity
                   onPress={() => {
-                    Alert.alert('Forgot Password', 'Password reset functionality coming soon');
+                    navigation.navigate('ForgotPassword');
                   }}>
                   <Text style={styles.linkText}>Forgot Password</Text>
                 </TouchableOpacity>
@@ -193,7 +193,7 @@ const LoginScreen = () => {
               <TouchableOpacity
                 style={styles.termsContainer}
                 onPress={() => {
-                  Alert.alert('Terms of Use', 'Terms and conditions coming soon');
+                  navigation.navigate('TermsOfUse');
                 }}>
                 <Text style={styles.linkText}>Terms of Use</Text>
               </TouchableOpacity>

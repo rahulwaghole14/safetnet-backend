@@ -329,6 +329,14 @@ export const LoginScreen = () => {
     form: {
       flex: 1,
     },
+    errorText: {
+      color: colors.error || '#EF4444',
+      fontSize: 12,
+      fontWeight: '600',
+      marginBottom: 12,
+      marginLeft: 4,
+      textAlign: 'left',
+    },
   });
 
   const [email, setEmail] = useState('');
@@ -371,8 +379,9 @@ export const LoginScreen = () => {
 
 
   const handleLogin = async () => {
+    setError(''); // Clear previous error
     if (!email || !password) {
-      Alert.alert('Error', 'Please enter email and password');
+      setError('Please enter email and password');
       return;
     }
 
@@ -494,67 +503,52 @@ export const LoginScreen = () => {
       console.error("Error response status:", err.response?.status);
       console.error("Error response data:", err.response?.data);
 
-      const status = err.response && err.response.status ? err.response.status : undefined;
+      const backendError = err.response?.data;
+      const status = err.response?.status;
       const isNetworkError = err.code === 'ERR_NETWORK' || err.message === 'Network Error' || !err.response;
-      let errorMessage = 'Invalid Credentials';
+      let errorMessage = 'Invalid credentials';
 
-      // Handle network errors (no response from server)
-      if (isNetworkError) {
-        errorMessage = 'Cannot reach server. The backend service may be sleeping (Render free tier takes 30-90 seconds to wake up). Please wait 1-2 minutes and try again.';
-      } else if (status === 502) {
-        // Bad Gateway - Render service is down or sleeping
-        errorMessage = 'Backend service is not responding. The service may be sleeping (Render free tier takes 30-90 seconds to wake up). Please wait and try again, or check Render dashboard.';
-      } else if (status === 503) {
-        errorMessage = 'Service temporarily unavailable. The server is starting up or overloaded. Please wait 1-2 minutes and try again.';
-      } else if (status === 400) {
-        // 400 Bad Request - show backend's specific error message
-        // Handle Django REST Framework error formats
-        const backendError = err.response && err.response.data ? err.response.data : null;
-
-        if (backendError) {
-          // Format: { "non_field_errors": ["Invalid credentials."] }
-          if (backendError.non_field_errors && Array.isArray(backendError.non_field_errors)) {
-            errorMessage = backendError.non_field_errors[0];
-          }
-          // Format: { "message": "Invalid credentials" }
-          else if (backendError.message) {
-            errorMessage = backendError.message;
-          }
-          // Format: { "error": "Invalid credentials" }
-          else if (backendError.error) {
-            errorMessage = backendError.error;
-          }
-          // Format: { "detail": "Invalid credentials" }
-          else if (backendError.detail) {
-            errorMessage = backendError.detail;
-          }
-          // Format: string
-          else if (typeof backendError === 'string') {
-            errorMessage = backendError;
-          }
-          // Fallback
-          else {
-            errorMessage = err.message || 'Invalid credentials. Please check your username and password.';
-          }
-        } else {
-          errorMessage = err.message || 'Invalid credentials. Please check your username and password.';
+      // 1. Highest Priority: Specific backend error data
+      if (backendError) {
+        if (backendError.non_field_errors && Array.isArray(backendError.non_field_errors)) {
+          errorMessage = backendError.non_field_errors[0];
+        } else if (backendError.message) {
+          errorMessage = backendError.message;
+        } else if (backendError.error) {
+          errorMessage = backendError.error;
+        } else if (backendError.detail) {
+          errorMessage = backendError.detail;
+        } else if (typeof backendError === 'string' && backendError.length < 100) {
+          errorMessage = backendError;
         }
-
-        // Log full error details for debugging
-        console.error("400 Error Details:", JSON.stringify(backendError, null, 2));
-      } else if (status === 401) {
-        errorMessage = 'Invalid username or password. Please try again.';
-      } else if (status === 503) {
-        errorMessage = 'Service temporarily unavailable. The server is down or overloaded. Please try again later.';
-      } else if (status >= 500) {
-        errorMessage = 'Server error. Please try again later.';
-      } else if (!err.response) {
-        errorMessage = 'Network error. Please check your internet connection.';
-      } else {
-        errorMessage = (err.response && err.response.data && err.response.data.message) || (err.response && err.response.data && err.response.data.error) || err.message || 'Invalid Credentials';
+      } 
+      
+      // 2. Second Priority: Use system error message if it's descriptive and not already handled
+      if (errorMessage === 'Invalid credentials' && err.message && err.message !== 'Network Error') {
+        errorMessage = err.message;
       }
 
-      Alert.alert('Login Failed', errorMessage);
+      // 3. Third Priority: Handle specific status codes if message is still generic
+      if (errorMessage === 'Invalid credentials' || errorMessage === 'Network Error') {
+        if (status === 401) {
+          errorMessage = 'Invalid username or password. Please try again.';
+        } else if (status === 403) {
+          errorMessage = 'Access denied. Please contact your supervisor.';
+        } else if (status === 502 || status === 503 || isNetworkError) {
+          errorMessage = 'Server is currently unavailable. Please check your internet or try again in a minute.';
+        } else if (status >= 500) {
+          errorMessage = 'Internal server error. Please try again later.';
+        }
+      }
+
+      // Log full error details for debugging
+      console.error("Login Context Error Details:", JSON.stringify({
+        status,
+        isNetworkError,
+        backendError: err.response?.data
+      }, null, 2));
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -623,7 +617,10 @@ export const LoginScreen = () => {
                 style={styles.input}
                 placeholder="Enter your badge ID or email"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  if (error) setError('');
+                }}
                 onFocus={() => setEmailFocused(true)}
                 onBlur={() => setEmailFocused(false)}
                 autoCapitalize="none"
@@ -648,7 +645,10 @@ export const LoginScreen = () => {
                 style={[styles.input, styles.passwordInput]}
                 placeholder="Enter your password"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  if (error) setError('');
+                }}
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}
                 secureTextEntry={!showPassword}
@@ -676,6 +676,10 @@ export const LoginScreen = () => {
           >
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
+
+          {error ? (
+            <Text style={styles.errorText}>{error}</Text>
+          ) : null}
 
           <TouchableOpacity
             style={styles.loginButton}

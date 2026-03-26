@@ -1,10 +1,7 @@
 package com.safetnet.userapp.calls
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.core.content.ContextCompat
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -15,7 +12,6 @@ class DirectCallModule(private val reactContext: ReactApplicationContext) :
 
   override fun getName(): String = "DirectCallModule"
 
-  @SuppressLint("MissingPermission")
   @ReactMethod
   fun startDirectCall(phoneNumber: String, promise: Promise) {
     if (phoneNumber.isBlank()) {
@@ -23,18 +19,9 @@ class DirectCallModule(private val reactContext: ReactApplicationContext) :
       return
     }
 
-    val permissionStatus = ContextCompat.checkSelfPermission(
-      reactContext,
-      android.Manifest.permission.CALL_PHONE,
-    )
-
-    if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
-      promise.reject("MISSING_PERMISSION", "CALL_PHONE permission not granted")
-      return
-    }
-
     val sanitized = phoneNumber.replace("\\s+".toRegex(), "")
-    val intent = Intent(Intent.ACTION_CALL).apply {
+    // ACTION_DIAL opens the dialer without requiring permissions
+    val intent = Intent(Intent.ACTION_DIAL).apply {
       data = Uri.parse("tel:$sanitized")
       flags = Intent.FLAG_ACTIVITY_NEW_TASK
     }
@@ -47,8 +34,3 @@ class DirectCallModule(private val reactContext: ReactApplicationContext) :
     }
   }
 }
-
-
-
-
-

@@ -33,53 +33,80 @@ export interface LiveLocationSession {
   last_location?: LocationData;
 }
 
-// Location tracking disabled - frontend no longer handles GPS
+import GeolocationService from 'react-native-geolocation-service';
+import { Platform, PermissionsAndroid } from 'react-native';
+
+// Location tracking service - restored to provide real-time GPS
 export const locationService = {
-  // Start live location - disabled (backend handles location tracking)
-  startLiveLocation: async (geofenceId: string): Promise<LiveLocationSession> => {
-    console.log('🚫 Location tracking disabled - frontend no longer handles live location');
-    // Return neutral session object instead of throwing
-    return {
-      id: 'disabled',
-      officer_id: 'disabled',
-      geofence_id: geofenceId,
-      start_time: new Date().toISOString(),
-      status: 'stopped' as const,
-    };
+  // Check and request location permissions
+  requestPermission: async (): Promise<boolean> => {
+    if (Platform.OS === 'ios') {
+      const auth = await GeolocationService.requestAuthorization('whenInUse');
+      return auth === 'granted';
+    }
+
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+
+    return false;
   },
 
-  // Update live location - disabled (backend handles location tracking)
-  updateLiveLocation: async (sessionId: string, locationData: LocationData): Promise<LiveLocationSession> => {
-    console.log('🚫 Location tracking disabled - frontend no longer handles live location');
-    // Return neutral session object instead of throwing
-    return {
-      id: sessionId,
-      officer_id: 'disabled',
-      geofence_id: 'disabled',
-      start_time: new Date().toISOString(),
-      status: 'stopped' as const,
-    };
-  },
-
-  // Stop live location - disabled (backend handles location tracking)
-  stopLiveLocation: async (sessionId: string): Promise<LiveLocationSession> => {
-    console.log('🚫 Location tracking disabled - frontend no longer handles live location');
-    // Return neutral session object instead of throwing
-    return {
-      id: sessionId,
-      officer_id: 'disabled',
-      geofence_id: 'disabled',
-      start_time: new Date().toISOString(),
-      status: 'stopped' as const,
-    };
-  },
-
-  // Get current location - disabled (frontend no longer handles GPS)
+  // Get current location
   getCurrentLocation: async (): Promise<LocationData | null> => {
-    console.log('🚫 GPS tracking disabled - frontend no longer handles location acquisition');
-    // Return null instead of throwing
-    return null;
+    return new Promise((resolve) => {
+      GeolocationService.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: new Date(position.timestamp).toISOString(),
+          });
+        },
+        (error) => {
+          console.error('❌ [locationService] getCurrentPosition Error:', error);
+          resolve(null);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
+    });
   },
+
+  // Watch location updates (for map screen)
+  watchLocation: (
+    onSuccess: (location: LocationData) => void,
+    onError: (error: any) => void
+  ): number => {
+    return GeolocationService.watchPosition(
+      (position) => {
+        onSuccess({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          timestamp: new Date(position.timestamp).toISOString(),
+        });
+      },
+      (error) => {
+        console.error('❌ [locationService] watchPosition Error:', error);
+        onError(error);
+      },
+      { 
+        enableHighAccuracy: true, 
+        distanceFilter: 10, // Update every 10 meters 
+        interval: 5000, // Update every 5 seconds
+        fastestInterval: 2000 
+      }
+    );
+  },
+
+  // Stop watching location
+  stopWatching: (watchId: number) => {
+    GeolocationService.clearWatch(watchId);
+  }
 };
 
 export const geofenceService = {

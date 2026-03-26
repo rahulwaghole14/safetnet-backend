@@ -76,45 +76,9 @@ export const login = async (credentials: LoginPayload, retryCount: number = 0): 
       return login(credentials, retryCount + 1);
     }
 
-    if (error.response) {
-      // Server responded with error status
-      console.error('📊 Response Status:', error.response.status);
-      console.error('📄 Response Data:', error.response.data);
-
-      if (error.response.status === 400) {
-        throw new Error('Invalid username or password');
-      } else if (error.response.status === 401) {
-        throw new Error('Invalid credentials');
-      } else if (error.response.status === 404) {
-        throw new Error('Login endpoint not found. Check backend deployment.');
-      } else if (error.response.status === 500) {
-        // Check if it's an SSL error
-        if (error.message && error.message.includes('SSL')) {
-          throw new Error('Backend SSL error. The server may be restarting. Please try again in a moment.');
-        }
-        throw new Error('Server error. Please try again later.');
-      } else {
-        throw new Error(`Login failed: ${error.response.data?.message || 'Unknown error'}`);
-      }
-    } else if (error.request) {
-      // No response received
-      console.error('🌐 No response received:', error.message);
-
-      // Check for SSL/network errors
-      if (error.message && error.message.includes('SSL')) {
-        throw new Error('SSL connection failed. Backend may be unavailable. Please try again.');
-      }
-      throw new Error('Network error. Please check your connection and try again.');
-    } else {
-      // Other error
-      console.error('⚙️ UNKNOWN ERROR:', error.message);
-
-      // Check for SSL errors
-      if (error.message && error.message.includes('SSL')) {
-        throw new Error('SSL connection error. Please try again.');
-      }
-      throw new Error('An unexpected error occurred. Please try again.');
-    }
+    // Throw the original error - callers (like LoginScreen) are better equipped 
+    // to parse the detailed error structure (response data, status codes, etc.)
+    throw error;
   }
 };
 

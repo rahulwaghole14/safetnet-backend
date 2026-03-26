@@ -1,11 +1,16 @@
 import { useEffect } from 'react';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import * as fcmTokenService from '../api/services/fcmTokenService';
-import { Platform, Alert } from 'react-native';
+import { DeviceEventEmitter, Platform, Alert, PermissionsAndroid } from 'react-native';
+import { useAppSelector } from '../store/hooks';
+import { useAlertsStore } from '../store/alertsStore'; // Assuming this import exists or needs to be added
 
 export const usePushNotifications = (isAuthenticated: boolean) => {
-    useEffect(() => {
-        if (!isAuthenticated) return;
+  const { fetchAlerts } = useAlertsStore();
+  const { officer } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
 
         const requestUserPermission = async () => {
             if (Platform.OS === 'ios') {
@@ -15,9 +20,21 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
                     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
                 if (!enabled) {
-                    console.log('[FCM] Permission not granted');
+                    console.log('[FCM] Permission not granted on iOS');
                     return;
                 }
+            } else if (Platform.OS === 'android') {
+                if (Platform.Version >= 33) {
+                    // PermissionsAndroid is already imported at the top
+                    const granted = await PermissionsAndroid.request(
+                        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+                    );
+                    if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+                        console.log('[FCM] Permission not granted on Android 13+');
+                        return;
+                    }
+                }
+                // For older Android versions, permission is granted at install time
             }
 
             await registerFCMToken();
@@ -28,8 +45,13 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
                 const token = await messaging().getToken();
                 console.log('[FCM] Token:', token);
                 await fcmTokenService.updateFCMToken(token);
-            } catch (error) {
-                console.error('[FCM] Error getting/registering token', error);
+            } catch (error: any) {
+                const errorStr = String(error);
+                if (errorStr.includes('SERVICE_NOT_AVAILABLE')) {
+                    console.log('[FCM] Google Play Services unavailable (SERVICE_NOT_AVAILABLE). Push notifications will be disabled for this session.');
+                } else {
+                    console.error('[FCM] Registration Error:', error);
+                }
             }
         };
 
@@ -47,17 +69,31 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
         const unsubscribeMessage = messaging().onMessage(async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
             console.log('[FCM] Foreground Message:', JSON.stringify(remoteMessage));
             
-            // If it's an SOS alert, show a high-visibility alert
-            if (remoteMessage.data?.type === 'sos_alert') {
+            // Handle SOS alerts in foreground
+            if (remoteMessage.data?.type === 'sos_alert' || remoteMessage.data?.type === 'emergency') {
+                // Check if this alert was created by the current officer to avoid self-notification
+                const body = remoteMessage.notification?.body || '';
+                const officerName = officer?.name || '';
+                
+                if (officerName && body.includes(officerName)) {
+                    console.log('🚫 Skipping foreground notification alert for creator:', officerName);
+                    return;
+                }
+
+                // For foreground alerts, show a persistent notification or top-level UI
                 Alert.alert(
-                    "🚨 EMERGENCY SOS",
+                    "🚨 EMERGENCY SOS", // Changed from original "🚨 EMERGENCY SOS" to match instruction
                     remoteMessage.notification?.body || "New SOS Alert received!",
                     [
                         { 
-                            text: "VIEW ALERT", 
+                            text: 'VIEW ALERT',
                             onPress: () => {
-                                // You can add navigation logic here if needed
-                                console.log("User clicked View Alert from Foreground");
+                                if (remoteMessage.data?.sos_alert_id) {
+                                    DeviceEventEmitter.emit('notification:navigate', {
+                                        alertId: String(remoteMessage.data.sos_alert_id)
+                                    });
+                                }
+                                console.log('[FCM] User clicked View Alert from Foreground');
                             }
                         },
                         { text: "DISMISS", style: "cancel" }

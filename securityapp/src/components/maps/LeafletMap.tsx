@@ -27,6 +27,7 @@ export const LeafletMap = React.forwardRef<WebView, {
   }>;
   mapKey?: string;
   autoFitBounds?: boolean;
+  showRoute?: boolean;
 }>(({
   latitude,
   longitude,
@@ -39,7 +40,8 @@ export const LeafletMap = React.forwardRef<WebView, {
   polygonCoordinates,
   multiplePolygons,
   mapKey,
-  autoFitBounds = true
+  autoFitBounds = true,
+  showRoute = false
 }, ref) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -77,27 +79,37 @@ export const LeafletMap = React.forwardRef<WebView, {
           const color = polygon.color || '#3388ff';
           
           return `
-            console.log('🗺️ Adding polygon:', '${polygon.name}', 'with coords:', [${coordsString}]);
-            var polygon_${polygon.id} = L.polygon([${coordsString}], {
+            console.log('🗺️ Adding polygon:', '${polygon.name || "Assigned Zone"}', 'with coords:', [${coordsString}]);
+            var polyId = '${polygon.id || Math.random().toString(36).substr(2, 9)}';
+            var polygonObj = L.polygon([${coordsString}], {
               color: '${color}',
               fillColor: '${color}',
               fillOpacity: 0.2,
               weight: 2
             }).addTo(map);
             
-            polygon_${polygon.id}.bindPopup('<div style="font-family: Arial, sans-serif;"><strong>${polygon.name}</strong><br/>Type: Assigned Zone</div>');
+            polygonObj.bindPopup('<div style="font-family: Arial, sans-serif;"><strong>${polygon.name || "Assigned Zone"}</strong><br/>Type: Assigned Zone</div>');
             
-            // Add zone label
-            var center_${polygon.id} = polygon_${polygon.id}.getBounds().getCenter();
-            L.marker([center_${polygon.id}.lat, center_${polygon.id}.lng], {
-              icon: L.divIcon({
-                html: '<div style="background: ${color}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; white-space: nowrap;">${polygon.name}</div>',
-                className: 'zone-label',
-                iconSize: [80, 16],
-                iconAnchor: [40, 8]
-              })
-            }).addTo(map);
-            console.log('✅ Polygon added:', '${polygon.name}');
+            // Add zone label if polygon is valid
+            try {
+              var bounds = polygonObj.getBounds();
+              if (bounds.isValid()) {
+                var center = bounds.getCenter();
+                if (center && typeof center.lat === 'number' && typeof center.lng === 'number') {
+                  L.marker([center.lat, center.lng], {
+                    icon: L.divIcon({
+                      html: '<div style="background: ${color}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: bold; white-space: nowrap;">${polygon.name || "Assigned Zone"}</div>',
+                      className: 'zone-label',
+                      iconSize: [80, 16],
+                      iconAnchor: [40, 8]
+                    })
+                  }).addTo(map);
+                }
+              }
+            } catch (e) {
+              console.warn('⚠️ Could not add label for polygon:', polyId, e);
+            }
+            console.log('✅ Polygon added:', '${polygon.name || "Assigned Zone"}');
           `;
         }).join('\n')
       : '';
@@ -240,6 +252,37 @@ export const LeafletMap = React.forwardRef<WebView, {
                 }
                 map.fitBounds(group.getBounds().pad(0.1));
                 console.log('Map auto-fitted to show both markers');
+                ` : ''}
+
+                // Add route (OSRM) if showRoute is true and we have both markers
+                ${showRoute && officerLatitude && officerLongitude ? `
+                console.log('🗺️ Fetching OSRM route...');
+                var start = [${officerLongitude}, ${officerLatitude}];
+                var end = [${longitude}, ${latitude}];
+                var url = 'https://router.project-osrm.org/route/v1/driving/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?overview=full&geometries=geojson';
+                
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 'Ok' && data.routes && data.routes[0]) {
+                            var routeData = data.routes[0].geometry;
+                            var polyline = L.geoJSON(routeData, {
+                                style: {
+                                    color: '#2563eb', // Blue route line
+                                    weight: 6,
+                                    opacity: 0.7,
+                                    lineJoin: 'round'
+                                }
+                            }).addTo(map);
+                            
+                            // Adjust bounds to include the route
+                            map.fitBounds(polyline.getBounds().pad(0.2));
+                            console.log('✅ Route line added to map');
+                        } else {
+                            console.warn('⚠️ OSRM Route failed:', data.code);
+                        }
+                    })
+                    .catch(err => console.error('❌ OSRM Fetch Error:', err));
                 ` : ''}
 
                 window.mapInstance = map;

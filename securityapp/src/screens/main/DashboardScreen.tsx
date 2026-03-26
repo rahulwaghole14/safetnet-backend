@@ -9,7 +9,7 @@ import {
   Alert as RNAlert,
   LogBox,
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useCallback } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AlertCard } from '../../components/alerts/AlertCard';
@@ -131,6 +131,37 @@ export const DashboardScreen = () => {
 
     setSelectedAlertId(String(alert.id));
     setShowRespondModal(true);
+  };
+
+  const handleViewLocation = (alert: Alert) => {
+    console.log('🏠 Dashboard: Navigating to map for alert:', alert.id);
+    (navigation as any).navigate('AlertRespondMap', { alertId: String(alert.id) });
+  };
+
+  const handleSolve = async (alert: Alert) => {
+    console.log('🔧 Dashboard: Solve button pressed for alert:', alert.id);
+    try {
+      await useAlertsStore.getState().resolveAlert(alert.id);
+      console.log('✅ Dashboard: Alert resolved successfully');
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Alert marked as solved!',
+        visibilityTime: 3000,
+        position: 'bottom',
+      });
+      // Refresh dashboard stats after solving
+      fetchDashboardData();
+    } catch (error: any) {
+      console.error('❌ Dashboard: Failed to resolve alert:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to mark alert as solved. Please try again.',
+        visibilityTime: 3000,
+        position: 'bottom',
+      });
+    }
   };
 
   const handleSettingsPress = () => {
@@ -518,7 +549,7 @@ export const DashboardScreen = () => {
                 {recentAlerts.map((alert) => {
                   console.log('🔑 Dashboard AlertCard key:', alert.id, alert.message?.substring(0, 30));
                   return (
-                    <AlertCard key={String(alert.id)} alert={alert} onRespond={handleRespond} />
+                    <AlertCard key={String(alert.id)} alert={alert} onRespond={handleRespond} onViewLocation={handleViewLocation} onSolve={handleSolve} />
                   );
                 })}
               </>

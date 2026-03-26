@@ -34,14 +34,22 @@ class SOSAlertSerializer(serializers.ModelSerializer):
         return 'USER'
 
     def update(self, instance, validated_data):
-        """Apply officer field restrictions during update operations only"""
+        """Apply officer field restrictions and auto-assign officer on acceptance"""
         request = self.context.get('request')
+        user = request.user if request and hasattr(request, 'user') else None
         
-        # Only apply restrictions for security officers updating USER-created alerts
-        if (request and 
-            hasattr(request, 'user') and 
-            request.user and 
-            request.user.role == 'security_officer' and
+        # 1. AUTO-ASSIGN OFFICER: If status is being changed to 'accepted' and no officer assigned
+        if (user and 
+            user.role == 'security_officer' and 
+            validated_data.get('status') == 'accepted' and 
+            not instance.assigned_officer):
+            
+            logger.info(f"👮 Auto-assigning officer {user.username} to alert {instance.id}")
+            validated_data['assigned_officer'] = user
+
+        # 2. RESTRICTIONS: Only apply restrictions for security officers updating USER-created alerts
+        if (user and 
+            user.role == 'security_officer' and
             instance and 
             hasattr(instance, 'created_by_role') and 
             instance.created_by_role == 'USER'):
@@ -50,11 +58,15 @@ class SOSAlertSerializer(serializers.ModelSerializer):
             user_fields = ['message', 'description', 'location_lat', 'location_long']
             for field in user_fields:
                 if field in validated_data:
-                    raise serializers.ValidationError({
-                        field: f"Security officers cannot modify {field} on USER-created alerts"
-                    })
+                    # Allow the update if the field value is the same (preventing false errors)
+                    if getattr(instance, field) != validated_data[field]:
+                        logger.warning(f"⚠️ Officer {user.username} tried to modify restricted field '{field}' on alert {instance.id}")
+                        raise serializers.ValidationError({
+                            field: f"Security officers cannot modify {field} on USER-created alerts"
+                        })
         
         return super().update(instance, validated_data)
+
 
     class Meta:
         model = SOSAlert

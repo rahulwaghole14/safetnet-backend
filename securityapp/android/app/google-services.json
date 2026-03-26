@@ -7,28 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:217811935902:android:7a2f8242045b062888d18f",
+        "mobilesdk_app_id": "1:217811935902:android:46beae0f0de01bec88d18f",
         "android_client_info": {
-          "package_name": "com.securityapp"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCPZ9G-aBVDRGCPEvuqaF5pFS3EYuf5-zo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:217811935902:android:c5686235ccf2f1c888d18f",
-        "android_client_info": {
-          "package_name": "com.userapp"
+          "package_name": "com.safetnet.securityapp"
         }
       },
       "oauth_client": [],
