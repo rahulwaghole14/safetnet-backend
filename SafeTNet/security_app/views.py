@@ -693,13 +693,50 @@ class OfficerProfileView(OfficerOnlyMixin, APIView):
         if request.user.role != 'security_officer':
             return Response({'detail': 'Only officers can view profile.'}, status=status.HTTP_403_FORBIDDEN)
 
-        # Return User data instead of OfficerProfile data for compatibility with frontend
         user = request.user
+        
+        # Calculate dynamic stats for the officer
+        # 1. Total responses = Count of resolved cases
+        resolved_cases = Case.objects.filter(officer=user, status='resolved').select_related('sos_alert')
+        total_responses = resolved_cases.count()
+        
+        # 2. Avg response time = Avg time between SOS creation and Case resolution (in minutes)
+        response_times = []
+        for case in resolved_cases:
+            if case.sos_alert:
+                delta = case.updated_at - case.sos_alert.created_at
+                response_times.append(delta.total_seconds() / 60)
+        
+        avg_response_time = sum(response_times) / len(response_times) if response_times else 0
+        
+        # Get base serialized data
         from users_profile.serializers import UserProfileSerializer
-
-        # Create serializer context with request
         serializer = UserProfileSerializer(user, context={'request': request})
-        return Response(serializer.data)
+        data = serializer.data
+        
+        # Inject officer-specific fields for frontend alignment
+        data['security_id'] = f"SEC-{user.id:04d}"
+        data['security_role'] = user.role.replace('_', ' ').title()
+        data['badge_number'] = user.username.upper() or f"OFF-{user.id}"
+        
+        # Add stats object
+        data['stats'] = {
+            'total_responses': total_responses,
+            'avg_response_time': round(avg_response_time, 1),
+            'active_hours': 0,  # Placeholder
+            'area_coverage': 0   # Placeholder
+        }
+        
+        # Add geofence detail if available
+        first_geofence = user.geofences.first()
+        if first_geofence:
+            data['geofence_name'] = first_geofence.name
+            data['assigned_geofence'] = {
+                'id': first_geofence.id,
+                'name': first_geofence.name
+            }
+
+        return Response(data)
 
     def patch(self, request):
         if request.user.role != 'security_officer':

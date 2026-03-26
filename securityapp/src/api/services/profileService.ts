@@ -14,40 +14,32 @@ export const profileService = {
       // Map UserProfileSerializer response to SecurityOfficer interface
       const backendData = response.data;
       
-      // Check geofences array
-      if (!backendData.geofences || backendData.geofences.length === 0) {
-        console.log("No geofences received from backend");
-      } else {
-        console.log("Geofences received:", backendData.geofences);
-      }
-      
-      // Ensure mapping is correct
-      const assignedGeofence = backendData.geofences?.[0] || null;
-      console.log("Mapped assigned_geofence:", assignedGeofence);
+      // Map assigned geofence if available
+      const assignedGeofence = backendData.assigned_geofence || backendData.geofences?.[0] || null;
       
       const officer: SecurityOfficer = {
-        security_id: String(backendData.id), // User ID
-        name: backendData.name || backendData.username, // Full name or username fallback
+        id: backendData.id,
+        security_id: backendData.security_id || String(backendData.id),
+        name: backendData.name || backendData.username,
         email_id: backendData.email,
         mobile: backendData.phone || '',
-        security_role: backendData.role === 'security_officer' ? 'guard' : 'guard',
+        security_role: backendData.security_role || (backendData.role === 'security_officer' ? 'guard' : 'guard'),
         geofence_id: assignedGeofence?.id || '',
-        user_image: undefined, // Not provided by UserProfileSerializer
-        status: backendData.is_active ? 'active' : 'inactive',
-        badge_number: backendData.username,
-        shift_schedule: 'Day Shift', // Default value
+        user_image: undefined,
+        status: backendData.status || (backendData.is_active ? 'active' : 'inactive'),
+        badge_number: backendData.badge_number || backendData.username,
+        shift_schedule: 'Day Shift', 
         stats: {
-          total_responses: 0, // Default values - would need separate API call
-          avg_response_time: 0,
-          active_hours: 0,
-          area_coverage: 0,
+          total_responses: backendData.stats?.total_responses ?? 0,
+          avg_response_time: backendData.stats?.avg_response_time ?? 0,
+          active_hours: backendData.stats?.active_hours ?? 0,
+          area_coverage: backendData.stats?.area_coverage ?? 0,
         },
-        geofence_name: assignedGeofence?.name || undefined,
+        geofence_name: backendData.geofence_name || assignedGeofence?.name || undefined,
         assigned_geofence: assignedGeofence ? {
           id: assignedGeofence.id,
           name: assignedGeofence.name,
         } : undefined,
-        // Additional fields from UserProfileSerializer
         date_joined: backendData.date_joined,
         last_login: backendData.last_login,
       };
