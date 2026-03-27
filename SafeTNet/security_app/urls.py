@@ -20,6 +20,8 @@ urlpatterns = [
     path('profile/update-fcm-token/', views_user.UpdateFCMTokenView.as_view(), name='security-update-fcm-token'),
     path('geofence/', views.GeofenceCurrentView.as_view(), name='security-geofence-current'),
     path('geofence/<int:geofence_id>/', views.GeofenceDetailView.as_view(), name='security-geofence-detail'),
+    path('geofence/<int:geofence_id>/users/', views.GeofenceUsersView.as_view(), name='security-geofence-users'),
+
     path('notifications/', views.NotificationView.as_view(), name='security-notifications'),
     path('notifications/acknowledge/', views.NotificationAcknowledgeView.as_view(), name='security-notifications-acknowledge'),
     path('dashboard/', views.DashboardView.as_view(), name='security-dashboard'),

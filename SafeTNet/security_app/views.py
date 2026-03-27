@@ -39,8 +39,11 @@ from .serializers import (
     LiveLocationSerializer,
     GeofenceSerializer,  # This is the security_app one
     UnifiedAlertSerializer,
-    OfficerAlertSerializer
+    OfficerAlertSerializer,
+    UserInAreaSerializer
 )
+from .geo_utils import get_users_in_geofence
+
 from users.serializers import GeofenceSerializer as UserGeofenceSerializer
 
 User = get_user_model()
@@ -1527,3 +1530,40 @@ class UserAlertViewSet(viewsets.ReadOnlyModelViewSet):
                 return Response({'error': 'Not found'}, status=404)
         
         return Response({'status': 'ok'})
+
+
+class GeofenceUsersView(OfficerOnlyMixin, APIView):
+    """
+    Get users who are physically located within a specific geofence.
+    """
+    def get(self, request, geofence_id):
+        try:
+            # Get the geofence by ID
+            geofence = get_object_or_404(Geofence, id=geofence_id)
+            
+            # Check if this geofence is assigned to the officer
+            # This is a security check to ensure officers only see users in their assigned areas
+            officer = request.user
+            is_assigned = officer.geofences.filter(id=geofence_id).exists() or \
+                          OfficerGeofenceAssignment.objects.filter(officer=officer, geofence=geofence, is_active=True).exists()
+            
+            if not is_assigned:
+                return Response(
+                    {'error': 'Geofence not assigned to this officer'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Get users in this geofence using the utility function
+            # Default to 24 hours for location freshness
+            users_locations = get_users_in_geofence(geofence, max_age_hours=24)
+            
+            serializer = UserInAreaSerializer(users_locations, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"Error in GeofenceUsersView: {str(e)}")
+            return Response(
+                {'error': 'An error occurred while fetching users in area', 'detail': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+

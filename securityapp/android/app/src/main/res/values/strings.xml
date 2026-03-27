@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SafeTNet Security</string>
+    <string name="debug_http_host">localhost:8082</string>
 </resources>

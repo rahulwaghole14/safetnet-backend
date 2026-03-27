@@ -76,7 +76,8 @@ export const API_ENDPOINTS = {
   UPDATE_LOCATION: '/live_location/', // Maps to live_location
   GET_USER_LOCATION: '/live_location/', // User location might be in SOS alert data
   GET_GEOFENCE_DETAILS: '/geofence/',
-  GET_USERS_IN_AREA: '/geofence/users/',
+  GET_USERS_IN_AREA: '/geofence/{geofence_id}/users/',
+
   SEND_BROADCAST: '/broadcast/',
   GET_LOGS: '/logs/', // May map to incidents or cases
 };

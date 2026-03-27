@@ -1,0 +1,780 @@
+﻿Initialized native services in: C:\Users\ADMIN\.gradle\native
+Initialized jansi services in: C:\Users\ADMIN\.gradle\native
+The client will now receive all logging from the daemon (pid: 3212). The daemon log file: C:\Users\ADMIN\.gradle\daemon\8.13\daemon-3212.out.log
+Starting 14th build in daemon [uptime: 17 mins 44.285 secs, performance: 99%, GC rate: 0.00/s, heap usage: 0% of 2 GiB, non-heap usage: 43% of 512 MiB]
+Using 8 worker leases.
+Now considering [C:\Safetnet\userapp\android, C:\Safetnet\userapp\node_modules\@react-native\gradle-plugin] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Starting Build
+Now considering [C:\Safetnet\userapp\node_modules\@react-native\gradle-plugin, C:\Safetnet\userapp\android] as hierarchies to watch
+Resolved plugin [id: 'org.gradle.toolchains.foojay-resolver-convention', version: '0.5.0']
+
+> Configure project :gradle-plugin
+Evaluating project ':gradle-plugin' using build file 'C:\Safetnet\userapp\node_modules\@react-native\gradle-plugin\build.gradle.kts'.
+Resolved plugin [id: 'org.jetbrains.kotlin.jvm', version: '2.1.20', apply: false]
+Resolved plugin [id: 'com.ncorti.ktfmt.gradle', version: '0.22.0']
+
+> Configure project :gradle-plugin:react-native-gradle-plugin
+Evaluating project ':gradle-plugin:react-native-gradle-plugin' using build file 'C:\Safetnet\userapp\node_modules\@react-native\gradle-plugin\react-native-gradle-plugin\build.gradle.kts'.
+Resolved plugin [id: 'org.jetbrains.kotlin.jvm', version: '2.1.20']
+Resolved plugin [id: 'com.ncorti.ktfmt.gradle', version: '0.22.0']
+Resolved plugin [id: 'java-gradle-plugin']
+Build df4c8890-9cd8-4887-ad07-0ad85706f993 is started
+Using Kotlin Gradle Plugin gradle85 variant
+kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+
+> Configure project :gradle-plugin:settings-plugin
+Evaluating project ':gradle-plugin:settings-plugin' using build file 'C:\Safetnet\userapp\node_modules\@react-native\gradle-plugin\settings-plugin\build.gradle.kts'.
+Resolved plugin [id: 'org.jetbrains.kotlin.jvm', version: '2.1.20']
+Resolved plugin [id: 'com.ncorti.ktfmt.gradle', version: '0.22.0']
+Resolved plugin [id: 'java-gradle-plugin']
+Using Kotlin Gradle Plugin gradle85 variant
+kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+
+> Configure project :gradle-plugin:shared
+Evaluating project ':gradle-plugin:shared' using build file 'C:\Safetnet\userapp\node_modules\@react-native\gradle-plugin\shared\build.gradle.kts'.
+Resolved plugin [id: 'org.jetbrains.kotlin.jvm', version: '2.1.20']
+Resolved plugin [id: 'com.ncorti.ktfmt.gradle', version: '0.22.0']
+Using Kotlin Gradle Plugin gradle85 variant
+kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+
+> Configure project :gradle-plugin:shared-testutil
+Evaluating project ':gradle-plugin:shared-testutil' using build file 'C:\Safetnet\userapp\node_modules\@react-native\gradle-plugin\shared-testutil\build.gradle.kts'.
+Resolved plugin [id: 'org.jetbrains.kotlin.jvm', version: '2.1.20']
+Resolved plugin [id: 'com.ncorti.ktfmt.gradle', version: '0.22.0']
+Using Kotlin Gradle Plugin gradle85 variant
+kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+Resolved plugin [id: 'com.facebook.react.settings']
+Resolve mutations for :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
+:gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+Resolve mutations for :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
+:gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+Resolve mutations for :gradle-plugin:shared:compileKotlin (Thread[Execution worker,5,main]) started.
+:gradle-plugin:shared:compileKotlin (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:shared:compileKotlin UP-TO-DATE
+Caching disabled for task ':gradle-plugin:shared:compileKotlin' because:
+  Build cache is disabled
+Skipping task ':gradle-plugin:shared:compileKotlin' as it is up-to-date.
+Resolve mutations for :gradle-plugin:shared:compileJava (Thread[Execution worker,5,main]) started.
+:gradle-plugin:shared:compileJava (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:shared:compileJava NO-SOURCE
+Skipping task ':gradle-plugin:shared:compileJava' as it has no source files and no previous output files.
+Resolve mutations for :gradle-plugin:shared:processResources (Thread[Execution worker,5,main]) started.
+:gradle-plugin:shared:processResources (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:shared:processResources NO-SOURCE
+Skipping task ':gradle-plugin:shared:processResources' as it has no source files and no previous output files.
+Resolve mutations for :gradle-plugin:shared:classes (Thread[Execution worker,5,main]) started.
+:gradle-plugin:shared:classes (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:shared:classes UP-TO-DATE
+Skipping task ':gradle-plugin:shared:classes' as it has no actions.
+Resolve mutations for :gradle-plugin:shared:jar (Thread[Execution worker,5,main]) started.
+:gradle-plugin:shared:jar (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:shared:jar UP-TO-DATE
+Caching disabled for task ':gradle-plugin:shared:jar' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':gradle-plugin:shared:jar' as it is up-to-date.
+work action resolve shared.jar (project :gradle-plugin:shared) (Thread[Execution worker,5,main]) started.
+Resolve mutations for :gradle-plugin:settings-plugin:compileKotlin (Thread[Execution worker,5,main]) started.
+:gradle-plugin:settings-plugin:compileKotlin (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:settings-plugin:compileKotlin UP-TO-DATE
+Caching disabled for task ':gradle-plugin:settings-plugin:compileKotlin' because:
+  Build cache is disabled
+Skipping task ':gradle-plugin:settings-plugin:compileKotlin' as it is up-to-date.
+Resolve mutations for :gradle-plugin:settings-plugin:compileJava (Thread[Execution worker,5,main]) started.
+:gradle-plugin:settings-plugin:compileJava (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:settings-plugin:compileJava NO-SOURCE
+Skipping task ':gradle-plugin:settings-plugin:compileJava' as it has no source files and no previous output files.
+Resolve mutations for :gradle-plugin:settings-plugin:pluginDescriptors (Thread[Execution worker,5,main]) started.
+:gradle-plugin:settings-plugin:pluginDescriptors (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:settings-plugin:pluginDescriptors UP-TO-DATE
+Caching disabled for task ':gradle-plugin:settings-plugin:pluginDescriptors' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':gradle-plugin:settings-plugin:pluginDescriptors' as it is up-to-date.
+Resolve mutations for :gradle-plugin:settings-plugin:processResources (Thread[Execution worker,5,main]) started.
+:gradle-plugin:settings-plugin:processResources (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:settings-plugin:processResources UP-TO-DATE
+Caching disabled for task ':gradle-plugin:settings-plugin:processResources' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':gradle-plugin:settings-plugin:processResources' as it is up-to-date.
+Resolve mutations for :gradle-plugin:settings-plugin:classes (Thread[Execution worker,5,main]) started.
+:gradle-plugin:settings-plugin:classes (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:settings-plugin:classes UP-TO-DATE
+Skipping task ':gradle-plugin:settings-plugin:classes' as it has no actions.
+Resolve mutations for :gradle-plugin:settings-plugin:jar (Thread[Execution worker,5,main]) started.
+:gradle-plugin:settings-plugin:jar (Thread[Execution worker,5,main]) started.
+
+> Task :gradle-plugin:settings-plugin:jar UP-TO-DATE
+Caching disabled for task ':gradle-plugin:settings-plugin:jar' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':gradle-plugin:settings-plugin:jar' as it is up-to-date.
+Settings evaluated using settings file 'C:\Safetnet\userapp\android\settings.gradle'.
+Projects loaded. Root project using build file 'C:\Safetnet\userapp\android\build.gradle'.
+Included projects: [root project 'userapp', project ':app', project ':react-native-async-storage_async-storage', project ':react-native-community_geolocation', project ':react-native-community_netinfo', project ':react-native-firebase_app', project ':react-native-firebase_messaging', project ':react-native-fs', project ':react-native-geolocation-service', project ':react-native-gesture-handler', project ':react-native-iap', project ':react-native-image-picker', project ':react-native-linear-gradient', project ':react-native-maps', project ':react-native-push-notification', project ':react-native-safe-area-context', project ':react-native-screens', project ':react-native-sensors', project ':react-native-svg', project ':react-native-vector-icons', project ':react-native-video', project ':react-native-webview']
+Registering project ':gradle-plugin' in composite build. Will substitute for module ':gradle-plugin-root'.
+Registering project ':gradle-plugin:react-native-gradle-plugin' in composite build. Will substitute for module 'com.facebook.react:react-native-gradle-plugin'.
+Registering project ':gradle-plugin:settings-plugin' in composite build. Will substitute for module 'com.facebook.react:settings-plugin'.
+Registering project ':gradle-plugin:shared' in composite build. Will substitute for module 'com.facebook.react:shared'.
+Registering project ':gradle-plugin:shared-testutil' in composite build. Will substitute for module 'com.facebook.react:shared-testutil'.
+Resolve mutations for :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 7,5,main]) started.
+:gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+Resolve mutations for :gradle-plugin:react-native-gradle-plugin:compileKotlin (Thread[Execution worker Thread 7,5,main]) started.
+:gradle-plugin:react-native-gradle-plugin:compileKotlin (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :gradle-plugin:react-native-gradle-plugin:compileKotlin UP-TO-DATE
+Caching disabled for task ':gradle-plugin:react-native-gradle-plugin:compileKotlin' because:
+  Build cache is disabled
+Skipping task ':gradle-plugin:react-native-gradle-plugin:compileKotlin' as it is up-to-date.
+Resolve mutations for :gradle-plugin:react-native-gradle-plugin:compileJava (Thread[Execution worker Thread 7,5,main]) started.
+:gradle-plugin:react-native-gradle-plugin:compileJava (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :gradle-plugin:react-native-gradle-plugin:compileJava NO-SOURCE
+Skipping task ':gradle-plugin:react-native-gradle-plugin:compileJava' as it has no source files and no previous output files.
+Resolve mutations for :gradle-plugin:react-native-gradle-plugin:pluginDescriptors (Thread[Execution worker Thread 7,5,main]) started.
+:gradle-plugin:react-native-gradle-plugin:pluginDescriptors (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :gradle-plugin:react-native-gradle-plugin:pluginDescriptors UP-TO-DATE
+Caching disabled for task ':gradle-plugin:react-native-gradle-plugin:pluginDescriptors' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':gradle-plugin:react-native-gradle-plugin:pluginDescriptors' as it is up-to-date.
+Resolve mutations for :gradle-plugin:react-native-gradle-plugin:processResources (Thread[Execution worker Thread 7,5,main]) started.
+:gradle-plugin:react-native-gradle-plugin:processResources (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :gradle-plugin:react-native-gradle-plugin:processResources UP-TO-DATE
+Caching disabled for task ':gradle-plugin:react-native-gradle-plugin:processResources' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':gradle-plugin:react-native-gradle-plugin:processResources' as it is up-to-date.
+Resolve mutations for :gradle-plugin:react-native-gradle-plugin:classes (Thread[Execution worker Thread 7,5,main]) started.
+:gradle-plugin:react-native-gradle-plugin:classes (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :gradle-plugin:react-native-gradle-plugin:classes UP-TO-DATE
+Skipping task ':gradle-plugin:react-native-gradle-plugin:classes' as it has no actions.
+Resolve mutations for :gradle-plugin:react-native-gradle-plugin:jar (Thread[Execution worker Thread 7,5,main]) started.
+:gradle-plugin:react-native-gradle-plugin:jar (Thread[Execution worker Thread 7,5,main]) started.
+
+> Task :gradle-plugin:react-native-gradle-plugin:jar UP-TO-DATE
+Caching disabled for task ':gradle-plugin:react-native-gradle-plugin:jar' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':gradle-plugin:react-native-gradle-plugin:jar' as it is up-to-date.
+
+> Configure project :app
+Evaluating project ':app' using build file 'C:\Safetnet\userapp\android\app\build.gradle'.
+Using default execution profile
+Build 30473268-5f6f-4f5d-86a1-9e507577ee0b is started
+Using Kotlin Gradle Plugin gradle85 variant
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+
+> Configure project :
+Evaluating root project 'userapp' using build file 'C:\Safetnet\userapp\android\build.gradle'.
+Found project 'project :gradle-plugin:react-native-gradle-plugin' as substitute for module 'com.facebook.react:react-native-gradle-plugin'.
+Ignoring listeners of task graph ready event, as this build (:gradle-plugin) has already executed work.
+
+> Configure project :react-native-async-storage_async-storage
+Evaluating project ':react-native-async-storage_async-storage' using build file 'C:\Safetnet\userapp\node_modules\@react-native-async-storage\async-storage\android\build.gradle'.
+Using default execution profile
+[AsyncStorage] Config used: {kotlinVersion=2.1.20, kspVersion=1.9.24-1.0.20, roomVersion=2.6.1, minSdkVersion=24, targetSdkVersion=35, compileSdkVersion=35, useNextStorage=false, databaseSizeMB=6, isNewArchitectureEnabled=true, useDedicatedExecutor=false}
+
+> Configure project :react-native-community_geolocation
+Evaluating project ':react-native-community_geolocation' using build file 'C:\Safetnet\userapp\node_modules\@react-native-community\geolocation\android\build.gradle'.
+Using default execution profile
+:react-native-community_geolocation:reactNativeAndroidRoot C:\Safetnet\userapp\node_modules\react-native
+
+> Configure project :react-native-community_netinfo
+Evaluating project ':react-native-community_netinfo' using build file 'C:\Safetnet\userapp\node_modules\@react-native-community\netinfo\android\build.gradle'.
+Using default execution profile
+
+> Configure project :react-native-firebase_app
+Evaluating project ':react-native-firebase_app' using build file 'C:\Safetnet\userapp\node_modules\@react-native-firebase\app\android\build.gradle'.
+Resolved plugin [id: 'io.invertase.gradle.build', version: '1.5']
+Using default execution profile
+:react-native-firebase_app package.json found at C:\Safetnet\userapp\node_modules\@react-native-firebase\app\package.json
+:react-native-firebase_app no firebase.json found, skipping
+:react-native-firebase_app:firebase.bom using default value: 34.8.0
+:react-native-firebase_app:play.play-services-auth using default value: 21.4.0
+:react-native-firebase_app package.json found at C:\Safetnet\userapp\node_modules\@react-native-firebase\app\package.json
+:react-native-firebase_app:version set from package.json: 23.8.6 (23,8,6 - 23008006)
+:react-native-firebase_app:android.compileSdk using custom value: 35
+:react-native-firebase_app:android.targetSdk using custom value: 35
+:react-native-firebase_app:android.minSdk using custom value: 24
+:react-native-firebase_app:reactNativeAndroidDir C:\Safetnet\userapp\node_modules\react-native
+
+> Configure project :react-native-firebase_messaging
+Evaluating project ':react-native-firebase_messaging' using build file 'C:\Safetnet\userapp\node_modules\@react-native-firebase\messaging\android\build.gradle'.
+Resolved plugin [id: 'io.invertase.gradle.build', version: '1.5']
+Using default execution profile
+:react-native-firebase_messaging package.json found at C:\Safetnet\userapp\node_modules\@react-native-firebase\messaging\package.json
+:react-native-firebase_app package.json found at C:\Safetnet\userapp\node_modules\@react-native-firebase\app\package.json
+:react-native-firebase_messaging no firebase.json found, skipping
+:react-native-firebase_messaging:firebase.bom using default value: 34.8.0
+:react-native-firebase_messaging package.json found at C:\Safetnet\userapp\node_modules\@react-native-firebase\messaging\package.json
+:react-native-firebase_messaging:version set from package.json: 23.8.6 (23,8,6 - 23008006)
+:react-native-firebase_messaging:android.compileSdk using custom value: 35
+:react-native-firebase_messaging:android.targetSdk using custom value: 35
+:react-native-firebase_messaging:android.minSdk using custom value: 24
+:react-native-firebase_messaging:reactNativeAndroidDir C:\Safetnet\userapp\node_modules\react-native
+
+> Configure project :react-native-fs
+Evaluating project ':react-native-fs' using build file 'C:\Safetnet\userapp\node_modules\react-native-fs\android\build.gradle'.
+Using default execution profile
+
+> Configure project :react-native-geolocation-service
+Evaluating project ':react-native-geolocation-service' using build file 'C:\Safetnet\userapp\node_modules\react-native-geolocation-service\android\build.gradle'.
+Using default execution profile
+
+> Configure project :react-native-gesture-handler
+Evaluating project ':react-native-gesture-handler' using build file 'C:\Safetnet\userapp\node_modules\react-native-gesture-handler\android\build.gradle'.
+Using default execution profile
+Using Kotlin Gradle Plugin gradle85 variant
+Starting process 'command 'node''. Working directory: C:\Safetnet\userapp\android Command: node --print require.resolve('react-native/package.json')
+Successfully started process 'command 'node''
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+
+> Configure project :react-native-iap
+Evaluating project ':react-native-iap' using build file 'C:\Safetnet\userapp\node_modules\react-native-iap\android\build.gradle'.
+Using default execution profile
+Using Kotlin Gradle Plugin gradle85 variant
+:react-native-iap:reactNativeAndroidRoot C:\Safetnet\userapp\node_modules\react-native
+
+> Configure project :react-native-image-picker
+Evaluating project ':react-native-image-picker' using build file 'C:\Safetnet\userapp\node_modules\react-native-image-picker\android\build.gradle'.
+Using default execution profile
+
+> Configure project :react-native-linear-gradient
+Evaluating project ':react-native-linear-gradient' using build file 'C:\Safetnet\userapp\node_modules\react-native-linear-gradient\android\build.gradle'.
+Using default execution profile
+
+> Configure project :react-native-maps
+Evaluating project ':react-native-maps' using build file 'C:\Safetnet\userapp\node_modules\react-native-maps\android\build.gradle'.
+Using default execution profile
+Using Kotlin Gradle Plugin gradle85 variant
+
+> Configure project :react-native-push-notification
+Evaluating project ':react-native-push-notification' using build file 'C:\Safetnet\userapp\node_modules\react-native-push-notification\android\build.gradle'.
+Using default execution profile
+
+> Configure project :react-native-safe-area-context
+Evaluating project ':react-native-safe-area-context' using build file 'C:\Safetnet\userapp\node_modules\react-native-safe-area-context\android\build.gradle'.
+Using default execution profile
+Using Kotlin Gradle Plugin gradle85 variant
+
+> Configure project :react-native-screens
+Evaluating project ':react-native-screens' using build file 'C:\Safetnet\userapp\node_modules\react-native-screens\android\build.gradle'.
+Using default execution profile
+Using Kotlin Gradle Plugin gradle85 variant
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+C/C++: android.ndkVersion from module build.gradle is [27.1.12297006]
+C/C++: android.ndkPath from module build.gradle is not set
+C/C++: ndk.dir in local.properties is not set
+C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+C/C++: sdkFolder is C:\Users\ADMIN\AppData\Local\Android\Sdk
+
+> Configure project :react-native-sensors
+Evaluating project ':react-native-sensors' using build file 'C:\Safetnet\userapp\node_modules\react-native-sensors\android\build.gradle'.
+Using default execution profile
+
+> Configure project :react-native-svg
+Evaluating project ':react-native-svg' using build file 'C:\Safetnet\userapp\node_modules\react-native-svg\android\build.gradle'.
+Using default execution profile
+Starting process 'command 'node''. Working directory: C:\Safetnet\userapp\android Command: node --print require.resolve('react-native/package.json')
+Successfully started process 'command 'node''
+Starting process 'command 'node''. Working directory: C:\Safetnet\userapp\android Command: node --print require.resolve('react-native/package.json')
+Successfully started process 'command 'node''
+
+> Configure project :react-native-vector-icons
+Evaluating project ':react-native-vector-icons' using build file 'C:\Safetnet\userapp\node_modules\react-native-vector-icons\android\build.gradle'.
+Using default execution profile
+
+> Configure project :react-native-video
+Evaluating project ':react-native-video' using build file 'C:\Safetnet\userapp\node_modules\react-native-video\android\build.gradle'.
+Kotlin version is correct: 2.1.20
+AndroidX version is correct: 1.9.3
+Using default execution profile
+Using Kotlin Gradle Plugin gradle85 variant
+useExoplayerIMA: false
+useExoplayerSmoothStreaming: true
+useExoplayerDash: true
+useExoplayerHls: true
+useExoplayerRtsp: false
+buildFromSource: false
+
+> Configure project :react-native-webview
+Evaluating project ':react-native-webview' using build file 'C:\Safetnet\userapp\node_modules\react-native-webview\android\build.gradle'.
+Using default execution profile
+Using Kotlin Gradle Plugin gradle85 variant
+All projects evaluated.
+Task path ':react-native-iap:compilePlayDebugKotlin' matched project ':react-native-iap'
+Task name matched 'compilePlayDebugKotlin'
+Selected primary task 'compilePlayDebugKotlin' from project :react-native-iap
+Tasks to be executed: [task ':react-native-iap:checkKotlinGradlePluginConfigurationErrors', task ':react-native-iap:preBuild', task ':react-native-iap:prePlayDebugBuild', task ':react-native-iap:generatePlayDebugBuildConfig', task ':react-native-iap:generatePlayDebugResValues', task ':react-native-iap:generatePlayDebugResources', task ':react-native-iap:packagePlayDebugResources', task ':react-native-iap:parsePlayDebugLocalResources', task ':react-native-iap:generatePlayDebugRFile', task ':react-native-iap:compilePlayDebugKotlin']
+Tasks that were excluded: []
+Resolve mutations for :react-native-iap:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 2,5,main]) started.
+:react-native-iap:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
+
+> Task :react-native-iap:checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':react-native-iap:checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+Resolve mutations for :react-native-iap:preBuild (Thread[included builds,5,main]) started.
+:react-native-iap:preBuild (Thread[included builds,5,main]) started.
+
+> Task :react-native-iap:preBuild UP-TO-DATE
+Skipping task ':react-native-iap:preBuild' as it has no actions.
+Resolve mutations for :react-native-iap:prePlayDebugBuild (Thread[included builds,5,main]) started.
+:react-native-iap:prePlayDebugBuild (Thread[included builds,5,main]) started.
+
+> Task :react-native-iap:prePlayDebugBuild UP-TO-DATE
+Skipping task ':react-native-iap:prePlayDebugBuild' as it has no actions.
+Resolve mutations for :react-native-iap:generatePlayDebugBuildConfig (Thread[included builds,5,main]) started.
+:react-native-iap:generatePlayDebugBuildConfig (Thread[included builds,5,main]) started.
+
+> Task :react-native-iap:generatePlayDebugBuildConfig UP-TO-DATE
+Caching disabled for task ':react-native-iap:generatePlayDebugBuildConfig' because:
+  Build cache is disabled
+Skipping task ':react-native-iap:generatePlayDebugBuildConfig' as it is up-to-date.
+Resolve mutations for :react-native-iap:generatePlayDebugResValues (Thread[included builds,5,main]) started.
+:react-native-iap:generatePlayDebugResValues (Thread[included builds,5,main]) started.
+
+> Task :react-native-iap:generatePlayDebugResValues UP-TO-DATE
+Caching disabled for task ':react-native-iap:generatePlayDebugResValues' because:
+  Build cache is disabled
+Skipping task ':react-native-iap:generatePlayDebugResValues' as it is up-to-date.
+Resolve mutations for :react-native-iap:generatePlayDebugResources (Thread[included builds,5,main]) started.
+:react-native-iap:generatePlayDebugResources (Thread[included builds,5,main]) started.
+
+> Task :react-native-iap:generatePlayDebugResources UP-TO-DATE
+Caching disabled for task ':react-native-iap:generatePlayDebugResources' because:
+  Build cache is disabled
+Skipping task ':react-native-iap:generatePlayDebugResources' as it is up-to-date.
+Resolve mutations for :react-native-iap:packagePlayDebugResources (Thread[included builds,5,main]) started.
+:react-native-iap:packagePlayDebugResources (Thread[included builds,5,main]) started.
+
+> Task :react-native-iap:packagePlayDebugResources UP-TO-DATE
+Caching disabled for task ':react-native-iap:packagePlayDebugResources' because:
+  Build cache is disabled
+Skipping task ':react-native-iap:packagePlayDebugResources' as it is up-to-date.
+Resolve mutations for :react-native-iap:parsePlayDebugLocalResources (Thread[included builds,5,main]) started.
+:react-native-iap:parsePlayDebugLocalResources (Thread[included builds,5,main]) started.
+
+> Task :react-native-iap:parsePlayDebugLocalResources UP-TO-DATE
+Caching disabled for task ':react-native-iap:parsePlayDebugLocalResources' because:
+  Build cache is disabled
+Skipping task ':react-native-iap:parsePlayDebugLocalResources' as it is up-to-date.
+Resolve mutations for :react-native-iap:generatePlayDebugRFile (Thread[included builds,5,main]) started.
+:react-native-iap:generatePlayDebugRFile (Thread[included builds,5,main]) started.
+
+> Task :react-native-iap:generatePlayDebugRFile UP-TO-DATE
+Caching disabled for task ':react-native-iap:generatePlayDebugRFile' because:
+  Build cache is disabled
+Skipping task ':react-native-iap:generatePlayDebugRFile' as it is up-to-date.
+Resolve mutations for :react-native-iap:compilePlayDebugKotlin (Thread[included builds,5,main]) started.
+:react-native-iap:compilePlayDebugKotlin (Thread[included builds,5,main]) started.
+
+> Task :react-native-iap:compilePlayDebugKotlin FAILED
+Adding -Xuse-inline-scopes-numbers Kotlin compiler flag for task :react-native-iap:compileAmazonDebugAndroidTestKotlin
+GradleBuildProject.Builder should not be accessed through AnalyticsConfiguratorService after AnalyticsService is created. Analytics information of this build might be incomplete.
+Caching disabled for task ':react-native-iap:compilePlayDebugKotlin' because:
+  Build cache is disabled
+Task ':react-native-iap:compilePlayDebugKotlin' is not up-to-date because:
+  Task has failed previously.
+The input changes require a full rebuild for incremental task ':react-native-iap:compilePlayDebugKotlin'.
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\kotlin', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\debug\java', not found
+file or directory 'C:\Safetnet\userapp\node_modules\react-native-iap\android\src\playDebug\java', not found
+Kotlin source files: C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\java\com\dooboolab\rniap\PromiseUtils.kt, C:\Safetnet\userapp\node_modules\react-native-iap\android\src\main\java\com\dooboolab\rniap\PromiseUtlis.kt, C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\java\com\dooboolab\rniap\PlayUtils.kt, C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\java\com\dooboolab\rniap\RNIapActivityListener.kt, C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\java\com\dooboolab\rniap\RNIapModule.kt, C:\Safetnet\userapp\node_modules\react-native-iap\android\src\play\java\com\dooboolab\rniap\RNIapPackage.kt
+Java source files: C:\Safetnet\userapp\node_modules\react-native-iap\android\build\generated\source\buildConfig\play\debug\com\dooboolab\rniap\BuildConfig.java
+Script source files: 
+Script file extensions: 
+Using Kotlin/JVM incremental compilation
+[KOTLIN] Kotlin compilation 'jdkHome' argument: null
+Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0, 3], reportSeverity=2, requestedCompilationResults=[0], kotlinScriptExtensions=[]), sourceChanges=org.jetbrains.kotlin.buildtools.api.SourcesChanges$Unknown@4b3d1852, classpathChanges=NotAvailableForNonIncrementalRun, workingDir=C:\Safetnet\userapp\node_modules\react-native-iap\android\build\kotlin\compilePlayDebugKotlin\cacheable, multiModuleICSettings=MultiModuleICSettings(buildHistoryFile=C:\Safetnet\userapp\node_modules\react-native-iap\android\build\kotlin\compilePlayDebugKotlin\local-state\build-history.bin, useModuleDetection=true), usePreciseJavaTracking=true, icFeatures=IncrementalCompilationFeatures(withAbiSnapshot=false, preciseCompilationResultsBackup=true, keepIncrementalCompilationCachesInMemory=true, enableUnsafeIncrementalCompilationForMultiplatform=false, enableMonotonousIncrementalCompileSetExpansion=true), outputFiles=[C:\Safetnet\userapp\node_modules\react-native-iap\android\build\tmp\kotlin-classes\playDebug, C:\Safetnet\userapp\node_modules\react-native-iap\android\build\kotlin\compilePlayDebugKotlin\cacheable, C:\Safetnet\userapp\node_modules\react-native-iap\android\build\kotlin\compilePlayDebugKotlin\local-state])
+Finished executing kotlin compiler using DAEMON strategy
+Build df4c8890-9cd8-4887-ad07-0ad85706f993 is closed
+Build 30473268-5f6f-4f5d-86a1-9e507577ee0b is closed
+./gradlew : e: file:///C:/Safetnet/userapp/node_modules/react-native-iap/android/s
+rc/main/java/com/dooboolab/rniap/PromiseUtlis.kt:4:34 Cannot access 'class 
+ObjectAlreadyConsumedException : RuntimeException': it is internal in file.
+At line:1 char:1
++ ./gradlew :react-native-iap:compilePlayDebugKotlin --info *>&1 | Out- ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (e: file:///C:/S...ternal in file.:St 
+   ring) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+e: file:///C:/Safetnet/userapp/node_modules/react-native-iap/android/src/main/java
+/com/dooboolab/rniap/PromiseUtlis.kt:17:19 Cannot access 'class 
+ObjectAlreadyConsumedException : RuntimeException': it is internal in file.
+e: file:///C:/Safetnet/userapp/node_modules/react-native-iap/android/src/main/java
+/com/dooboolab/rniap/PromiseUtlis.kt:18:44 Cannot access 'class 
+ObjectAlreadyConsumedException : RuntimeException': it is internal in file.
+e: file:///C:/Safetnet/userapp/node_modules/react-native-iap/android/src/main/java
+/com/dooboolab/rniap/PromiseUtlis.kt:41:19 Cannot access 'class 
+ObjectAlreadyConsumedException : RuntimeException': it is internal in file.
+e: file:///C:/Safetnet/userapp/node_modules/react-native-iap/android/src/main/java
+/com/dooboolab/rniap/PromiseUtlis.kt:42:44 Cannot access 'class 
+ObjectAlreadyConsumedException : RuntimeException': it is internal in file.
+e: file:///C:/Safetnet/userapp/node_modules/react-native-iap/android/src/play/java
+/com/dooboolab/rniap/RNIapModule.kt:259:47 Argument type mismatch: actual type is 
+'String?', but 'String' was expected.
+e: file:///C:/Safetnet/userapp/node_modules/react-native-iap/android/src/play/java
+/com/dooboolab/rniap/RNIapModule.kt:464:24 Unresolved reference 'currentActivity'.
+e: file:///C:/Safetnet/userapp/node_modules/react-native-iap/android/src/play/java
+/com/dooboolab/rniap/RNIapModule.kt:506:85 Argument type mismatch: actual type is 
+'String?', but 'String' was expected.
+e: file:///C:/Safetnet/userapp/node_modules/react-native-iap/android/src/play/java
+/com/dooboolab/rniap/RNIapModule.kt:541:69 Argument type mismatch: actual type is 
+'Any', but 'Activity' was expected.
+
+
+[Incubating] Problems report is available at: file:///C:/Safetnet/userapp/android/build/reports/problems/problems-report.html
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':react-native-iap:compilePlayDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCom
+pilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 5s
+17 actionable tasks: 1 executed, 16 up-to-date
+Watched directory hierarchies: [C:\Safetnet\userapp\node_modules\@react-native\gradle-plugin, C:\Safetnet\userapp\android]

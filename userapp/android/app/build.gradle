@@ -141,8 +141,11 @@ android {
         applicationId "com.safetnet.userapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 13
-        versionName "1.3.0"
+        versionCode 1
+        versionName "1.1.0"
+
+        missingDimensionStrategy "store", "play"
+
         manifestPlaceholders = [
             usesCleartextTraffic: true,
             MAPS_API_KEY: mapApiKey

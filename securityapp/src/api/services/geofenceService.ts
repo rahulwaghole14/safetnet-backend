@@ -32,27 +32,14 @@ export interface LiveLocationSession {
   status: 'active' | 'paused' | 'stopped';
   last_location?: LocationData;
 }
-
 import GeolocationService from 'react-native-geolocation-service';
-import { Platform, PermissionsAndroid } from 'react-native';
+import { requestLocationPermission } from '../../utils/permissions';
 
 // Location tracking service - restored to provide real-time GPS
 export const locationService = {
-  // Check and request location permissions
+  // Check and request location permissions with prominent disclosure
   requestPermission: async (): Promise<boolean> => {
-    if (Platform.OS === 'ios') {
-      const auth = await GeolocationService.requestAuthorization('whenInUse');
-      return auth === 'granted';
-    }
-
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    }
-
-    return false;
+    return requestLocationPermission();
   },
 
   // Get current location

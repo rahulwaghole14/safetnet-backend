@@ -38,6 +38,7 @@ class MainApplication : Application(), ReactApplication {
           add(RNScreensPackage())
           add(VectorIconsPackage())
           add(RNFusedLocationPackage())
+          add(RNCWebViewPackage())
           add(ReactNativeFirebaseAppPackage())
           add(ReactNativeFirebaseMessagingPackage())
           

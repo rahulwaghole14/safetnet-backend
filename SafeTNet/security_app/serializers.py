@@ -1,7 +1,8 @@
 import logging
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import SOSAlert, Case, Incident, OfficerProfile, Notification, LiveLocation, OfficerAlert, AlertRead
+from .models import SOSAlert, Case, Incident, OfficerProfile, Notification, LiveLocation, OfficerAlert, AlertRead, UserLocation
+
 from users.models import Geofence
 import math
 
@@ -678,3 +679,28 @@ class OfficerAlertSerializer(serializers.ModelSerializer):
                 officer_alert=obj
             ).exists()
         return False
+
+
+class UserInAreaSerializer(serializers.ModelSerializer):
+    """
+    Serializer for users physically located within a geofence.
+    Matches the frontend UserInArea interface.
+    """
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+    user_name = serializers.SerializerMethodField()
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    current_latitude = serializers.FloatField(source='latitude', read_only=True)
+    current_longitude = serializers.FloatField(source='longitude', read_only=True)
+    last_seen = serializers.DateTimeField(source='location_timestamp', read_only=True)
+    is_inside = serializers.BooleanField(default=True, read_only=True)
+
+    class Meta:
+        model = UserLocation
+        fields = (
+            'user_id', 'user_name', 'user_email', 'current_latitude', 
+            'current_longitude', 'last_seen', 'is_inside'
+        )
+
+    def get_user_name(self, obj):
+        name = f"{obj.user.first_name} {obj.user.last_name}".strip()
+        return name or obj.user.username or obj.user.email
