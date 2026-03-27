@@ -168,8 +168,7 @@ export const useGeofenceStore = create<GeofenceState>((set, get) => ({
   fetchUsersInArea: async (geofenceId: string) => {
     try {
       console.log('👥 Fetching users in geofence area:', geofenceId);
-      // Note: This method may not exist in officerGeofenceService, implement as needed
-      const usersInArea: any[] = []; // Placeholder implementation
+      const usersInArea = await officerGeofenceService.getUsersInArea(geofenceId);
 
       set({
         usersInArea,

@@ -21,6 +21,17 @@ interface OfficerWithGeofences {
   assigned_geofences: Geofence[];
 }
 
+export interface UserInArea {
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  current_latitude: number;
+  current_longitude: number;
+  last_seen: string;
+  distance_from_center?: number;
+  is_inside: boolean;
+}
+
 class OfficerGeofenceService {
   private cache: Map<string, Geofence[]> = new Map();
   private cacheExpiry: Map<string, number> = new Map();
@@ -157,6 +168,32 @@ class OfficerGeofenceService {
     } catch (error: any) {
       console.error('❌ Error getting assigned geofence:', error.message);
       return null;
+    }
+  }
+
+  /**
+   * Get users physically located within a geofence area
+   */
+  async getUsersInArea(geofenceId: string): Promise<UserInArea[]> {
+    try {
+      console.log('👥 Fetching users in area for geofence:', geofenceId);
+      
+      // Correct endpoint: GET /geofence/{geofence_id}/users/
+      const endpoint = `/geofence/${geofenceId}/users/`;
+      const response = await apiClient.get(endpoint);
+      
+      console.log(`📥 Users in area response (${geofenceId}):`, response.data);
+      
+      if (Array.isArray(response.data)) {
+        return response.data;
+      } else if (response.data && response.data.results && Array.isArray(response.data.results)) {
+        return response.data.results;
+      }
+      
+      return [];
+    } catch (error: any) {
+      console.error(`❌ Error fetching users in area for geofence ${geofenceId}:`, error.message);
+      return [];
     }
   }
 
