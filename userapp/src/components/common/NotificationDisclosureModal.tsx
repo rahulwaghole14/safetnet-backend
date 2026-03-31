@@ -5,35 +5,30 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Platform,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '@react-navigation/native';
 
-interface LocationDisclosureModalProps {
+interface NotificationDisclosureModalProps {
   visible: boolean;
   onAccept: () => void;
   onDecline: () => void;
-  mode?: 'foreground' | 'background';
 }
 
 /**
- * Prominent Disclosure Modal for Location Access
- * Required by Google Play Console User Data Policy
+ * Prominent Disclosure Modal for Notification Access
+ * Required by Google Play Console User Data Policy (Android 13+)
  */
-export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = ({
+export const NotificationDisclosureModal: React.FC<NotificationDisclosureModalProps> = ({
   visible,
   onAccept,
   onDecline,
-  mode = 'background',
 }) => {
   const {colors, dark} = useTheme();
 
   if (!visible) {
     return null;
   }
-
-  const isBackground = mode === 'background';
 
   return (
     <Modal
@@ -44,64 +39,42 @@ export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = (
       <View style={styles.overlay}>
         <View style={[styles.container, {backgroundColor: colors.card}]}>
           <View style={styles.iconWrapper}>
-            <MaterialIcons name={isBackground ? "my-location" : "location-on"} size={32} color="#2563EB" />
+            <MaterialIcons name="notifications-active" size={32} color="#2563EB" />
           </View>
           
           <Text style={[styles.title, {color: colors.text}]}>
-            {isBackground ? 'Background Location Access' : 'Location Access'}
+            Stay Protected with Notifications
           </Text>
           
           <Text style={[styles.message, {color: colors.text}]}>
-            {isBackground 
-              ? 'SafeTNet collects location data to enable the following features even when the app is closed or not in use:' 
-              : 'SafeTNet collects location data to enable the following features while you are using the app:'}
+            SafeTNet uses notifications to keep you informed about critical safety events:
           </Text>
           
           <View style={styles.featureList}>
-            {isBackground ? (
-              <>
-                <View style={styles.featureItem}>
-                  <MaterialIcons name="emergency-share" size={20} color="#DC2626" />
-                  <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>SOS Alerts:</Text> Shares your live location with emergency contacts when you trigger an SOS.
-                  </Text>
-                </View>
-                
-                <View style={styles.featureItem}>
-                  <MaterialIcons name="notifications-active" size={20} color="#047857" />
-                  <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>Geofence Monitoring:</Text> Notifies you and your contacts when you enter or exit safe zones.
-                  </Text>
-                </View>
-              </>
-            ) : (
-              <>
-                <View style={styles.featureItem}>
-                  <MaterialIcons name="security" size={20} color="#047857" />
-                  <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>Nearby Officers:</Text> Shows you the nearest security officers and help centers on the map.
-                  </Text>
-                </View>
-                
-                <View style={styles.featureItem}>
-                  <MaterialIcons name="map" size={20} color="#2563EB" />
-                  <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>Navigation:</Text> Helps you navigate safely within the city and see geofenced zones.
-                  </Text>
-                </View>
+            <View style={styles.featureItem}>
+              <MaterialIcons name="emergency" size={20} color="#DC2626" />
+              <Text style={[styles.featureText, {color: colors.text}]}>
+                <Text style={styles.boldText}>SOS Confirmations:</Text> Get immediate feedback when your SOS alert is successfully sent and received.
+              </Text>
+            </View>
+            
+            <View style={styles.featureItem}>
+              <MaterialIcons name="security" size={20} color="#047857" />
+              <Text style={[styles.featureText, {color: colors.text}]}>
+                <Text style={styles.boldText}>Safety Status:</Text> Receive updates about active safety sessions and nearby help.
+              </Text>
+            </View>
 
-                <View style={styles.featureItem}>
-                  <MaterialIcons name="sos" size={20} color="#DC2626" />
-                  <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>SOS Trigger:</Text> Accurately identifies your current location when you send an SOS.
-                  </Text>
-                </View>
-              </>
-            )}
+            <View style={styles.featureItem}>
+              <MaterialIcons name="location-searching" size={20} color="#2563EB" />
+              <Text style={[styles.featureText, {color: colors.text}]}>
+                <Text style={styles.boldText}>Geofence Alerts:</Text> Notifications when you enter or leave safe zones (Premium).
+              </Text>
+            </View>
           </View>
           
           <Text style={[styles.footerText, {color: colors.text}]}>
-            This data is only used for your safety and is never shared for advertising. You can change this in settings at any time.
+            Notifications are essential for the SOS feature to work effectively. You can manage these in settings later.
           </Text>
           
           <View style={styles.actions}>
@@ -110,7 +83,7 @@ export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = (
               onPress={onDecline}
             >
               <Text style={[styles.secondaryText, {color: dark ? '#F8FAFC' : '#0F172A'}]}>
-                No, thanks
+                Remind me later
               </Text>
             </TouchableOpacity>
             
@@ -119,7 +92,7 @@ export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = (
               onPress={onAccept}
               activeOpacity={0.8}
             >
-              <Text style={styles.primaryText}>Accept & Continue</Text>
+              <Text style={styles.primaryText}>Enable Notifications</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -227,4 +200,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LocationDisclosureModal;
+export default NotificationDisclosureModal;

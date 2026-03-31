@@ -45,6 +45,9 @@ import {
 } from '../../services/geofenceMonitoringService';
 import {requestDirectCall} from '../../services/callService';
 import {sendSmsDirect} from '../../services/smsService';
+import {LocationDisclosureModal} from '../../components/common/LocationDisclosureModal';
+import {NotificationDisclosureModal} from '../../components/common/NotificationDisclosureModal';
+import {permissionService} from '../../services/permissionService';
 
 const COMMUNITY_MESSAGES = [
   'Suspicious activity near my location.',
@@ -197,6 +200,10 @@ const HomeScreen = ({navigation}: any) => {
   const familyContacts = useContactStore((state) => state.contacts);
   const contactsInitialized = useContactStore((state) => state.initialized);
   const [isSendingCommunityMessage, setIsSendingCommunityMessage] = useState(false);
+  const [showLocationDisclosure, setShowLocationDisclosure] = useState(false);
+  const [showNotificationDisclosure, setShowNotificationDisclosure] = useState(false);
+  const [locationDisclosureMode, setLocationDisclosureMode] = useState<'foreground' | 'background'>('foreground');
+  const [pendingPermissionAction, setPendingPermissionAction] = useState<(() => void) | null>(null);
   const loadContacts = useContactStore((state) => state.loadContacts);
   const [customFamilyMessage, setCustomFamilyMessage] = useState('');
   const [selectedCommunityContact, setSelectedCommunityContact] = useState<any>(null);
@@ -234,12 +241,13 @@ const HomeScreen = ({navigation}: any) => {
 
   // Check route params for showLoginModal
   useEffect(() => {
-    if (route?.params?.showLoginModal) {
+    const params = route?.params as any;
+    if (params?.showLoginModal) {
       setShowLoginModal(true);
       // Clear the param after showing modal
       navigation.setParams({showLoginModal: undefined});
     }
-  }, [route?.params?.showLoginModal, navigation]);
+  }, [route?.params, navigation]);
 
   // Check for SOS trigger from shake gesture - works when app launches or comes to foreground
   useEffect(() => {
@@ -372,19 +380,31 @@ const HomeScreen = ({navigation}: any) => {
 
   // Geofence monitoring - start/stop based on authentication and premium status
   useEffect(() => {
-    if (!isAuthenticated || !user?.id || !isPremium) {
-      // Stop monitoring if user is not authenticated, no user ID, or not premium
-      stopGeofenceMonitoring();
-      return;
-    }
+    const initGeofence = async () => {
+      if (!isAuthenticated || !user?.id || !isPremium) {
+        // Stop monitoring if user is not authenticated, no user ID, or not premium
+        stopGeofenceMonitoring();
+        return;
+      }
 
-    // Start geofence monitoring for premium users
-    const userId = parseInt(user.id, 10);
-    if (!isNaN(userId)) {
-      startGeofenceMonitoring(userId).catch((error) => {
-        console.error('Failed to start geofence monitoring:', error);
-      });
-    }
+      // Ensure appropriate location permissions (including background if needed)
+      // This will show disclosure if necessary
+      const hasPermission = await ensureBackgroundLocationPermission();
+      if (!hasPermission) {
+        console.warn('[HomeScreen] Geofence monitoring skipped: permission not granted');
+        return;
+      }
+
+      // Start geofence monitoring for premium users
+      const userId = parseInt(user.id, 10);
+      if (!isNaN(userId)) {
+        startGeofenceMonitoring(userId).catch((error) => {
+          console.error('Failed to start geofence monitoring:', error);
+        });
+      }
+    };
+
+    initGeofence();
 
     // Cleanup on unmount or when conditions change
     return () => {
@@ -410,6 +430,28 @@ const HomeScreen = ({navigation}: any) => {
       subscription.remove();
     };
   }, [isAuthenticated, user?.id, isPremium]);
+
+  // Sequential permissions - requested on Android after login
+  useEffect(() => {
+    if (Platform.OS === 'android' && isAuthenticated) {
+      const initPermissions = async () => {
+        // Step 1: Ensure foreground location disclosure
+        const locationGranted = await ensureLocationPermission();
+        
+        // Step 2: Ensure notification disclosure (Android 13+)
+        if (locationGranted && Number(Platform.Version) >= 33) {
+          const notificationsGranted = await ensureNotificationPermission();
+          if (notificationsGranted) {
+             console.log('[HomeScreen] Notification permission granted');
+          }
+        }
+      };
+      
+      // Delay slightly to ensure app stability before starting disclosure flow
+      const timeout = setTimeout(initPermissions, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [isAuthenticated]);
 
   // Permissions are now handled automatically by the system on app start
 
@@ -825,15 +867,68 @@ const HomeScreen = ({navigation}: any) => {
     if (Platform.OS !== 'android') {
       return true;
     }
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title: 'Location Permission',
-        message: 'SafeTNet needs location access to share your live position with trusted contacts.',
-        buttonPositive: 'Allow',
-      },
-    );
-    return granted === PermissionsAndroid.RESULTS.GRANTED;
+
+    const isAlreadyGranted = await permissionService.checkPermission('location');
+    if (isAlreadyGranted) {
+      return true;
+    }
+
+    // Show prominent disclosure if not already granted
+    return new Promise((resolve) => {
+      setLocationDisclosureMode('foreground');
+      setPendingPermissionAction(() => async () => {
+        const granted = await permissionService.requestPermission('location');
+        resolve(granted);
+      });
+      setShowLocationDisclosure(true);
+    });
+  };
+
+  const ensureBackgroundLocationPermission = async (): Promise<boolean> => {
+    if (Platform.OS !== 'android' || Platform.Version < 29) {
+      return true;
+    }
+
+    // Step 1: Ensure foreground permission is granted FIRST with its own disclosure
+    const foregroundGranted = await ensureLocationPermission();
+    if (!foregroundGranted) {
+      return false;
+    }
+
+    const isAlreadyGranted = await permissionService.checkPermission('backgroundLocation');
+    if (isAlreadyGranted) {
+      return true;
+    }
+
+    // Show prominent disclosure for background location
+    return new Promise((resolve) => {
+      setLocationDisclosureMode('background');
+      setPendingPermissionAction(() => async () => {
+        const granted = await permissionService.requestPermission('backgroundLocation');
+        resolve(granted);
+      });
+      setShowLocationDisclosure(true);
+    });
+  };
+
+  const ensureNotificationPermission = async (): Promise<boolean> => {
+    if (Platform.OS !== 'android' || Platform.Version < 33) {
+      return true;
+    }
+
+    const isAlreadyGranted = await permissionService.checkPermission('notifications');
+    if (isAlreadyGranted) {
+      return true;
+    }
+
+    // Show prominent disclosure for notifications
+    return new Promise((resolve) => {
+      setPendingPermissionAction(() => async () => {
+        const granted = await permissionService.requestPermission('notifications');
+        resolve(granted);
+      });
+      setShowNotificationDisclosure(true);
+    });
   };
 
   const getCurrentPosition = (options = {enableHighAccuracy: true, timeout: 15000}) =>
@@ -1155,7 +1250,7 @@ const HomeScreen = ({navigation}: any) => {
         await apiService.sendChatMessage(Number(user.id), groupId, message);
         setAlertState({
           visible: true,
-          title: 'Message Sent',
+          title: 'Messages Sent',
           message: `Message sent to ${selectedCommunityContact.label}`,
           type: 'success',
         });
@@ -2000,6 +2095,39 @@ const HomeScreen = ({navigation}: any) => {
         onDismiss={() => setLiveShareStopAlert({...liveShareStopAlert, visible: false})}
       />
 
+      {/* Location Prominent Disclosure Modal */}
+      <LocationDisclosureModal
+        visible={showLocationDisclosure}
+        mode={locationDisclosureMode}
+        onAccept={async () => {
+          setShowLocationDisclosure(false);
+          if (pendingPermissionAction) {
+            await (pendingPermissionAction as any)();
+            setPendingPermissionAction(null);
+          }
+        }}
+        onDecline={() => {
+          setShowLocationDisclosure(false);
+          setPendingPermissionAction(null);
+        }}
+      />
+
+      {/* Notification Disclosure Modal */}
+      <NotificationDisclosureModal
+        visible={showNotificationDisclosure}
+        onAccept={async () => {
+          setShowNotificationDisclosure(false);
+          if (pendingPermissionAction) {
+            await (pendingPermissionAction as any)();
+            setPendingPermissionAction(null);
+          }
+        }}
+        onDecline={() => {
+          setShowNotificationDisclosure(false);
+          setPendingPermissionAction(null);
+        }}
+      />
+
       {/* Modern Shake SOS Confirmation Modal */}
       <Modal
         visible={showShakeSOSModal && !showSuccessScreen}
@@ -2146,19 +2274,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#B91C1C',
     textAlign: 'center',
-  },
-  countdownLabel: {
-    fontSize: 18,
-    fontWeight: '500',
-    textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 8,
-  },
-  countdownNumber: {
-    fontSize: 72,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    letterSpacing: 2,
   },
   countdownLabel: {
     fontSize: 18,
@@ -2687,6 +2802,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+  emptyContactsText: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 12,
+    marginBottom: 8,
   },
 });
 

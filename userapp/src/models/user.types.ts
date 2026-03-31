@@ -7,6 +7,8 @@ export interface User {
   avatar?: string;
   status: 'online' | 'offline';
   plan?: 'free' | 'premium';
+  first_name?: string;
+  last_name?: string;
 }
 
 export interface Alert {

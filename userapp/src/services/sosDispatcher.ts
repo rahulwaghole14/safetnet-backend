@@ -9,6 +9,7 @@ import {useAuthStore} from '../stores/authStore';
 import {apiService} from './apiService';
 import {startLiveLocationShareUpdates, startLiveLocationShare, getActiveLiveShareSession, type LiveShareSession} from './liveLocationShareService';
 import {sendAlertNotification} from './notificationService';
+import {permissionService} from './permissionService';
 
 // Import push notifications - use dynamic import to avoid bundling issues
 let PushNotification: any = null;
@@ -236,35 +237,17 @@ const sendSOSNotification = async () => {
     // Ensure notifications are configured first
     configureNotifications();
 
-    // Request notification permission on Android 13+ if needed
-    if (Platform.OS === 'android' && Platform.Version >= 33) {
+    // Check notification permission on Android 13+
+    if (Platform.OS === 'android' && Number(Platform.Version) >= 33) {
       try {
-        const hasPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-        );
+        const hasPermission = await permissionService.checkPermission('notifications');
         if (!hasPermission) {
-          console.log('Requesting notification permission...');
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-            {
-              title: 'Notification Permission',
-              message: 'This app needs notification permission to show SOS alerts.',
-              buttonNeutral: 'Ask Me Later',
-              buttonNegative: 'Cancel',
-              buttonPositive: 'OK',
-            }
-          );
-          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-            console.warn('Notification permission not granted:', granted);
-            // Continue to fallback even if permission denied
-          } else {
-            console.log('Notification permission granted');
-          }
+          console.warn('[SOS Notification] Permission not granted. Notification will be skipped.');
         } else {
-          console.log('Notification permission already granted');
+          console.log('[SOS Notification] Permission granted');
         }
       } catch (error) {
-        console.warn('Failed to request notification permission:', error);
+        console.warn('Failed to check notification permission:', error);
       }
     }
 
@@ -353,7 +336,14 @@ type DispatchResult = {
 /**
  * Get current user location using enhanced GPS (same method that works in liveLocationShareService)
  */
-const getCurrentLocation = (): Promise<{latitude: number; longitude: number} | null> => {
+const getCurrentLocation = async (): Promise<{latitude: number; longitude: number} | null> => {
+  // Ensure we have permission first using centralized check
+  const hasPermission = await permissionService.checkPermission('location');
+  if (!hasPermission) {
+    console.warn('[SOS Location] No location permission, cannot get position');
+    return null;
+  }
+
   return new Promise((resolve) => {
     // On Android, use enhanced GPS service (more reliable)
     if (Platform.OS === 'android') {

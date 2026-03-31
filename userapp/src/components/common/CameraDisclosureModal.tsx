@@ -5,35 +5,30 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Platform,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '@react-navigation/native';
 
-interface LocationDisclosureModalProps {
+interface CameraDisclosureModalProps {
   visible: boolean;
   onAccept: () => void;
   onDecline: () => void;
-  mode?: 'foreground' | 'background';
 }
 
 /**
- * Prominent Disclosure Modal for Location Access
+ * Prominent Disclosure Modal for Camera Access
  * Required by Google Play Console User Data Policy
  */
-export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = ({
+export const CameraDisclosureModal: React.FC<CameraDisclosureModalProps> = ({
   visible,
   onAccept,
   onDecline,
-  mode = 'background',
 }) => {
   const {colors, dark} = useTheme();
 
   if (!visible) {
     return null;
   }
-
-  const isBackground = mode === 'background';
 
   return (
     <Modal
@@ -44,64 +39,35 @@ export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = (
       <View style={styles.overlay}>
         <View style={[styles.container, {backgroundColor: colors.card}]}>
           <View style={styles.iconWrapper}>
-            <MaterialIcons name={isBackground ? "my-location" : "location-on"} size={32} color="#2563EB" />
+            <MaterialIcons name="photo-camera" size={32} color="#2563EB" />
           </View>
           
           <Text style={[styles.title, {color: colors.text}]}>
-            {isBackground ? 'Background Location Access' : 'Location Access'}
+            Camera Access Required
           </Text>
           
           <Text style={[styles.message, {color: colors.text}]}>
-            {isBackground 
-              ? 'SafeTNet collects location data to enable the following features even when the app is closed or not in use:' 
-              : 'SafeTNet collects location data to enable the following features while you are using the app:'}
+            SafeTNet requires camera access to allow you to:
           </Text>
           
           <View style={styles.featureList}>
-            {isBackground ? (
-              <>
-                <View style={styles.featureItem}>
-                  <MaterialIcons name="emergency-share" size={20} color="#DC2626" />
-                  <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>SOS Alerts:</Text> Shares your live location with emergency contacts when you trigger an SOS.
-                  </Text>
-                </View>
-                
-                <View style={styles.featureItem}>
-                  <MaterialIcons name="notifications-active" size={20} color="#047857" />
-                  <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>Geofence Monitoring:</Text> Notifies you and your contacts when you enter or exit safe zones.
-                  </Text>
-                </View>
-              </>
-            ) : (
-              <>
-                <View style={styles.featureItem}>
-                  <MaterialIcons name="security" size={20} color="#047857" />
-                  <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>Nearby Officers:</Text> Shows you the nearest security officers and help centers on the map.
-                  </Text>
-                </View>
-                
-                <View style={styles.featureItem}>
-                  <MaterialIcons name="map" size={20} color="#2563EB" />
-                  <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>Navigation:</Text> Helps you navigate safely within the city and see geofenced zones.
-                  </Text>
-                </View>
-
-                <View style={styles.featureItem}>
-                  <MaterialIcons name="sos" size={20} color="#DC2626" />
-                  <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>SOS Trigger:</Text> Accurately identifies your current location when you send an SOS.
-                  </Text>
-                </View>
-              </>
-            )}
+            <View style={styles.featureItem}>
+              <MaterialIcons name="chat" size={20} color="#2563EB" />
+              <Text style={[styles.featureText, {color: colors.text}]}>
+                <Text style={styles.boldText}>Capture Photos:</Text> Take and send real-time photos to your emergency contacts or chat groups.
+              </Text>
+            </View>
+            
+            <View style={styles.featureItem}>
+              <MaterialIcons name="report" size={20} color="#DC2626" />
+              <Text style={[styles.featureText, {color: colors.text}]}>
+                <Text style={styles.boldText}>Incident Reporting:</Text> Attach photographic evidence to safety reports when sharing your status.
+              </Text>
+            </View>
           </View>
           
           <Text style={[styles.footerText, {color: colors.text}]}>
-            This data is only used for your safety and is never shared for advertising. You can change this in settings at any time.
+            We only access your camera when you explicitly use these features. We never record or capture images in the background.
           </Text>
           
           <View style={styles.actions}>
@@ -119,7 +85,7 @@ export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = (
               onPress={onAccept}
               activeOpacity={0.8}
             >
-              <Text style={styles.primaryText}>Accept & Continue</Text>
+              <Text style={styles.primaryText}>Grant Access</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -227,4 +193,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LocationDisclosureModal;
+export default CameraDisclosureModal;

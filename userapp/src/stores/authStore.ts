@@ -53,6 +53,8 @@ const convertApiUserToUser = (apiUser: LoginResponse['user']): User => {
     plan: apiUser.is_premium ? 'premium' : 'free',
     role: 'user',
     status: 'online',
+    first_name: apiUser.first_name,
+    last_name: apiUser.last_name,
   };
 };
 
@@ -83,7 +85,9 @@ export const useAuthStore = create<AuthState>((set) => ({
           name: response.user.name || user.name,
           phone: response.user.phone || user.phone,
           plan: (response.user.is_premium ? 'premium' : 'free') as 'premium' | 'free',
-            };
+          first_name: response.user.first_name || user.first_name,
+          last_name: response.user.last_name || user.last_name,
+        };
         set({user: updatedUser, isAuthenticated: true, isLoading: false, showOnboarding: true});
         const storage = await getStorage();
         await storage.setItem('authState', JSON.stringify({user: updatedUser}));
@@ -211,6 +215,8 @@ export const useAuthStore = create<AuthState>((set) => ({
                     name: profileData.name || profileData.first_name || authState.user.name,
                     phone: profileData.phone || authState.user.phone,
                     plan: profileData.is_premium || profileData.plantype === 'premium' ? 'premium' : 'free',
+                    first_name: profileData.first_name || authState.user.first_name,
+                    last_name: profileData.last_name || authState.user.last_name,
               };
                   set({user: updatedUser, isAuthenticated: true, isLoading: false});
                   await storage.setItem('authState', JSON.stringify({user: updatedUser}));
@@ -324,6 +330,8 @@ export const useAuthStore = create<AuthState>((set) => ({
             name: profileData.name || profileData.first_name || currentUser.name,
             phone: profileData.phone || currentUser.phone,
             plan: (profileData.is_premium || profileData.plantype === 'premium' ? 'premium' : 'free') as 'premium' | 'free',
+            first_name: profileData.first_name || currentUser.first_name,
+            last_name: profileData.last_name || currentUser.last_name,
           };
           set({user: updatedUser});
           const storage = await getStorage();

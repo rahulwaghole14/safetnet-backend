@@ -33,6 +33,8 @@ import {
   ImageLibraryOptions,
 } from 'react-native-image-picker';
 import {ThemedAlert} from '../../components/common/ThemedAlert';
+import {CameraDisclosureModal} from '../../components/common/CameraDisclosureModal';
+import {permissionService} from '../../services/permissionService';
 import {getInitials, getAvatarColor} from '../../utils/avatarColors';
 import {
   downloadAndStoreFile,
@@ -203,6 +205,8 @@ const ChatScreen = () => {
   const [editText, setEditText] = useState('');
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showCameraDisclosure, setShowCameraDisclosure] = useState(false);
+  const [pendingCameraAction, setPendingCameraAction] = useState<(() => void) | null>(null);
   const [downloadingFiles, setDownloadingFiles] = useState<Set<string | number>>(new Set());
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
@@ -613,9 +617,9 @@ const ChatScreen = () => {
       id: tempId,
       text: textToSend,
       sender_id: userIdNum,
-      sender_name: user.name || user.email,
-      sender_first_name: user.first_name || '',
-      sender_last_name: user.last_name || '',
+      sender_name: user?.name || user?.email || 'User',
+      sender_first_name: user?.first_name || '',
+      sender_last_name: user?.last_name || '',
       created_at: new Date().toISOString(),
       isOwn: true,
       status: 'sending',
@@ -781,7 +785,7 @@ const ChatScreen = () => {
   };
 
   const handleDeleteSelectedMessages = async () => {
-    if (selectedMessages.size === 0) return;
+    if (selectedMessages.size === 0 || !user?.id) return;
     
     setDeleting(true);
     try {
@@ -814,7 +818,7 @@ const ChatScreen = () => {
 
   const handleDownloadFile = async (message: Message, options: {silent?: boolean} = {}): Promise<string | null> => {
     const {silent = false} = options;
-    if (!message.file_url && !message.image_url) return;
+    if (!message.file_url && !message.image_url) return null;
     
     const fileUrl = message.file_url || message.image_url || '';
     const messageId = message.id;
@@ -1035,7 +1039,7 @@ const ChatScreen = () => {
         const formData = new FormData();
         
         if (file.type === 'image') {
-          const imageFileName = file.fileName || file.name || 'image.jpg';
+          const imageFileName = file.fileName || 'image.jpg';
           formData.append('image', {
             uri: file.uri,
             type: file.mimeType || 'image/jpeg',
@@ -1055,7 +1059,7 @@ const ChatScreen = () => {
           }
         } else {
           // Ensure we have a valid file name
-          const fileName = file.fileName || file.name || 'file';
+          const fileName = file.fileName || 'file';
           formData.append('file', {
             uri: file.uri,
             type: file.mimeType || 'application/octet-stream',
@@ -1079,7 +1083,7 @@ const ChatScreen = () => {
             const fileUrl = newMessage.image_url || newMessage.file_url || '';
             if (fileUrl) {
               // Store the original local file path
-              const originalFileName = file.fileName || file.name || 'file';
+              const originalFileName = file.fileName || 'file';
               const storedFile = {
                 messageId: newMessage.id.toString(),
                 fileUrl: fileUrl,
@@ -1144,51 +1148,56 @@ const ChatScreen = () => {
   const openCamera = async () => {
     try {
       if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-          {
-            title: 'Camera Permission',
-            message: 'App needs access to your camera',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          showToast('Camera permission is required', ToastAndroid.SHORT);
-          return;
+        const isGranted = await permissionService.checkPermission('camera');
+        if (!isGranted) {
+          return new Promise((resolve) => {
+            setPendingCameraAction(() => async () => {
+              const granted = await permissionService.requestPermission('camera');
+              if (granted) {
+                // If granted, proceed with camera launch
+                launchCameraWithOptions();
+              } else {
+                showToast('Camera permission is required', ToastAndroid.SHORT);
+              }
+              resolve(granted);
+            });
+            setShowCameraDisclosure(true);
+          });
         }
       }
-
-      launchCamera(
-        {
-          mediaType: 'photo',
-          quality: 0.8,
-          includeBase64: false,
-        },
-        (response: ImagePickerResponse) => {
-          if (response.didCancel) {
-            return;
-          }
-          if (response.errorMessage) {
-            showToast(response.errorMessage, ToastAndroid.SHORT);
-            return;
-          }
-          if (response.assets && response.assets.length > 0) {
-            const asset = response.assets[0];
-            handleFileSelected(
-              'image',
-              asset.uri || '',
-              asset.fileName || 'image.jpg',
-              asset.fileSize || 0,
-            );
-          }
-        },
-      );
+      launchCameraWithOptions();
     } catch (error) {
       console.error('Camera error:', error);
       showToast('Failed to open camera', ToastAndroid.SHORT);
     }
+  };
+
+  const launchCameraWithOptions = () => {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        quality: 0.8,
+        includeBase64: false,
+      },
+      (response: ImagePickerResponse) => {
+        if (response.didCancel) {
+          return;
+        }
+        if (response.errorMessage) {
+          showToast(response.errorMessage, ToastAndroid.SHORT);
+          return;
+        }
+        if (response.assets && response.assets.length > 0) {
+          const asset = response.assets[0];
+          handleFileSelected(
+            'image',
+            asset.uri || '',
+            asset.fileName || 'image.jpg',
+            asset.fileSize || 0,
+          );
+        }
+      },
+    );
   };
 
   const openImageLibrary = () => {
@@ -1232,7 +1241,7 @@ const ChatScreen = () => {
               handleFileSelected(
                 'image',
                 asset.uri,
-                asset.fileName || asset.originalFileName || 'image.jpg',
+                asset.fileName || 'image.jpg',
                 asset.fileSize || 0,
               );
             }
@@ -1787,16 +1796,16 @@ const ChatScreen = () => {
             {selectedMessages.size} selected
           </Text>
           <TouchableOpacity
-            style={[styles.selectionActionButton, {borderColor: colors.error || '#EF4444'}]}
+            style={[styles.selectionActionButton, {borderColor: '#EF4444'}]}
             onPress={handleDeleteSelectedMessages}
             activeOpacity={0.7}
             disabled={deleting || selectedMessages.size === 0}>
             {deleting ? (
-              <ActivityIndicator size="small" color={colors.error || '#EF4444'} />
+              <ActivityIndicator size="small" color={'#EF4444'} />
             ) : (
-              <MaterialIcons name="delete" size={20} color={colors.error || '#EF4444'} />
+              <MaterialIcons name="delete" size={20} color={'#EF4444'} />
             )}
-            <Text style={[styles.selectionActionText, {color: colors.error || '#EF4444'}]}>
+            <Text style={[styles.selectionActionText, {color: '#EF4444'}]}>
               Delete
             </Text>
           </TouchableOpacity>
@@ -1826,16 +1835,16 @@ const ChatScreen = () => {
               <Text style={[styles.selectionActionText, {color: colors.text}]}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.selectionActionButton, {borderColor: colors.error || '#EF4444'}]}
+              style={[styles.selectionActionButton, {borderColor: '#EF4444'}]}
               onPress={handleDeleteMessage}
               activeOpacity={0.7}
               disabled={deleting}>
               {deleting ? (
-                <ActivityIndicator size="small" color={colors.error || '#EF4444'} />
+                <ActivityIndicator size="small" color={'#EF4444'} />
               ) : (
-                <MaterialIcons name="delete" size={20} color={colors.error || '#EF4444'} />
+                <MaterialIcons name="delete" size={20} color={'#EF4444'} />
               )}
-              <Text style={[styles.selectionActionText, {color: colors.error || '#EF4444'}]}>
+              <Text style={[styles.selectionActionText, {color: '#EF4444'}]}>
                 Delete
               </Text>
             </TouchableOpacity>
@@ -1909,7 +1918,7 @@ const ChatScreen = () => {
           style={[
             styles.inputContainer,
             {
-              paddingBottom: keyboardHeight > 0 ? keyboardHeight + 21 : insets.bottom + 8,
+              paddingBottom: insets.bottom + 8,
               backgroundColor: colors.card,
               borderTopColor: colors.border,
             },
@@ -1920,6 +1929,12 @@ const ChatScreen = () => {
               onPress={handleImagePicker}
               activeOpacity={0.7}>
               <MaterialIcons name="image" size={24} color={colors.text} style={{opacity: 0.7}} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.attachButton}
+              onPress={openCamera}
+              activeOpacity={0.7}>
+              <MaterialIcons name="photo-camera" size={24} color={colors.text} style={{opacity: 0.7}} />
             </TouchableOpacity>
             <TextInput
               style={[
@@ -1943,7 +1958,7 @@ const ChatScreen = () => {
                   backgroundColor: messageText.trim() && !sending ? colors.primary : colors.border,
                 },
               ]}
-              onPress={handleSendMessage}
+              onPress={() => handleSendMessage()}
               disabled={!messageText.trim() || sending}
               activeOpacity={0.7}>
               {sending ? (
@@ -2127,6 +2142,21 @@ const ChatScreen = () => {
         onDismiss={() => setAlertState({...alertState, visible: false})}
       />
 
+      {/* Camera Prominent Disclosure Modal */}
+      <CameraDisclosureModal
+        visible={showCameraDisclosure}
+        onAccept={async () => {
+          setShowCameraDisclosure(false);
+          if (pendingCameraAction) {
+            pendingCameraAction();
+            setPendingCameraAction(null);
+          }
+        }}
+        onDecline={() => {
+          setShowCameraDisclosure(false);
+          setPendingCameraAction(null);
+        }}
+      />
 
       {/* Edit Message Modal */}
       <Modal
@@ -2600,7 +2630,7 @@ const styles = StyleSheet.create({
   },
   attachButton: {
     padding: 8,
-    marginRight: 4,
+    marginRight: 12,
   },
   input: {
     flex: 1,
@@ -2611,7 +2641,7 @@ const styles = StyleSheet.create({
     maxHeight: 100,
     fontSize: 15,
     marginRight: 8,
-    marginLeft: 4,
+    marginLeft: 8,
   },
   sendButton: {
     width: 44,

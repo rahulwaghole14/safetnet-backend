@@ -3,6 +3,7 @@ import {Alert, Platform, PermissionsAndroid} from 'react-native';
 import GeolocationService from 'react-native-geolocation-service';
 import {apiService} from './apiService';
 import {useAuthStore} from '../stores/authStore';
+import {permissionService} from './permissionService';
 
 export interface LiveShareSession {
   userId: number;
@@ -25,7 +26,7 @@ interface LiveShareUpdateOptions {
 
 let watchId: number | null = null;
 let activeSession: LiveShareSession | null = null;
-let updateInterval: NodeJS.Timeout | null = null; // Fallback interval for location updates
+let updateInterval: any = null; // Fallback interval for location updates
 
 const clearWatcher = () => {
   if (watchId !== null) {
@@ -218,20 +219,7 @@ const ensureLocationPermission = async (): Promise<boolean> => {
   if (Platform.OS !== 'android') {
     return true;
   }
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title: 'Location Permission',
-        message: 'SafeTNet needs location access to share your live position.',
-        buttonPositive: 'Allow',
-      },
-    );
-    return granted === PermissionsAndroid.RESULTS.GRANTED;
-  } catch (error) {
-    console.warn('Error requesting location permission:', error);
-    return false;
-  }
+  return await permissionService.checkPermission('location');
 };
 
 /**

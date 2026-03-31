@@ -21,6 +21,8 @@ import {apiService} from '../../services/apiService';
 import {useSubscription} from '../../lib/hooks/useSubscription';
 import {ThemedAlert} from '../../components/common/ThemedAlert';
 import LeafletMap from '../../components/maps/LeafletMap';
+import {LocationDisclosureModal} from '../../components/common/LocationDisclosureModal';
+import {permissionService} from '../../services/permissionService';
 
 Geolocation.setRNConfiguration({
   skipPermissionRequests: false,
@@ -62,7 +64,9 @@ const AreaMapScreen = () => {
   const [securityOfficers, setSecurityOfficers] = useState<any[]>([]);
   const [loadingOfficers, setLoadingOfficers] = useState(false);
   const [locationProvider, setLocationProvider] = useState<'gps' | 'enhanced' | null>(null);
-  const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
+  const [showLocationDisclosure, setShowLocationDisclosure] = useState(false);
+  const [pendingLocationAction, setPendingLocationAction] = useState<(() => void) | null>(null);
+  const [pollingInterval, setPollingInterval] = useState<any>(null);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState<{
     title: string;
@@ -199,17 +203,70 @@ const AreaMapScreen = () => {
     setAlertVisible(true);
   }, []);
 
+  const loadOfficersWithDefault = useCallback(() => {
+    const defaultLocation = { latitude: 20.5937, longitude: 78.9629 };
+    loadSecurityOfficers(defaultLocation, true).catch(() => {});
+  }, [loadSecurityOfficers]);
+
+  const fetchLocation = useCallback(() => {
+    Promise.race([
+      getCurrentLocation('enhanced').catch(() => getCurrentLocation('legacy')),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Location timeout')), 10000))
+    ]).catch((err) => {
+      console.warn('Location fetch failed or timed out:', err);
+      loadOfficersWithDefault();
+    });
+  }, [getCurrentLocation, loadOfficersWithDefault]);
+
+  const requestLocationPermission = useCallback(async () => {
+    if (Platform.OS === 'android') {
+      const isGranted = await permissionService.checkPermission('location');
+      if (isGranted) {
+        setLocationPermissionGranted(true);
+        fetchLocation();
+        return;
+      }
+
+      // Show disclosure
+      setShowLocationDisclosure(true);
+      setPendingLocationAction(() => async () => {
+        const granted = await permissionService.requestPermission('location');
+        if (granted) {
+          setLocationPermissionGranted(true);
+          fetchLocation();
+        } else {
+          setLocationPermissionGranted(false);
+          loadOfficersWithDefault();
+        }
+      });
+    } else {
+      // iOS
+      try {
+        const authStatus = await (Geolocation.requestAuthorization() as any);
+        if (authStatus === 'granted' || authStatus === 'restricted' || !authStatus) {
+          setLocationPermissionGranted(true);
+          fetchLocation();
+        } else {
+          loadOfficersWithDefault();
+        }
+      } catch (err) {
+        console.warn('Location authorization error:', err);
+        loadOfficersWithDefault();
+      }
+    }
+  }, [fetchLocation, loadOfficersWithDefault]);
+
   const handleLocationFailure = useCallback(
     async (error: any) => {
       console.error('Location error:', error);
 
       if (Platform.OS === 'android') {
-        const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+        const isGranted = await permissionService.checkPermission('location');
 
-        if (!hasPermission && error.code === 1) {
+        if (!isGranted && error.code === 1) {
           showPermissionAlert({
             title: 'Location Permission Required',
-            message: 'Please enable location permission in settings to see nearby help.',
+            message: 'Please enable location permission to see nearby help and geofences.',
             buttons: [
               {text: 'Cancel', style: 'cancel', onPress: () => setAlertVisible(false)},
               {
@@ -220,15 +277,8 @@ const AreaMapScreen = () => {
                 },
               },
               {text: 'Retry', onPress: () => {
-                // Retry permission request
-                if (Platform.OS === 'android') {
-                  PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((granted) => {
-                    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                      setLocationPermissionGranted(true);
-                      getCurrentLocation('enhanced').catch(() => getCurrentLocation('legacy'));
-                    }
-                  });
-                }
+                setAlertVisible(false);
+                requestLocationPermission();
               }},
             ],
           });
@@ -249,15 +299,8 @@ const AreaMapScreen = () => {
                 },
               },
               {text: 'Retry', onPress: () => {
-                // Retry location services
-                if (Platform.OS === 'android') {
-                  PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((granted) => {
-                    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                      setLocationPermissionGranted(true);
-                      getCurrentLocation('enhanced').catch(() => getCurrentLocation('legacy'));
-                    }
-                  });
-                }
+                setAlertVisible(false);
+                requestLocationPermission();
               }},
             ],
           });
@@ -276,6 +319,10 @@ const AreaMapScreen = () => {
                 setAlertVisible(false);
               },
             },
+            {text: 'Retry', onPress: () => {
+              setAlertVisible(false);
+              requestLocationPermission();
+            }},
           ],
         });
         return;
@@ -288,101 +335,14 @@ const AreaMapScreen = () => {
         buttons: [
           {text: 'OK', style: 'cancel', onPress: () => setAlertVisible(false)},
           {text: 'Retry', onPress: () => {
-            // Retry location permission request
-            if (Platform.OS === 'android') {
-              PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((granted) => {
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                  setLocationPermissionGranted(true);
-                  getCurrentLocation('enhanced').catch(() => getCurrentLocation('legacy'));
-                }
-              });
-        } else {
-              Geolocation.requestAuthorization().then((authStatus) => {
-                if (authStatus === 'granted' || authStatus === 'restricted') {
-                  setLocationPermissionGranted(true);
-                  getCurrentLocation('legacy').catch(() => getCurrentLocation('enhanced'));
-                }
-              });
-      }
+            setAlertVisible(false);
+            requestLocationPermission();
           }},
         ],
         type: 'error',
     });
     },
-  [showPermissionAlert]);
-
-  const requestLocationPermission = useCallback(async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          setLocationPermissionGranted(true);
-          // Try to get location with timeout
-          Promise.race([
-            getCurrentLocation('enhanced').catch(() => getCurrentLocation('legacy')),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Location timeout')), 10000))
-          ]).catch((err) => {
-            console.warn('Location fetch failed or timed out:', err);
-            // Still try to load officers with default location
-            const defaultLocation = { latitude: 20.5937, longitude: 78.9629 };
-            loadSecurityOfficers(defaultLocation, true).catch(() => {});
-          });
-        } else {
-          setLocationPermissionGranted(false);
-          // Load officers anyway with default location
-          const defaultLocation = { latitude: 20.5937, longitude: 78.9629 };
-          loadSecurityOfficers(defaultLocation, true).catch(() => {});
-          if (granted === PermissionsAndroid.RESULTS.DENIED) {
-            setAlertConfig({
-              title: 'Location Permission Required',
-              message: 'Please enable location permission in settings to see nearby help.',
-              type: 'warning',
-              buttons: [
-                {text: 'Cancel', style: 'cancel', onPress: () => setAlertVisible(false)},
-                {text: 'Open Settings', onPress: () => {
-                  Linking.openSettings();
-                  setAlertVisible(false);
-                }},
-              ],
-            });
-            setAlertVisible(true);
-          }
-        }
-      } catch (err) {
-        console.warn('Location permission error:', err);
-        // Load officers with default location
-        const defaultLocation = { latitude: 20.5937, longitude: 78.9629 };
-        loadSecurityOfficers(defaultLocation, true).catch(() => {});
-      }
-    } else {
-      // iOS - check authorization status first
-      try {
-        const authStatus = await Geolocation.requestAuthorization();
-        if (authStatus === 'granted' || authStatus === 'restricted') {
-          setLocationPermissionGranted(true);
-          // Try to get location with timeout
-          Promise.race([
-            getCurrentLocation('legacy').catch(() => getCurrentLocation('enhanced')),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Location timeout')), 10000))
-          ]).catch((err) => {
-            console.warn('Location fetch failed or timed out:', err);
-            // Still try to load officers with default location
-            const defaultLocation = { latitude: 20.5937, longitude: 78.9629 };
-            loadSecurityOfficers(defaultLocation, true).catch(() => {});
-          });
-        } else {
-          // Load officers with default location
-          const defaultLocation = { latitude: 20.5937, longitude: 78.9629 };
-          loadSecurityOfficers(defaultLocation, true).catch(() => {});
-        }
-      } catch (err) {
-        console.warn('Location authorization error:', err);
-        // Load officers with default location
-        const defaultLocation = { latitude: 20.5937, longitude: 78.9629 };
-        loadSecurityOfficers(defaultLocation, true).catch(() => {});
-      }
-    }
-  }, [getCurrentLocation, loadSecurityOfficers]);
+  [showPermissionAlert, requestLocationPermission]);
 
   useEffect(() => {
     requestLocationPermission();
@@ -613,6 +573,24 @@ const AreaMapScreen = () => {
         )}
           </View>
       </View>
+
+      {/* Location Disclosure Modal */}
+      <LocationDisclosureModal
+        visible={showLocationDisclosure}
+        mode="foreground"
+        onAccept={async () => {
+          setShowLocationDisclosure(false);
+          if (pendingLocationAction) {
+            await (pendingLocationAction as any)();
+            setPendingLocationAction(null);
+          }
+        }}
+        onDecline={() => {
+          setShowLocationDisclosure(false);
+          setPendingLocationAction(null);
+          loadOfficersWithDefault();
+        }}
+      />
     </>
   );
 };

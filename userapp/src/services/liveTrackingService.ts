@@ -17,12 +17,13 @@ const LOCATION_OPTIONS = {
 let watchId: number | null = null;
 let isStarting = false;
 
+import {permissionService} from './permissionService';
+
 const ensureLocationPermission = async () => {
   if (Platform.OS !== 'android') {
     return true;
   }
-  const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
-  return granted === PermissionsAndroid.RESULTS.GRANTED;
+  return await permissionService.checkPermission('location');
 };
 
 const getCurrentPosition = () =>

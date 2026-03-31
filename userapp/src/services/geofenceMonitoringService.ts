@@ -4,9 +4,10 @@
  */
 
 import Geolocation from '@react-native-community/geolocation';
-import {Platform, PermissionsAndroid} from 'react-native';
+import {Platform} from 'react-native';
 import {sendAlertNotification} from './notificationService';
 import {apiService} from './apiService';
+import {permissionService} from './permissionService';
 import {useAuthStore} from '../stores/authStore';
 
 interface Geofence {
@@ -173,15 +174,13 @@ const ensureLocationPermission = async (): Promise<boolean> => {
     return true;
   }
 
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
-    return granted === PermissionsAndroid.RESULTS.GRANTED;
-  } catch (error) {
-    console.error('Error requesting location permission:', error);
-    return false;
+  // Check for background location on Android 10+
+  if (Platform.Version >= 29) {
+    return await permissionService.checkPermission('backgroundLocation');
   }
+  
+  // For older versions, fine location is enough
+  return await permissionService.checkPermission('location');
 };
 
 /**
