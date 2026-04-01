@@ -36,6 +36,8 @@ export const GeofenceMapScreen = () => {
   const [geofence, setGeofence] = useState<GeofenceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [areaUsers, setAreaUsers] = useState<any[]>([]);
+  const [polling, setPolling] = useState(false);
 
   // Ref hooks
   const webViewRef = useRef<any>(null);
@@ -62,6 +64,18 @@ export const GeofenceMapScreen = () => {
   useEffect(() => {
     fetchGeofence();
   }, []);
+
+  // Poll for area users once geofence is loaded
+  useEffect(() => {
+    let interval: any;
+    if (geofence?.id) {
+      fetchAreaUsers(); // Initial fetch
+      interval = setInterval(() => {
+        fetchAreaUsers();
+      }, 30000); // Every 30 seconds
+    }
+    return () => clearInterval(interval);
+  }, [geofence?.id]);
 
 
 
@@ -407,6 +421,23 @@ export const GeofenceMapScreen = () => {
     }
   };
 
+  const fetchAreaUsers = async () => {
+    if (!geofence?.id) return;
+    
+    try {
+      setPolling(true);
+      const response = await apiClient.get(`/geofence/${geofence.id}/users/`);
+      if (Array.isArray(response.data)) {
+        setAreaUsers(response.data);
+        console.log(`📍 Found ${response.data.length} users in area`);
+      }
+    } catch (error) {
+      console.error('Error fetching area users:', error);
+    } finally {
+      setPolling(false);
+    }
+  };
+
   // Location tracking functions with simulated 1-second updates
 
   // Send officer location to backend
@@ -510,6 +541,13 @@ export const GeofenceMapScreen = () => {
             latitude: coord.latitude,
             longitude: coord.longitude
           })) : undefined}
+          userMarkers={areaUsers.map(user => ({
+            id: String(user.id),
+            username: user.user_name || user.email || 'User',
+            latitude: user.latitude,
+            longitude: user.longitude,
+            updated_at: user.updated_at
+          }))}
         />
 
         {/* Floating Action Button - Top Right */}
@@ -536,6 +574,14 @@ export const GeofenceMapScreen = () => {
         <View style={styles.sectionHeader}>
           <Icon name="info" size={20} color={colors.primary} style={styles.sectionIcon} />
           <Text style={[styles.sectionTitle, { color: colors.darkText }]}>Geofence Details</Text>
+          {polling && <ActivityIndicator size="small" color={colors.primary} style={{ marginLeft: 8 }} />}
+        </View>
+
+        <View style={styles.detailRow}>
+          <Text style={[styles.detailLabel, { color: colors.mediumText }]}>Users In Area:</Text>
+          <Text style={[styles.detailValue, { color: colors.primary, fontWeight: '700' }]}>
+            {areaUsers.length} Active Users
+          </Text>
         </View>
 
         <View style={styles.detailRow}>

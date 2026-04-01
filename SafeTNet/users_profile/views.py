@@ -591,6 +591,24 @@ class GeofenceEventView(APIView):
                 timestamp=timezone.now()
             )
 
+            # --- ENTRY NOTIFICATION ---
+            if event_type == 'enter':
+                try:
+                    from security_app.fcm_service import fcm_service
+                    fcm_service.send_to_user(
+                        user=user,
+                        title=f"📍 Entering Security Zone: {geofence.name}",
+                        body=f"You've entered a secured area managed by SafeTNet. Security officers are available for your protection.",
+                        data={
+                            'type': 'geofence_entry',
+                            'geofence_id': str(geofence.id),
+                            'geofence_name': geofence.name
+                        }
+                    )
+                    logger.info(f"[Geofence] Entry notification sent to {user.email} for {geofence.name}")
+                except Exception as fcm_error:
+                    logger.error(f"[Geofence] Failed to send entry notification: {fcm_error}")
+
             return Response({
                 'message': 'Geofence event recorded successfully',
                 'geofence': {

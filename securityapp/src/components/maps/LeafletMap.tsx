@@ -28,6 +28,13 @@ export const LeafletMap = React.forwardRef<WebView, {
   mapKey?: string;
   autoFitBounds?: boolean;
   showRoute?: boolean;
+  userMarkers?: Array<{
+    id: string;
+    username: string;
+    latitude: number;
+    longitude: number;
+    updated_at?: string;
+  }>;
 }>(({
   latitude,
   longitude,
@@ -41,7 +48,8 @@ export const LeafletMap = React.forwardRef<WebView, {
   multiplePolygons,
   mapKey,
   autoFitBounds = true,
-  showRoute = false
+  showRoute = false,
+  userMarkers = []
 }, ref) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -110,6 +118,23 @@ export const LeafletMap = React.forwardRef<WebView, {
               console.warn('⚠️ Could not add label for polygon:', polyId, e);
             }
             console.log('✅ Polygon added:', '${polygon.name || "Assigned Zone"}');
+          `;
+        }).join('\n')
+      : '';
+      
+    // Process user markers
+    const userMarkersJS = userMarkers && userMarkers.length > 0
+      ? userMarkers.map(user => {
+          return `
+            var userMarker = L.marker([${user.latitude}, ${user.longitude}], {
+                icon: L.divIcon({
+                    className: 'custom-div-icon',
+                    html: "<div style='background-color: #10b981; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);'></div>",
+                    iconSize: [18, 18],
+                    iconAnchor: [9, 9]
+                })
+            }).addTo(map);
+            userMarker.bindPopup('<b>👤 User: ${user.username}</b><br/>Lat: ${user.latitude.toFixed(6)}<br/>Lng: ${user.longitude.toFixed(6)}${user.updated_at ? `<br/>Last Updated: ${new Date(user.updated_at).toLocaleTimeString()}` : ""}');
           `;
         }).join('\n')
       : '';
@@ -218,6 +243,12 @@ export const LeafletMap = React.forwardRef<WebView, {
                 ${multiplePolygonsJS ? `
                 ${multiplePolygonsJS}
                 console.log('Multiple geofence polygons added');
+                ` : ''}
+
+                // Add user markers from area
+                ${userMarkersJS ? `
+                ${userMarkersJS}
+                console.log('User markers added to map area');
                 ` : ''}
 
                 // Add alert marker (red)

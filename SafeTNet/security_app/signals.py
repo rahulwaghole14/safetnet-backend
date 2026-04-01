@@ -122,8 +122,21 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
         
         # In DEBUG mode, notify ALL active officers regardless of organization to simplify testing
         if settings.DEBUG:
-            logger.info("DEBUG mode detected - bypassing organization filter for notifications")
+            logger.info("DEBUG mode detected - bypassing geofence/organization filters for notifications")
             officers = User.objects.filter(role='security_officer', is_active=True)
+        # Targeted Filter: Only notify officers assigned to the same geofence
+        elif instance.geofence:
+            from users.models import OfficerGeofenceAssignment
+            assigned_officer_ids = OfficerGeofenceAssignment.objects.filter(
+                geofence=instance.geofence,
+                is_active=True
+            ).values_list('officer_id', flat=True)
+            
+            officers = User.objects.filter(
+                id__in=assigned_officer_ids, 
+                is_active=True
+            )
+            logger.info(f"Targeted Geofence {instance.geofence.name}: Found {officers.count()} assigned officers")
         elif user_org:
             officers = User.objects.filter(
                 role='security_officer',
@@ -131,7 +144,7 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 is_active=True
             )
         else:
-            # If no organization and not in DEBUG, notify all active security officers as fallback
+            # If no geofence/organization and not in DEBUG, notify all active security officers as fallback
             officers = User.objects.filter(role='security_officer', is_active=True)
         
         logger.info(f"Found {officers.count()} security officers to notify: {[o.email for o in officers]}")
@@ -288,8 +301,21 @@ def send_officer_alert_broadcast(sender, instance, created, **kwargs):
             from django.contrib.auth import get_user_model
             User = get_user_model()
             
-            # Broadcast to all active users
-            users_to_notify = User.objects.filter(is_active=True)
+            # Target users based on geofence if location is provided
+            if instance.latitude and instance.longitude:
+                from users.utils import get_geofence_from_location
+                from .geo_utils import get_users_in_geofence
+                
+                target_geofence = get_geofence_from_location(instance.latitude, instance.longitude)
+                if target_geofence:
+                    affected_locations = get_users_in_geofence(target_geofence)
+                    users_to_notify = [ul.user for ul in affected_locations]
+                    logger.info(f"Targeted Broadcast: Found {len(users_to_notify)} users in geofence {target_geofence.name}")
+                else:
+                    users_to_notify = User.objects.filter(is_active=True)
+            else:
+                # Fallback to all active users for global broadcasts
+                users_to_notify = User.objects.filter(is_active=True)
                 
             fcm_service.send_to_users(
                 users_queryset=users_to_notify,
