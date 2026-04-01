@@ -542,11 +542,11 @@ export const GeofenceMapScreen = () => {
             longitude: coord.longitude
           })) : undefined}
           userMarkers={areaUsers.map(user => ({
-            id: String(user.id),
-            username: user.user_name || user.email || 'User',
-            latitude: user.latitude,
-            longitude: user.longitude,
-            updated_at: user.updated_at
+            id: String(user.user_id),
+            username: user.user_name || user.user_email || 'User',
+            latitude: user.current_latitude,
+            longitude: user.current_longitude,
+            updated_at: user.last_seen
           }))}
         />
 
