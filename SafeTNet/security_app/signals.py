@@ -120,15 +120,13 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
         logger.info(f"Triggered by: {instance.user.username} (Org: {user_org})")
         logger.info(f"DEBUG Mode: {settings.DEBUG}")
         
-        # In DEBUG mode, notify ALL active officers regardless of organization to simplify testing
-        if settings.DEBUG:
-            logger.info("DEBUG mode detected - bypassing geofence/organization filters for notifications")
-            officers = User.objects.filter(role='security_officer', is_active=True)
         # Targeted Filter: Only notify officers assigned to the same geofence
-        elif instance.geofence:
+        geofence = getattr(instance, 'geofence', None)
+        
+        if geofence:
             from users.models import OfficerGeofenceAssignment
             assigned_officer_ids = OfficerGeofenceAssignment.objects.filter(
-                geofence=instance.geofence,
+                geofence=geofence,
                 is_active=True
             ).values_list('officer_id', flat=True)
             
@@ -136,7 +134,7 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 id__in=assigned_officer_ids, 
                 is_active=True
             )
-            logger.info(f"Targeted Geofence {instance.geofence.name}: Found {officers.count()} assigned officers")
+            logger.info(f"Targeted Geofence {geofence.name}: Found {officers.count()} assigned officers")
         elif user_org:
             officers = User.objects.filter(
                 role='security_officer',
@@ -144,7 +142,7 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 is_active=True
             )
         else:
-            # If no geofence/organization and not in DEBUG, notify all active security officers as fallback
+            # If no geofence/organization, notify all active security officers as fallback
             officers = User.objects.filter(role='security_officer', is_active=True)
         
         logger.info(f"Found {officers.count()} security officers to notify: {[o.email for o in officers]}")

@@ -52,6 +52,12 @@ class User(AbstractUser):
         help_text="User's current location (longitude, latitude)"
     )
     
+    geofence_history = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Tracks geofence entries and notification timestamps. Format: {'geofence_id': 'ISO_timestamp'}"
+    )
+    
     # Override the USERNAME_FIELD to use email instead of username
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name', 'phone']
@@ -74,12 +80,57 @@ class User(AbstractUser):
         return self.planexpiry > timezone.now().date()
     
     def set_location(self, longitude, latitude):
-        """Set user's location from longitude and latitude."""
+        """Set user's location and detect geofence entries."""
         self.location = {
             'longitude': longitude,
             'latitude': latitude
         }
         self.save(update_fields=['location'])
+        
+        # Geofence Entry Detection
+        try:
+            from security_app.geo_utils import get_geofences_for_point
+            from security_app.geofence_alerts import handle_geofence_entry
+            
+            # Find all geofences this point is in
+            current_geofences = get_geofences_for_point(latitude, longitude)
+            
+            if not current_geofences:
+                return
+
+            if not isinstance(self.geofence_history, dict):
+                self.geofence_history = {}
+
+            now = timezone.now()
+            cooldown_period = 30 # minutes
+
+            for gf in current_geofences:
+                gf_id_str = str(gf.id)
+                last_notify_str = self.geofence_history.get(gf_id_str)
+                should_notify = False
+                
+                if not last_notify_str:
+                    # New entry
+                    should_notify = True
+                else:
+                    # Check cooldown
+                    from datetime import datetime
+                    last_notify = datetime.fromisoformat(last_notify_str)
+                    if now - last_notify > timedelta(minutes=cooldown_period):
+                        should_notify = True
+                
+                if should_notify:
+                    logger.info(f"🚀 Triggering geofence entry alert for {self.email} into {gf.name}")
+                    handle_geofence_entry(self, gf)
+                    
+                    # Update history
+                    self.geofence_history[gf_id_str] = now.isoformat()
+            
+            self.save(update_fields=['geofence_history'])
+            
+        except Exception as e:
+            logger.error(f"Error in geofence entry detection: {str(e)}")
+
     
     def get_location_dict(self):
         """Get user's location as a dictionary."""

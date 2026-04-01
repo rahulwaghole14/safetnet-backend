@@ -51,8 +51,8 @@ class FCMService:
         if isinstance(registration_tokens, str):
             registration_tokens = [registration_tokens]
 
-        # Filter out empty tokens
-        registration_tokens = [t for t in registration_tokens if t]
+        # Filter out empty tokens and deduplicate
+        registration_tokens = list(set([t for t in registration_tokens if t]))
         if not registration_tokens:
             return False
 

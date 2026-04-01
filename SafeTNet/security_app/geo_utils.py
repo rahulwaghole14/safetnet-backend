@@ -171,13 +171,19 @@ def get_users_in_geofence(geofence: Geofence, max_age_hours: int = 24) -> List[U
     ).select_related('user').prefetch_related('user__geofences')
     
     users_in_geofence = []
+    checked_users = set()
     
     for user_location in fresh_locations:
+        user_id = user_location.user.id
+        if user_id in checked_users:
+            continue
+            
         lat = float(user_location.latitude)
         lon = float(user_location.longitude)
         
         if is_point_in_geofence(lat, lon, geofence):
             users_in_geofence.append(user_location)
+            checked_users.add(user_id)
     
     return users_in_geofence
 
@@ -270,3 +276,23 @@ def calculate_geofence_center(geofence: Geofence) -> Optional[Tuple[float, float
             return (float(center[0]), float(center[1]))
     
     return None
+
+
+def get_geofences_for_point(latitude: float, longitude: float) -> List[Geofence]:
+    """
+    Find all active geofences that contain the given point.
+    
+    Args:
+        latitude, longitude: Point coordinates in decimal degrees
+    
+    Returns:
+        List of matching Geofence objects
+    """
+    active_geofences = Geofence.objects.filter(active=True)
+    matching = []
+    
+    for gf in active_geofences:
+        if is_point_in_geofence(latitude, longitude, gf):
+            matching.append(gf)
+            
+    return matching
