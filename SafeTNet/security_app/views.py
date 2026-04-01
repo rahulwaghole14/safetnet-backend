@@ -343,8 +343,9 @@ class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
             
             logger.info(f"✅ Area-based alert created: ID={alert.id}, Users={affected_users_count}")
             
-            # Step 8: Send push notifications ONLY to affected users
+            # Step 8: Send push notifications ONLY to affected users (Authoritative Dispatch)
             if affected_users_count > 0:
+                logger.info(f"📣 Manual notification dispatch for area_user_alert {alert.id}")
                 self._send_area_alert_notifications(alert, affected_users)
             else:
                 logger.warning(f"⚠️ No users in geofences for alert {alert.id}")

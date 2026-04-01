@@ -228,7 +228,8 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
             logger.info(f"Successfully synced SOSAlert {instance.id} ({instance.created_by_role}) to users.Alert table")
 
             # If this is an OFFICER alert, broadcast to users in the area
-            if instance.created_by_role == 'OFFICER':
+            # 🚨 EXCEPTION: area_user_alert is handled explicitly by its view for precision targeting
+            if instance.created_by_role == 'OFFICER' and instance.alert_type != 'area_user_alert':
                 logger.info(f"🔄 Broadcasting OFFICER alert {instance.id} to users...")
                 if instance.geofence:
                     from .geo_utils import get_users_in_geofence
