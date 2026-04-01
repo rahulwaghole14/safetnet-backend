@@ -125,16 +125,43 @@ export const LeafletMap = React.forwardRef<WebView, {
     // Process user markers
     const userMarkersJS = userMarkers && userMarkers.length > 0
       ? userMarkers.map(user => {
+          // Ensure coordinates are valid numbers before generating JS and clamp to precision
+          const lat = typeof user.latitude === 'number' ? user.latitude : parseFloat(String(user.latitude));
+          const lon = typeof user.longitude === 'number' ? user.longitude : parseFloat(String(user.longitude));
+          
+          if (isNaN(lat) || isNaN(lon)) return '';
+
           return `
-            var userMarker = L.marker([${user.latitude}, ${user.longitude}], {
+            console.log('📍 Adding user marker for ${user.username} at [${lat}, ${lon}]');
+            var userMarker = L.marker([${lat}, ${lon}], {
                 icon: L.divIcon({
-                    className: 'custom-div-icon',
-                    html: "<div style='background-color: #10b981; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);'></div>",
-                    iconSize: [18, 18],
-                    iconAnchor: [9, 9]
-                })
+                    className: 'user-marker-icon',
+                    html: "<div class='user-pulse'></div><div style='background-color: #10b981; width: 22px; height: 22px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;'>👤</div>",
+                    iconSize: [22, 22],
+                    iconAnchor: [11, 11]
+                }),
+                riseOnHover: true,
+                zIndexOffset: 2000
             }).addTo(map);
-            userMarker.bindPopup('<b>👤 User: ${user.username}</b><br/>Lat: ${user.latitude.toFixed(6)}<br/>Lng: ${user.longitude.toFixed(6)}${user.updated_at ? `<br/>Last Updated: ${new Date(user.updated_at).toLocaleTimeString()}` : ""}');
+            
+            // Add a permanent label if username exists
+            L.marker([${lat}, ${lon}], {
+                icon: L.divIcon({
+                    className: 'user-label-icon',
+                    html: "<div class='user-label'>${user.username}</div>",
+                    iconSize: [100, 20],
+                    iconAnchor: [50, -15]
+                }),
+                interactive: false,
+                zIndexOffset: 2000
+            }).addTo(map);
+
+            userMarker.bindPopup('<div style="font-family: sans-serif; padding: 5px;">' +
+              '<b style="color: #10b981; font-size: 14px;">👤 User: ${user.username}</b><br/>' +
+              '<hr style="margin: 5px 0; border: none; border-top: 1px solid #eee;" />' +
+              '<b>Coordinates:</b> ${lat.toFixed(6)}, ${lon.toFixed(6)}' + 
+              '${user.updated_at ? `<br/><b>Last Seen:</b> ${new Date(user.updated_at).toLocaleTimeString()}` : ""}' +
+              '</div>');
           `;
         }).join('\n')
       : '';
@@ -176,6 +203,40 @@ export const LeafletMap = React.forwardRef<WebView, {
             font-size: 18px;
             font-weight: bold;
             z-index: 1000;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .user-pulse {
+            background-color: rgba(16, 185, 129, 0.4);
+            border-radius: 50%;
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: 30px;
+            height: 30px;
+            animation: pulse 2s infinite;
+            z-index: -1;
+        }
+        .user-label {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 4px;
+            padding: 2px 6px;
+            border: 1px solid #10b981;
+            font-size: 10px;
+            font-weight: bold;
+            color: #065f46;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+        .user-marker-icon {
+            z-index: 1000 !important;
+        }
+        .user-label-icon {
+            z-index: 1001 !important;
         }
     </style>
 </head>
@@ -245,7 +306,7 @@ export const LeafletMap = React.forwardRef<WebView, {
                 console.log('Multiple geofence polygons added');
                 ` : ''}
 
-                // Add user markers from area
+                // Add user markers from area last to ensure they are on top
                 ${userMarkersJS ? `
                 ${userMarkersJS}
                 console.log('User markers added to map area');
