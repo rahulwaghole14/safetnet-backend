@@ -1,114 +1,83 @@
-import {PermissionsAndroid, Platform} from 'react-native';
+import {PermissionsAndroid, Platform, Permission} from 'react-native';
 
-export type PermissionType = 'location' | 'backgroundLocation' | 'camera' | 'notifications';
+export type PermissionType = 
+  | 'location' 
+  | 'backgroundLocation' 
+  | 'camera' 
+  | 'notifications' 
+  | 'photos'
+  | 'audio';
 
 /**
- * Service to handle permission requests with previous disclosure if needed
+ * Service to handle native Android permission requests.
+ * Designed to be called AFTER a prominent disclosure modal has been shown to the user.
+ * 
+ * IMPORTANT: Google Play Store requires every sensitive permission (Location, Camera, etc.)
+ * to be preceded by an in-app disclosure explaining WHAT, WHY, and HOW data is used.
  */
 class PermissionService {
   /**
-   * Check and request permission
-   * Usually called after a disclosure modal has been shown and accepted
+   * Translates our PermissionType to native Android PERMISSIONS
+   */
+  private getNativePermission(type: PermissionType): Permission | null {
+    if (Platform.OS !== 'android') return null;
+
+    switch (type) {
+      case 'location':
+        return PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION;
+      case 'backgroundLocation':
+        return Platform.Version >= 29 ? PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION : null;
+      case 'camera':
+        return PermissionsAndroid.PERMISSIONS.CAMERA;
+      case 'notifications':
+        return Platform.Version >= 33 ? (PermissionsAndroid.PERMISSIONS as any).POST_NOTIFICATIONS : null;
+      case 'photos':
+        // Android 13+ handles photos separately from generic storage
+        return Platform.Version >= 33 
+          ? (PermissionsAndroid.PERMISSIONS as any).READ_MEDIA_IMAGES
+          : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+      case 'audio':
+        return PermissionsAndroid.PERMISSIONS.RECORD_AUDIO;
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Requests a permission from the system.
+   * This method does NOT show its own disclosure; it expects one has been shown by the UI.
    */
   async requestPermission(type: PermissionType): Promise<boolean> {
-    if (Platform.OS !== 'android') {
-      return true;
-    }
+    const permission = this.getNativePermission(type);
+    if (!permission) return true;
 
     try {
-      let permission;
-      let title = '';
-      let message = '';
-
-      switch (type) {
-        case 'location':
-          permission = PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION;
-          title = 'Location Permission';
-          message = 'SafeTNet needs location access for safety features.';
-          break;
-        case 'backgroundLocation':
-          // Background location must be requested AFTER fine location on Android 10+
-          if (Platform.OS === 'android' && Platform.Version >= 29) {
-            // Ensure fine location is already granted (should be handled by UI disclosure flow)
-            const fineGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
-            if (!fineGranted) {
-              console.warn('[PermissionService] Background location requested without Fine Location granted.');
-              return false;
-            }
-            
-            permission = PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION;
-            title = 'Always-on Location Permission';
-            message = 'To enable geofencing and SOS alerts while the app is closed, please select "Allow all the time" in the next screen.';
-          } else {
-            return true; // Already handled by fine location on older versions
-          }
-          break;
-        case 'camera':
-          permission = PermissionsAndroid.PERMISSIONS.CAMERA;
-          title = 'Camera Permission';
-          message = 'SafeTNet needs camera access to take photos.';
-          break;
-        case 'notifications':
-          if (Platform.OS === 'android' && Platform.Version >= 33) {
-            permission = (PermissionsAndroid.PERMISSIONS as any).POST_NOTIFICATIONS;
-            title = 'Notification Permission';
-            message = 'SafeTNet needs notification permission to show SOS alerts and status.';
-          } else {
-            return true;
-          }
-          break;
-      }
-
-      if (!permission) return true;
-
-      const granted = await PermissionsAndroid.request(permission, {
-        title,
-        message,
-        buttonPositive: 'Allow',
-        buttonNegative: 'Deny',
-      });
-
+      /**
+       * We do NOT pass the 'rationale' object (title, message) to request() here. 
+       * Instead, we rely ENTIRELY on our custom Disclosure Modals in the UI.
+       * This ensures full control over the disclosure presentation as required by Google.
+       */
+      const granted = await PermissionsAndroid.request(permission);
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (err) {
-      console.warn('Permission request error:', err);
+      console.warn(`[PermissionService] Error requesting ${type}:`, err);
       return false;
     }
   }
 
   /**
-   * Check if a permission is already granted
+   * Checks if a permission is already granted.
    */
   async checkPermission(type: PermissionType): Promise<boolean> {
-    if (Platform.OS !== 'android') {
-      return true;
-    }
-
-    let permission;
-    switch (type) {
-      case 'location':
-        permission = PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION;
-        break;
-      case 'backgroundLocation':
-        if (Platform.Version >= 29) {
-          permission = PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION;
-        } else {
-          return true;
-        }
-        break;
-      case 'camera':
-        permission = PermissionsAndroid.PERMISSIONS.CAMERA;
-        break;
-      case 'notifications':
-        if (Platform.Version >= 33) {
-          permission = (PermissionsAndroid.PERMISSIONS as any).POST_NOTIFICATIONS;
-        } else {
-          return true;
-        }
-        break;
-    }
-
+    const permission = this.getNativePermission(type);
     if (!permission) return true;
-    return await PermissionsAndroid.check(permission);
+
+    try {
+      return await PermissionsAndroid.check(permission);
+    } catch (err) {
+      console.warn(`[PermissionService] Error checking ${type}:`, err);
+      return false;
+    }
   }
 }
 

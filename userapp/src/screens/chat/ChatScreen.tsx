@@ -33,8 +33,9 @@ import {
   ImageLibraryOptions,
 } from 'react-native-image-picker';
 import {ThemedAlert} from '../../components/common/ThemedAlert';
-import {CameraDisclosureModal} from '../../components/common/CameraDisclosureModal';
 import {permissionService} from '../../services/permissionService';
+import {CameraDisclosureModal} from '../../components/common/CameraDisclosureModal';
+import {PhotoDisclosureModal} from '../../components/common/PhotoDisclosureModal';
 import {getInitials, getAvatarColor} from '../../utils/avatarColors';
 import {
   downloadAndStoreFile,
@@ -207,6 +208,8 @@ const ChatScreen = () => {
   const [deleting, setDeleting] = useState(false);
   const [showCameraDisclosure, setShowCameraDisclosure] = useState(false);
   const [pendingCameraAction, setPendingCameraAction] = useState<(() => void) | null>(null);
+  const [showPhotoDisclosure, setShowPhotoDisclosure] = useState(false);
+  const [pendingPhotoAction, setPendingPhotoAction] = useState<(() => void) | null>(null);
   const [downloadingFiles, setDownloadingFiles] = useState<Set<string | number>>(new Set());
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
@@ -1200,14 +1203,39 @@ const ChatScreen = () => {
     );
   };
 
-  const openImageLibrary = () => {
+  const openImageLibrary = async () => {
     try {
-      if (!launchImageLibrary) {
-        showToast('Image picker not available. Please reinstall app.', ToastAndroid.LONG);
-        return;
+      if (Platform.OS === 'android') {
+        const isGranted = await permissionService.checkPermission('photos');
+        if (!isGranted) {
+          return new Promise((resolve) => {
+            setPendingPhotoAction(() => async () => {
+              const granted = await permissionService.requestPermission('photos');
+              if (granted) {
+                launchImageLibraryWithOptions();
+              } else {
+                showToast('Photo library access is required', ToastAndroid.SHORT);
+              }
+              resolve(granted);
+            });
+            setShowPhotoDisclosure(true);
+          });
+        }
       }
+      launchImageLibraryWithOptions();
+    } catch (error: any) {
+      console.error('Image picker error:', error);
+      showToast(error?.message || 'Failed to open image library', ToastAndroid.SHORT);
+    }
+  };
 
-      const options: ImageLibraryOptions = {
+  const launchImageLibraryWithOptions = () => {
+    if (!launchImageLibrary) {
+      showToast('Image picker not available. Please reinstall app.', ToastAndroid.LONG);
+      return;
+    }
+
+    const options: ImageLibraryOptions = {
         mediaType: 'photo' as MediaType,
         quality: 0.8,
         includeBase64: false,
@@ -1248,10 +1276,6 @@ const ChatScreen = () => {
           });
         }
       });
-    } catch (error: any) {
-      console.error('Image picker error:', error);
-      showToast(error?.message || 'Failed to open image library', ToastAndroid.SHORT);
-    }
   };
 
 
@@ -2155,6 +2179,22 @@ const ChatScreen = () => {
         onDecline={() => {
           setShowCameraDisclosure(false);
           setPendingCameraAction(null);
+        }}
+      />
+
+      {/* Photo Prominent Disclosure Modal */}
+      <PhotoDisclosureModal
+        visible={showPhotoDisclosure}
+        onAccept={async () => {
+          setShowPhotoDisclosure(false);
+          if (pendingPhotoAction) {
+            pendingPhotoAction();
+            setPendingPhotoAction(null);
+          }
+        }}
+        onDecline={() => {
+          setShowPhotoDisclosure(false);
+          setPendingPhotoAction(null);
         }}
       />
 

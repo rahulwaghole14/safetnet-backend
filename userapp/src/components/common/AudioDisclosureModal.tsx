@@ -9,17 +9,17 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '@react-navigation/native';
 
-interface NotificationDisclosureModalProps {
+interface AudioDisclosureModalProps {
   visible: boolean;
   onAccept: () => void;
   onDecline: () => void;
 }
 
 /**
- * Prominent Disclosure Modal for Notification Access
- * Required by Google Play Console User Data Policy (Android 13+)
+ * Prominent Disclosure Modal for Microphone Access
+ * Required by Google Play Console User Data Policy
  */
-export const NotificationDisclosureModal: React.FC<NotificationDisclosureModalProps> = ({
+export const AudioDisclosureModal: React.FC<AudioDisclosureModalProps> = ({
   visible,
   onAccept,
   onDecline,
@@ -39,35 +39,35 @@ export const NotificationDisclosureModal: React.FC<NotificationDisclosureModalPr
       <View style={styles.overlay}>
         <View style={[styles.container, {backgroundColor: colors.card}]}>
           <View style={styles.iconWrapper}>
-            <MaterialIcons name="notifications-active" size={32} color="#2563EB" />
+            <MaterialIcons name="mic" size={32} color="#2563EB" />
           </View>
           
           <Text style={[styles.title, {color: colors.text}]}>
-            Stay Protected with Notifications
+            Microphone Access
           </Text>
           
           <Text style={[styles.message, {color: colors.text}]}>
-            SafeTNet uses notifications to keep you informed about critical safety events:
+            SafeTNet needs access to your microphone to capture audio during emergency SOS alerts and video reports.
           </Text>
           
           <View style={styles.featureList}>
-            <View style={styles.featureItem}>
-              <MaterialIcons name="emergency" size={20} color="#DC2626" />
-              <Text style={[styles.featureText, {color: colors.text}]}>
-                <Text style={styles.boldText}>SOS Feedback:</Text> Receive immediate confirmation when your SOS alert is successfully transmitted and acknowledged by responders.
-              </Text>
-            </View>
-            
-            <View style={styles.featureItem}>
-              <MaterialIcons name="security" size={20} color="#047857" />
-              <Text style={[styles.featureText, {color: colors.text}]}>
-                <Text style={styles.boldText}>Safety Status:</Text> Get real-time updates about nearby safety officers and the status of your active SOS sessions.
-              </Text>
-            </View>
+                <View style={styles.featureItem}>
+                  <MaterialIcons name="emergency" size={20} color="#DC2626" />
+                  <Text style={[styles.featureText, {color: colors.text}]}>
+                    <Text style={styles.boldText}>SOS Evidence:</Text> Records audio when an SOS is triggered to provide critical evidence to emergency responders.
+                  </Text>
+                </View>
+                
+                <View style={styles.featureItem}>
+                  <MaterialIcons name="videocam" size={20} color="#047857" />
+                  <Text style={[styles.featureText, {color: colors.text}]}>
+                    <Text style={styles.boldText}>Voice Reports:</Text> Allows you to record voice descriptions when submitting safety reports or community alerts.
+                  </Text>
+                </View>
           </View>
           
           <Text style={[styles.footerText, {color: colors.text}]}>
-            Notifications are essential for providing you with real-time safety updates. We do not use notifications for advertising or promotional purposes.
+            Your audio data is only recorded during active SOS events or when you explicitly start a recording. It is never used for advertising.
           </Text>
           
           <View style={styles.actions}>
@@ -76,7 +76,7 @@ export const NotificationDisclosureModal: React.FC<NotificationDisclosureModalPr
               onPress={onDecline}
             >
               <Text style={[styles.secondaryText, {color: dark ? '#F1F5F9' : '#475569'}]}>
-                Remind me later
+                No, thanks
               </Text>
             </TouchableOpacity>
             
@@ -85,7 +85,9 @@ export const NotificationDisclosureModal: React.FC<NotificationDisclosureModalPr
               onPress={onAccept}
               activeOpacity={0.8}
             >
-              <Text style={styles.primaryText}>Enable Notifications</Text>
+              <Text style={styles.primaryText}>
+                Accept & Continue
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -193,4 +195,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NotificationDisclosureModal;
+export default AudioDisclosureModal;

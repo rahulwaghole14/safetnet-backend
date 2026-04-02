@@ -43,31 +43,31 @@ export const CameraDisclosureModal: React.FC<CameraDisclosureModalProps> = ({
           </View>
           
           <Text style={[styles.title, {color: colors.text}]}>
-            Camera Access Required
+            Camera Access for Safety
           </Text>
           
           <Text style={[styles.message, {color: colors.text}]}>
-            SafeTNet requires camera access to allow you to:
+            SafeTNet requires camera access to capture and share visual evidence during safety incidents.
           </Text>
           
           <View style={styles.featureList}>
             <View style={styles.featureItem}>
               <MaterialIcons name="chat" size={20} color="#2563EB" />
               <Text style={[styles.featureText, {color: colors.text}]}>
-                <Text style={styles.boldText}>Capture Photos:</Text> Take and send real-time photos to your emergency contacts or chat groups.
+                <Text style={styles.boldText}>Capture Photos:</Text> Take and send real-time photos to your emergency contacts, chat groups, and responders during an active SOS.
               </Text>
             </View>
             
             <View style={styles.featureItem}>
               <MaterialIcons name="report" size={20} color="#DC2626" />
               <Text style={[styles.featureText, {color: colors.text}]}>
-                <Text style={styles.boldText}>Incident Reporting:</Text> Attach photographic evidence to safety reports when sharing your status.
+                <Text style={styles.boldText}>Incident Reporting:</Text> Attach photographic evidence to safety reports to provide critical context to security teams.
               </Text>
             </View>
           </View>
           
           <Text style={[styles.footerText, {color: colors.text}]}>
-            We only access your camera when you explicitly use these features. We never record or capture images in the background.
+            We only access your camera when you explicitly use these features. Personal images are never recorded or captured in the background.
           </Text>
           
           <View style={styles.actions}>
@@ -75,7 +75,7 @@ export const CameraDisclosureModal: React.FC<CameraDisclosureModalProps> = ({
               style={[styles.secondaryBtn, {borderColor: colors.border}]} 
               onPress={onDecline}
             >
-              <Text style={[styles.secondaryText, {color: dark ? '#F8FAFC' : '#0F172A'}]}>
+              <Text style={[styles.secondaryText, {color: dark ? '#F1F5F9' : '#475569'}]}>
                 No, thanks
               </Text>
             </TouchableOpacity>
@@ -85,7 +85,7 @@ export const CameraDisclosureModal: React.FC<CameraDisclosureModalProps> = ({
               onPress={onAccept}
               activeOpacity={0.8}
             >
-              <Text style={styles.primaryText}>Grant Access</Text>
+              <Text style={styles.primaryText}>Accept & Continue</Text>
             </TouchableOpacity>
           </View>
         </View>

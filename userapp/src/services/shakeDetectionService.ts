@@ -146,8 +146,7 @@ class ShakeDetectionService {
   private isConfigured: boolean = false;
 
   constructor() {
-    // Configure push notifications lazily
-    this.configureNotifications();
+    // Notifications will be configured lazily when the service starts
   }
 
   private configureNotifications() {
@@ -245,6 +244,9 @@ class ShakeDetectionService {
       return;
     }
 
+    // Configure notifications before starting
+    this.configureNotifications();
+
     this.onShakeDetected = onShakeDetected;
     this.isActive = true;
     this.shakeTimestamps = [];
@@ -252,9 +254,9 @@ class ShakeDetectionService {
     try {
       // Disable React Native dev menu shake gesture to prevent conflicts
       // Method 1: Try using DevSettings (if available)
-      if (__DEV__ && DevSettings && typeof DevSettings.setIsShakeToShowDevMenuEnabled === 'function') {
+      if (__DEV__ && DevSettings && typeof (DevSettings as any).setIsShakeToShowDevMenuEnabled === 'function') {
         try {
-          DevSettings.setIsShakeToShowDevMenuEnabled(false);
+          (DevSettings as any).setIsShakeToShowDevMenuEnabled(false);
           console.log('Dev menu shake gesture disabled via DevSettings');
         } catch (e) {
           console.warn('Could not disable dev menu shake gesture via DevSettings:', e);
@@ -397,9 +399,9 @@ class ShakeDetectionService {
 
     // Re-enable React Native dev menu shake gesture when stopping
     // Method 1: Try using DevSettings (if available)
-    if (__DEV__ && DevSettings && typeof DevSettings.setIsShakeToShowDevMenuEnabled === 'function') {
+    if (__DEV__ && DevSettings && typeof (DevSettings as any).setIsShakeToShowDevMenuEnabled === 'function') {
       try {
-        DevSettings.setIsShakeToShowDevMenuEnabled(true);
+        (DevSettings as any).setIsShakeToShowDevMenuEnabled(true);
         console.log('Dev menu shake gesture re-enabled via DevSettings');
       } catch (e) {
         console.warn('Could not re-enable dev menu shake gesture via DevSettings:', e);

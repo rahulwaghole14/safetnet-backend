@@ -47,6 +47,7 @@ import {requestDirectCall} from '../../services/callService';
 import {sendSmsDirect} from '../../services/smsService';
 import {LocationDisclosureModal} from '../../components/common/LocationDisclosureModal';
 import {NotificationDisclosureModal} from '../../components/common/NotificationDisclosureModal';
+import {AudioDisclosureModal} from '../../components/common/AudioDisclosureModal';
 import {permissionService} from '../../services/permissionService';
 
 const COMMUNITY_MESSAGES = [
@@ -184,6 +185,8 @@ const HomeScreen = ({navigation}: any) => {
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showShakeSOSModal, setShowShakeSOSModal] = useState(false);
+  const [showAudioDisclosure, setShowAudioDisclosure] = useState(false);
+  const [isPermissionsChecked, setIsPermissionsChecked] = useState(false);
   const [isSendingSOSFromModal, setIsSendingSOSFromModal] = useState(false);
   const [alertState, setAlertState] = useState<{
     visible: boolean;
@@ -378,80 +381,66 @@ const HomeScreen = ({navigation}: any) => {
     };
   }, [user?.id]);
 
-  // Geofence monitoring - start/stop based on authentication and premium status
+  // Consolidated initialization - ensures sequential permission disclosures
+  // then starts background services only when allowed.
   useEffect(() => {
-    const initGeofence = async () => {
-      if (!isAuthenticated || !user?.id || !isPremium) {
-        // Stop monitoring if user is not authenticated, no user ID, or not premium
-        stopGeofenceMonitoring();
-        return;
-      }
+    let isMounted = true;
 
-      // Ensure appropriate location permissions (including background if needed)
-      // This will show disclosure if necessary
-      const hasPermission = await ensureBackgroundLocationPermission();
-      if (!hasPermission) {
-        console.warn('[HomeScreen] Geofence monitoring skipped: permission not granted');
-        return;
-      }
+    const initializeSafetyServices = async () => {
+      if (!isAuthenticated || !user?.id) return;
 
-      // Start geofence monitoring for premium users
-      const userId = parseInt(user.id, 10);
-      if (!isNaN(userId)) {
-        startGeofenceMonitoring(userId).catch((error) => {
-          console.error('Failed to start geofence monitoring:', error);
-        });
-      }
-    };
-
-    initGeofence();
-
-    // Cleanup on unmount or when conditions change
-    return () => {
-      stopGeofenceMonitoring();
-    };
-  }, [isAuthenticated, user?.id, isPremium]);
-
-  // Handle app state changes to refresh geofences when app comes to foreground
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (nextAppState === 'active' && isAuthenticated && user?.id && isPremium) {
-        // Refresh geofences when app comes to foreground
-        const userId = parseInt(user.id, 10);
-        if (!isNaN(userId)) {
-          refreshGeofences(userId).catch((error) => {
-            console.error('Failed to refresh geofences:', error);
-          });
-        }
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [isAuthenticated, user?.id, isPremium]);
-
-  // Sequential permissions - requested on Android after login
-  useEffect(() => {
-    if (Platform.OS === 'android' && isAuthenticated) {
-      const initPermissions = async () => {
-        // Step 1: Ensure foreground location disclosure
+      try {
+        // Step 1: Ensure Foreground Location (Disclosure -> System Prompt)
         const locationGranted = await ensureLocationPermission();
         
-        // Step 2: Ensure notification disclosure (Android 13+)
-        if (locationGranted && Number(Platform.Version) >= 33) {
-          const notificationsGranted = await ensureNotificationPermission();
-          if (notificationsGranted) {
-             console.log('[HomeScreen] Notification permission granted');
+        // Step 2: Ensure Notifications (Disclosure -> System Prompt)
+        if (locationGranted && Platform.OS === 'android' && Number(Platform.Version) >= 33) {
+          await ensureNotificationPermission();
+        }
+
+        // Step 3: Ensure Audio (Disclosure -> System Prompt)
+        // Only if not already checked this session
+        if (locationGranted && !isPermissionsChecked) {
+          await ensureAudioPermission();
+        }
+
+        if (!isMounted) return;
+        setIsPermissionsChecked(true);
+
+        // Step 4: After disclosures, start services if permissions allow
+        
+        // Initialize Geofencing
+        if (isPremium) {
+          const hasBgLoc = await ensureBackgroundLocationPermission();
+          if (hasBgLoc) {
+            const userId = parseInt(user.id, 10);
+            if (!isNaN(userId)) {
+              await startGeofenceMonitoring(userId);
+            }
           }
         }
-      };
-      
-      // Delay slightly to ensure app stability before starting disclosure flow
-      const timeout = setTimeout(initPermissions, 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [isAuthenticated]);
+
+        // Initialize Shake Detection
+        if (shakeToSendSOS) {
+          shakeDetectionService.start(() => {
+            if (isMounted) setShowShakeSOSModal(true);
+          });
+        }
+      } catch (error) {
+        console.error('[HomeScreen] Initialization error:', error);
+      }
+    };
+
+    // Run slightly after mount to ensure UI is ready for modals
+    const timeout = setTimeout(initializeSafetyServices, 500);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+      stopGeofenceMonitoring();
+      shakeDetectionService.stop();
+    };
+  }, [isAuthenticated, user?.id, isPremium, shakeToSendSOS]);
 
   // Permissions are now handled automatically by the system on app start
 
@@ -928,6 +917,26 @@ const HomeScreen = ({navigation}: any) => {
         resolve(granted);
       });
       setShowNotificationDisclosure(true);
+    });
+  };
+
+  const ensureAudioPermission = async (): Promise<boolean> => {
+    if (Platform.OS !== 'android') {
+      return true;
+    }
+
+    const isAlreadyGranted = await permissionService.checkPermission('audio');
+    if (isAlreadyGranted) {
+      return true;
+    }
+
+    // Show prominent disclosure for microphone
+    return new Promise((resolve) => {
+      setPendingPermissionAction(() => async () => {
+        const granted = await permissionService.requestPermission('audio');
+        resolve(granted);
+      });
+      setShowAudioDisclosure(true);
     });
   };
 
@@ -2124,6 +2133,22 @@ const HomeScreen = ({navigation}: any) => {
         }}
         onDecline={() => {
           setShowNotificationDisclosure(false);
+          setPendingPermissionAction(null);
+        }}
+      />
+
+      {/* Audio Disclosure Modal */}
+      <AudioDisclosureModal 
+        visible={showAudioDisclosure}
+        onAccept={async () => {
+          setShowAudioDisclosure(false);
+          if (pendingPermissionAction) {
+            await (pendingPermissionAction as any)();
+            setPendingPermissionAction(null);
+          }
+        }}
+        onDecline={() => {
+          setShowAudioDisclosure(false);
           setPendingPermissionAction(null);
         }}
       />

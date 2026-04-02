@@ -48,13 +48,13 @@ export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = (
           </View>
           
           <Text style={[styles.title, {color: colors.text}]}>
-            {isBackground ? 'Background Location Access' : 'Location Access'}
+            {isBackground ? 'Background Location Access' : 'Location Permission'}
           </Text>
           
           <Text style={[styles.message, {color: colors.text}]}>
             {isBackground 
-              ? 'SafeTNet collects location data to enable the following features even when the app is closed or not in use:' 
-              : 'SafeTNet collects location data to enable the following features while you are using the app:'}
+              ? 'SafeTNet collects location data to enable SOS Alerts and Geofence Monitoring even when the app is closed or not in use.' 
+              : 'SafeTNet collects location data to show nearby security officers and help centers while you are using the app.'}
           </Text>
           
           <View style={styles.featureList}>
@@ -63,14 +63,14 @@ export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = (
                 <View style={styles.featureItem}>
                   <MaterialIcons name="emergency-share" size={20} color="#DC2626" />
                   <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>SOS Alerts:</Text> Shares your live location with emergency contacts when you trigger an SOS.
+                    <Text style={styles.boldText}>SOS Alerts:</Text> Automatically shares your live location with emergency contacts when an SOS is triggered, even if the app is in the background.
                   </Text>
                 </View>
                 
                 <View style={styles.featureItem}>
                   <MaterialIcons name="notifications-active" size={20} color="#047857" />
                   <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>Geofence Monitoring:</Text> Notifies you and your contacts when you enter or exit safe zones.
+                    <Text style={styles.boldText}>Geofence Monitoring:</Text> Tracks your entry and exit from safe zones to notify your contacts in real-time, requiring background access.
                   </Text>
                 </View>
               </>
@@ -84,16 +84,9 @@ export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = (
                 </View>
                 
                 <View style={styles.featureItem}>
-                  <MaterialIcons name="map" size={20} color="#2563EB" />
-                  <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>Navigation:</Text> Helps you navigate safely within the city and see geofenced zones.
-                  </Text>
-                </View>
-
-                <View style={styles.featureItem}>
                   <MaterialIcons name="sos" size={20} color="#DC2626" />
                   <Text style={[styles.featureText, {color: colors.text}]}>
-                    <Text style={styles.boldText}>SOS Trigger:</Text> Accurately identifies your current location when you send an SOS.
+                    <Text style={styles.boldText}>Precise SOS:</Text> Accurately identifies your current location when you send an SOS.
                   </Text>
                 </View>
               </>
@@ -101,7 +94,7 @@ export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = (
           </View>
           
           <Text style={[styles.footerText, {color: colors.text}]}>
-            This data is only used for your safety and is never shared for advertising. You can change this in settings at any time.
+            Your location data is encrypted and used only for your personal safety. It is never shared with third parties for advertising.
           </Text>
           
           <View style={styles.actions}>
@@ -109,7 +102,7 @@ export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = (
               style={[styles.secondaryBtn, {borderColor: colors.border}]} 
               onPress={onDecline}
             >
-              <Text style={[styles.secondaryText, {color: dark ? '#F8FAFC' : '#0F172A'}]}>
+              <Text style={[styles.secondaryText, {color: dark ? '#F1F5F9' : '#475569'}]}>
                 No, thanks
               </Text>
             </TouchableOpacity>
@@ -119,7 +112,9 @@ export const LocationDisclosureModal: React.FC<LocationDisclosureModalProps> = (
               onPress={onAccept}
               activeOpacity={0.8}
             >
-              <Text style={styles.primaryText}>Accept & Continue</Text>
+              <Text style={styles.primaryText}>
+                {isBackground ? 'Allow all the time' : 'Accept & Continue'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
