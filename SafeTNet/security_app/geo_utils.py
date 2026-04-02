@@ -146,7 +146,7 @@ def is_point_in_geofence(lat: float, lon: float, geofence: Geofence) -> bool:
     return False
 
 
-def get_users_in_geofence(geofence: Geofence, max_age_hours: int = 24) -> List[UserLocation]:
+def get_users_in_geofence(geofence: Geofence, max_age_hours: int = 72) -> List[UserLocation]:
     """
     Get all users whose last known location is within the specified geofence.
     
@@ -296,3 +296,30 @@ def get_geofences_for_point(latitude: float, longitude: float) -> List[Geofence]
             matching.append(gf)
             
     return matching
+
+
+def update_user_location(user, latitude: float, longitude: float):
+    """
+    Update or create a UserLocation record for the given user.
+    This ensures that location data from various sources (User profile,
+    SOS events, Live Sharing) is synchronized in the central UserLocation table.
+    """
+    from .models import UserLocation
+    from django.utils import timezone
+    
+    # Ensure coordinates are floats
+    try:
+        lat = float(latitude)
+        lon = float(longitude)
+    except (ValueError, TypeError):
+        return None
+
+    # Update or create the record
+    UserLocation.objects.update_or_create(
+        user=user,
+        defaults={
+            'latitude': lat,
+            'longitude': lon,
+            'location_timestamp': timezone.now()
+        }
+    )

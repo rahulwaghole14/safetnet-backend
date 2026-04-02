@@ -53,10 +53,11 @@ export const UpdateProfileScreen = ({ navigation, route }: any) => {
         );
         setEmail(profile.email_id || profile.email || profile.officer_email || officer.email_id || '');
         
-        // Extract phone number - API returns it in 'phone' field
-        const phoneNumber = profile.phone || officer.mobile || '';
+        // Extract phone number - API returns it in 'phone' field, profileService maps to 'mobile'
+        const phoneNumber = profile.mobile || profile.phone || officer.mobile || '';
         
         console.log('[UpdateProfileScreen] Phone number extraction:', {
+          'profile.mobile': profile.mobile,
           'profile.phone': profile.phone,
           'officer.mobile': officer.mobile,
           'extracted_phone': phoneNumber,
@@ -122,6 +123,15 @@ export const UpdateProfileScreen = ({ navigation, route }: any) => {
       console.log('[UpdateProfileScreen] Sending update data:', JSON.stringify(updateData, null, 2));
 
       await profileService.updateProfile(officer.security_id, updateData);
+      
+      // Update local Redux store
+      dispatch(updateOfficerProfile({
+        name: name.trim(),
+        email_id: email.trim(),
+        mobile: mobile.trim(),
+        badge_number: badgeNumber.trim(),
+        shift_schedule: shiftSchedule.trim(),
+      }));
       
       console.log('[UpdateProfileScreen] Update successful!');
 

@@ -676,8 +676,12 @@ const HomeScreen = ({navigation}: any) => {
 
   useEffect(() => {
     if (familyActionMode === 'single') {
-      if (!selectedFamilyContactId && familyContacts.length > 0) {
-        setSelectedFamilyContactId(familyContacts[0].id?.toString() ?? null);
+      // Use strict null check to avoid resetting when an empty string or 0 is a valid ID
+      if (selectedFamilyContactId === null && familyContacts.length > 0) {
+        const firstContactId = (familyContacts[0].id ?? familyContacts[0].pk ?? '').toString();
+        if (firstContactId) {
+          setSelectedFamilyContactId(firstContactId);
+        }
       }
     }
   }, [familyContacts, familyActionMode, selectedFamilyContactId]);
@@ -771,7 +775,8 @@ const HomeScreen = ({navigation}: any) => {
     } else if (card.type === 'sms') {
       setCustomFamilyMessage(card.smsBody || '');
       setFamilyActionMode('single');
-      setSelectedFamilyContactId(familyContacts[0]?.id?.toString() ?? null);
+      const firstId = (familyContacts[0]?.id ?? familyContacts[0]?.pk ?? '').toString();
+      setSelectedFamilyContactId(firstId || null);
     }
 
     setActionCard(card);
@@ -1279,9 +1284,10 @@ const HomeScreen = ({navigation}: any) => {
     }
   };
 
-  const selectedFamilyContact = familyContacts.find(
-    (contact) => contact.id?.toString() === selectedFamilyContactId,
-  );
+  const selectedFamilyContact = familyContacts.find((contact) => {
+    const contactId = (contact.id ?? contact.pk ?? '').toString();
+    return contactId === selectedFamilyContactId;
+  });
 
   const handleFamilyCallAction = () => {
     if (!selectedFamilyContact || !selectedFamilyContact.phone) {
@@ -1380,7 +1386,8 @@ const HomeScreen = ({navigation}: any) => {
                   onPress={() => {
                     setFamilyActionMode(option.key);
                     if (option.key === 'single' && familyContacts.length > 0) {
-                      setSelectedFamilyContactId(familyContacts[0].id?.toString() ?? null);
+                      const firstId = (familyContacts[0].id ?? familyContacts[0].pk ?? '').toString();
+                      setSelectedFamilyContactId(firstId || null);
                     }
                   }}
                   activeOpacity={0.8}>
@@ -1401,12 +1408,12 @@ const HomeScreen = ({navigation}: any) => {
           ) : familyActionMode === 'single' ? (
             hasFamilyContacts ? (
               <View style={styles.familyList}>
-                {familyContacts.map((contact) => {
-                  const contactId = contact.id?.toString() ?? '';
+                {familyContacts.map((contact, index) => {
+                  const contactId = (contact.id ?? contact.pk ?? '').toString();
                   const isSelected = selectedFamilyContactId === contactId;
                   return (
                     <TouchableOpacity
-                      key={contactId || contact.phone}
+                      key={contactId || contact.phone || index}
                       style={[
                         styles.familyContactRow,
                         {

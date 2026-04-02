@@ -2,6 +2,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from .models import Case, SOSAlert, Notification, OfficerAlert
 from .fcm_service import fcm_service
+from .geo_utils import update_user_location
 import logging
 from django.conf import settings
 
@@ -67,6 +68,9 @@ def sync_sos_event_to_security_alert(sender, instance, created, **kwargs):
             )
             
             logger.info(f"Successfully synced SOSEvent {instance.id} → SOSAlert {sos_alert.id}")
+            
+            # Sync user location to UserLocation table for real-time tracking on officer map
+            update_user_location(instance.user, lat_float, lon_float)
             
     except Exception as e:
         logger.exception(f"Failed to sync SOSEvent {instance.id} to SOSAlert: {str(e)}")
@@ -357,3 +361,38 @@ def send_case_assignment_notification(sender, instance, created, **kwargs):
                 'notification_id': str(notification.id)
             }
         )
+
+
+@receiver(post_save, sender='users.User')
+def sync_user_location_on_save(sender, instance, **kwargs):
+    """
+    Sync user location from User model heartbeat to UserLocation table.
+    """
+    if instance.location and isinstance(instance.location, dict):
+        latitude = instance.location.get('latitude') or instance.location.get('lat')
+        longitude = instance.location.get('longitude') or instance.location.get('lng')
+        
+        if latitude is not None and longitude is not None:
+            update_user_location(instance, latitude, longitude)
+
+
+@receiver(post_save, sender='users_profile.LiveLocationShare')
+def sync_live_location_on_save(sender, instance, **kwargs):
+    """
+    Sync live location from LiveLocationShare to UserLocation table.
+    Ensures users sharing live are visible on the officer's geofence map.
+    """
+    if instance.is_active and instance.current_location:
+        latitude = instance.current_location.get('latitude') or instance.current_location.get('lat')
+        longitude = instance.current_location.get('longitude') or instance.current_location.get('lng')
+        
+        if latitude is not None and longitude is not None:
+            update_user_location(instance.user, latitude, longitude)
+
+
+@receiver(post_save, sender='users_profile.GeofenceEvent')
+def sync_geofence_event_on_save(sender, instance, **kwargs):
+    """
+    Sync location when a geofence entry/exit event occurs.
+    """
+    update_user_location(instance.user, instance.latitude, instance.longitude)

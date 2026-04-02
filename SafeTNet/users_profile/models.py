@@ -630,3 +630,30 @@ class ChatMessage(models.Model):
     def __str__(self):
         sender_name = self.sender.name if hasattr(self.sender, 'name') else 'User'
         return f"{sender_name} in {self.group.name}: {self.text[:50]}"
+
+
+class GeofenceEvent(models.Model):
+    """
+    Record geofence enter/exit events.
+    Used for tracking user movement across security zones.
+    """
+    EVENT_TYPES = [
+        ('entry', 'Entry'),
+        ('exit', 'Exit'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='geofence_events')
+    geofence = models.ForeignKey('users.Geofence', on_delete=models.CASCADE, related_name='user_events')
+    event_type = models.CharField(max_length=10, choices=EVENT_TYPES)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'users_geofence_event'
+        verbose_name = 'Geofence Event'
+        verbose_name_plural = 'Geofence Events'
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.user.username} {self.event_type} {self.geofence.name}"

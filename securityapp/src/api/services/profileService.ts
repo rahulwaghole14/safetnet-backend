@@ -7,16 +7,16 @@ export const profileService = {
     try {
       console.log('🔄 Fetching profile from /api/security/profile/');
       const response = await apiClient.get(API_ENDPOINTS.GET_PROFILE);
-      
+
       // Log full API response
       console.log("FULL PROFILE RESPONSE:", response.data);
 
       // Map UserProfileSerializer response to SecurityOfficer interface
       const backendData = response.data;
-      
+
       // Map assigned geofence if available
       const assignedGeofence = backendData.assigned_geofence || backendData.geofences?.[0] || null;
-      
+
       const officer: SecurityOfficer = {
         id: backendData.id,
         security_id: backendData.security_id || String(backendData.id),
@@ -28,7 +28,7 @@ export const profileService = {
         user_image: undefined,
         status: backendData.status || (backendData.is_active ? 'active' : 'inactive'),
         badge_number: backendData.badge_number || backendData.username,
-        shift_schedule: 'Day Shift', 
+        shift_schedule: 'Day Shift',
         stats: {
           total_responses: backendData.stats?.total_responses ?? 0,
           avg_response_time: backendData.stats?.avg_response_time ?? 0,
@@ -57,9 +57,9 @@ export const profileService = {
     try {
       console.log('[profileService] Updating profile for securityId:', securityId);
       console.log('[profileService] Update data:', JSON.stringify(updates, null, 2));
-      
+
       const response = await apiClient.patch(API_ENDPOINTS.UPDATE_PROFILE, updates);
-      
+
       console.log('[profileService] Update response:', response.data);
       return { result: 'success', msg: 'Profile updated successfully' };
     } catch (error: any) {

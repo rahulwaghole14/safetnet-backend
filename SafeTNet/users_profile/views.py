@@ -19,7 +19,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import (
     User, FamilyContact, CommunityMembership, SOSEvent,
-    LiveLocationShare, CommunityAlert, ChatGroup, ChatMessage, FREE_TIER_LIMITS
+    LiveLocationShare, CommunityAlert, ChatGroup, ChatMessage, 
+    GeofenceEvent, FREE_TIER_LIMITS
 )
 # Import PromoCode and Alert from users app
 from users.models import PromoCode
