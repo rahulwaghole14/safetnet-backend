@@ -76,7 +76,7 @@ class FCMService:
             # In Python SDK, use channel_id, not notification_channel_id
             if sound == 'siren':
                 android_notif_args['channel_id'] = 'sos_alerts'
-                android_notif_args['notification_priority'] = 'priority_max'
+                android_notif_args['notification_priority'] = 'max'
             
             android_config = messaging.AndroidConfig(
                 priority='high',
