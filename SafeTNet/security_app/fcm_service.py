@@ -70,6 +70,7 @@ class FCMService:
                 notification=messaging.AndroidNotification(
                     priority='max',
                     sound=sound,
+                    notification_channel_id='sos_alerts',
                 )
             )
 
