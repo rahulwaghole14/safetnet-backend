@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <queries>
         <intent>
@@ -141,6 +142,7 @@
         android:resource="@color/white" />
       <meta-data
         android:name="com.google.firebase.messaging.default_notification_channel_id"
-        android:value="sos_alerts" />
+        android:value="sos_alerts"
+        tools:replace="android:value" />
     </application>
 </manifest>
