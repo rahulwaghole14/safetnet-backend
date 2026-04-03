@@ -63,7 +63,7 @@ class TestNotificationView(OfficerOnlyMixin, APIView):
             logger.info(f"🔔 Manual test notification requested by officer: {request.user.email}")
             
             # Use the FCM service to send a direct message
-            success = fcm_service.send_to_officer(
+            result = fcm_service.send_to_officer(
                 officer=request.user,
                 title="🚨 Diagnostic Siren Test",
                 body="If you hear a siren, your device is correctly configured for SOS alerts.",
@@ -74,15 +74,17 @@ class TestNotificationView(OfficerOnlyMixin, APIView):
                 sound='siren'
             )
             
-            if success:
+            if result.get('success'):
                 return Response({
                     'status': 'success',
-                    'message': 'Test notification sent to Firebase. Check your device.'
+                    'message': f"Test notification sent to {result.get('success_count')} tokens. Check your device."
                 })
             else:
+                error_detail = result.get('first_error') or "All tokens failed"
                 return Response({
                     'status': 'error',
-                    'message': 'Failed to send notification via Firebase. Check if your token is registered.'
+                    'message': f"Firebase rejected all tokens. Reason: {error_detail}",
+                    'details': result
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
         except Exception as e:

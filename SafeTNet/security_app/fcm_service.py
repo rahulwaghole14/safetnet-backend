@@ -114,17 +114,31 @@ class FCMService:
             
             logger.info(f"FCM v1: Successfully sent {response.success_count} messages. Failures: {response.failure_count}")
             
+            first_error = None
             if response.failure_count > 0:
                 for index, resp in enumerate(response.responses):
                     if not resp.success:
                         token_snippet = registration_tokens[index][:15] if index < len(registration_tokens) else "Unknown"
-                        logger.warning(f"Token {token_snippet}... failed: {resp.exception}")
+                        error_msg = str(resp.exception)
+                        if not first_error:
+                            first_error = error_msg
+                        logger.warning(f"Token {token_snippet}... failed: {error_msg}")
             
-            return response.success_count > 0
+            return {
+                'success': response.success_count > 0,
+                'success_count': response.success_count,
+                'failure_count': response.failure_count,
+                'first_error': first_error
+            }
                 
         except Exception as e:
             logger.error(f"FCM v1 transmission error: {str(e)}")
-            return False
+            return {
+                'success': False,
+                'success_count': 0,
+                'failure_count': len(registration_tokens),
+                'first_error': str(e)
+            }
     
     def send_to_officer(self, officer, title, body, data=None, sound='default'):
         """Send notification to a specific officer"""
