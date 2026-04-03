@@ -53,48 +53,6 @@ class OfficerOnlyMixin:
     permission_classes = [IsAuthenticated, IsSecurityOfficer]
 
 
-class TestNotificationView(OfficerOnlyMixin, APIView):
-    """
-    Diagnostic endpoint to send a test siren notification directly to the logged-in officer.
-    POST /api/security/profile/test-notification/
-    """
-    def post(self, request):
-        try:
-            logger.info(f"🔔 Manual test notification requested by officer: {request.user.email}")
-            
-            # Use the FCM service to send a direct message
-            result = fcm_service.send_to_officer(
-                officer=request.user,
-                title="🚨 Diagnostic Siren Test",
-                body="If you hear a siren, your device is correctly configured for SOS alerts.",
-                data={
-                    'type': 'diagnostic_test',
-                    'timestamp': str(timezone.now())
-                },
-                sound='siren'
-            )
-            
-            if result.get('success'):
-                return Response({
-                    'status': 'success',
-                    'message': f"Test notification sent to {result.get('success_count')} tokens. Check your device."
-                })
-            else:
-                error_detail = result.get('first_error') or "All tokens failed"
-                return Response({
-                    'status': 'error',
-                    'message': f"Firebase rejected all tokens. Reason: {error_detail}",
-                    'details': result
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
-        except Exception as e:
-            logger.error(f"Test notification error: {str(e)}", exc_info=True)
-            return Response({
-                'status': 'error',
-                'message': f'Server error: {str(e)}'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 class SOSAlertViewSet(OfficerOnlyMixin, viewsets.ModelViewSet):
     queryset = SOSAlert.objects.filter(is_deleted=False)
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
