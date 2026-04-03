@@ -64,8 +64,12 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
             const type = remoteMessage.data?.type;
             if (type === 'sos_alert' || type === 'emergency' || type === 'area_security_alert' || type === 'officer_alert_broadcast' || type === 'sos_alert_confirmation') {
                 
-                const title = remoteMessage.notification?.title || "🚨 SECURITY ALERT";
-                const body = remoteMessage.notification?.body || "A new security alert has been issued for your area.";
+                // Fallback for title and body from data payload if notification object is missing
+                const rawTitle = remoteMessage.notification?.title || remoteMessage.data?.title || "🚨 SECURITY ALERT";
+                const rawBody = remoteMessage.notification?.body || remoteMessage.data?.body || "A new security alert has been issued for your area.";
+
+                const title = String(rawTitle);
+                const body = String(rawBody);
 
                 Alert.alert(
                     title,

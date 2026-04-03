@@ -69,21 +69,27 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
         const unsubscribeMessage = messaging().onMessage(async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
             console.log('[FCM] Foreground Message:', JSON.stringify(remoteMessage));
             
-            // Handle SOS alerts in foreground
-            if (remoteMessage.data?.type === 'sos_alert' || remoteMessage.data?.type === 'emergency') {
-                // Check if this alert was created by the current officer to avoid self-notification
-                const body = remoteMessage.notification?.body || '';
+            // Handle SOS alerts and officer broadcasts in the foreground
+            const type = remoteMessage.data?.type;
+            if (type === 'sos_alert' || type === 'emergency' || type === 'area_security_alert' || type === 'officer_alert_broadcast') {
+                
+                // Fallback for title and body from data payload if notification object is missing
+                const rawTitle = remoteMessage.notification?.title || remoteMessage.data?.title || "🚨 SECURITY ALERT";
+                const rawBody = remoteMessage.notification?.body || remoteMessage.data?.body || "A new security alert has been issued.";
+                
+                const title = String(rawTitle);
+                const body = String(rawBody);
                 const officerName = officer?.name || '';
                 
+                // Check if this alert was created by the current officer to avoid self-notification
                 if (officerName && body.includes(officerName)) {
                     console.log('🚫 Skipping foreground notification alert for creator:', officerName);
                     return;
                 }
 
-                // For foreground alerts, show a persistent notification or top-level UI
                 Alert.alert(
-                    "🚨 EMERGENCY SOS", // Changed from original "🚨 EMERGENCY SOS" to match instruction
-                    remoteMessage.notification?.body || "New SOS Alert received!",
+                    title,
+                    body,
                     [
                         { 
                             text: 'VIEW ALERT',
