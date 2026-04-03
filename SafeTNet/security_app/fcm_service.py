@@ -36,7 +36,7 @@ class FCMService:
             logger.error(f"Failed to initialize Firebase Admin SDK from config: {str(e)}")
             return False
 
-    def send_notification(self, registration_tokens, title, body, data=None):
+    def send_notification(self, registration_tokens, title, body, data=None, sound='default'):
         """
         Send push notification to FCM tokens using FCM v1 Multicast
         """
@@ -69,7 +69,7 @@ class FCMService:
                 priority='high',
                 notification=messaging.AndroidNotification(
                     priority='max',
-                    sound='default',
+                    sound=sound,
                 )
             )
 
@@ -77,7 +77,7 @@ class FCMService:
             apns_config = messaging.APNSConfig(
                 payload=messaging.APNSPayload(
                     aps=messaging.Aps(
-                        sound='default',
+                        sound=sound,
                         content_available=True,
                         category='SOS_ALERT'
                     ),
@@ -118,17 +118,17 @@ class FCMService:
             logger.error(f"FCM v1 transmission error: {str(e)}")
             return False
     
-    def send_to_officer(self, officer, title, body, data=None):
+    def send_to_officer(self, officer, title, body, data=None, sound='default'):
         """Send notification to a specific officer"""
         registration_tokens = getattr(officer, 'fcm_tokens', [])
-        return self.send_notification(registration_tokens, title, body, data)
+        return self.send_notification(registration_tokens, title, body, data, sound=sound)
 
-    def send_to_user(self, user, title, body, data=None):
+    def send_to_user(self, user, title, body, data=None, sound='default'):
         """Send notification to a specific user"""
         registration_tokens = getattr(user, 'fcm_tokens', [])
-        return self.send_notification(registration_tokens, title, body, data)
+        return self.send_notification(registration_tokens, title, body, data, sound=sound)
         
-    def send_to_users(self, users_queryset, title, body, data=None):
+    def send_to_users(self, users_queryset, title, body, data=None, sound='default'):
         """Send notification to multiple users"""
         all_tokens = []
         for user in users_queryset:
@@ -144,7 +144,7 @@ class FCMService:
         success = False
         for i in range(0, len(all_tokens), chunk_size):
             chunk = all_tokens[i:i + chunk_size]
-            if self.send_notification(chunk, title, body, data):
+            if self.send_notification(chunk, title, body, data, sound=sound):
                 success = True
                 
         return success

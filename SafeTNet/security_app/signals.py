@@ -179,7 +179,8 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                         'sos_alert_id': str(instance.id),
                         'notification_id': str(notification.id),
                         'location': f"{instance.location_lat},{instance.location_long}"
-                    }
+                    },
+                    sound='siren'
                 )
             except Exception as e:
                 logger.error(f"Failed to send notification to officer {officer.username}: {str(e)}")
@@ -194,7 +195,8 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                     data={
                         'type': 'sos_alert_confirmation',
                         'sos_alert_id': str(instance.id),
-                    }
+                    },
+                    sound='siren'
                 )
             except Exception as e:
                 logger.error(f"Failed to send confirmation to user {instance.user.username}: {str(e)}")
@@ -250,7 +252,8 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                     data={
                         'type': 'area_security_alert',
                         'sos_alert_id': str(instance.id),
-                    }
+                    },
+                    sound='siren' if instance.priority == 'high' or instance.alert_type == 'emergency' else 'default'
                 )
         except Exception as e:
             logger.error(f"Failed to sync/broadcast alert to users: {str(e)}")
@@ -327,7 +330,8 @@ def send_officer_alert_broadcast(sender, instance, created, **kwargs):
                 data={
                     'type': 'officer_alert_broadcast',
                     'officer_alert_id': str(instance.id),
-                }
+                },
+                sound='siren' if instance.alert_type == 'emergency' else 'default'
             )
         except Exception as e:
             logger.error(f"Failed to broadcast OfficerAlert to users: {str(e)}")
