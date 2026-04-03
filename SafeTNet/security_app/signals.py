@@ -180,7 +180,7 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 )
                 
                 # Send FCM push notification
-                is_emergency = instance.alert_type == 'emergency'
+                is_emergency = instance.alert_type == 'emergency' or instance.created_by_role == 'USER'
                 fcm_service.send_to_officer(
                     officer=officer,
                     title="🚨 New SOS Alert" if is_emergency else "⚠️ New Security Alert",
@@ -256,7 +256,7 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 else:
                     users_to_notify = User.objects.filter(is_active=True)
 
-                is_emergency_broadcast = instance.alert_type == 'emergency'
+                is_emergency_broadcast = instance.alert_type == 'emergency' or instance.created_by_role == 'USER'
                 logger.info(f"🔄 Broadcasting to {len(users_to_notify)} users. Channel: {'sos_alerts' if is_emergency_broadcast else 'general_alerts'}")
                 fcm_service.send_to_users(
                     users_queryset=users_to_notify,
