@@ -170,17 +170,18 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 )
                 
                 # Send FCM push notification
+                is_emergency = instance.alert_type == 'emergency' or instance.priority == 'high'
                 fcm_service.send_to_officer(
                     officer=officer,
-                    title="🚨 New SOS Alert",
-                    body=f"Emergency alert from {instance.user.username}",
+                    title="🚨 New SOS Alert" if is_emergency else "⚠️ New Security Alert",
+                    body=f"Emergency alert from {instance.user.username}" if is_emergency else f"Security alert: {instance.user.username}",
                     data={
                         'type': 'sos_alert',
                         'sos_alert_id': str(instance.id),
                         'notification_id': str(notification.id),
                         'location': f"{instance.location_lat},{instance.location_long}"
                     },
-                    sound='siren'
+                    sound='siren' if is_emergency else 'default'
                 )
             except Exception as e:
                 logger.error(f"Failed to send notification to officer {officer.username}: {str(e)}")
@@ -245,6 +246,7 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 else:
                     users_to_notify = User.objects.filter(is_active=True)
 
+                is_emergency_broadcast = instance.alert_type == 'emergency' or instance.priority == 'high'
                 fcm_service.send_to_users(
                     users_queryset=users_to_notify,
                     title=f"Security Alert: {instance.alert_type.replace('_', ' ').title()}",
@@ -253,7 +255,7 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                         'type': 'area_security_alert',
                         'sos_alert_id': str(instance.id),
                     },
-                    sound='siren' if instance.priority == 'high' or instance.alert_type == 'emergency' else 'default'
+                    sound='siren' if is_emergency_broadcast else 'default'
                 )
         except Exception as e:
             logger.error(f"Failed to sync/broadcast alert to users: {str(e)}")

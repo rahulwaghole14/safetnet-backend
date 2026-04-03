@@ -54,10 +54,24 @@ class MainActivity : ReactActivity() {
               enableVibration(true)
           }
           
-          // Register the channel with the system
+          // Register SOS channel
           val notificationManager: NotificationManager =
               getSystemService(NotificationManager::class.java)
           notificationManager.createNotificationChannel(channel)
+          
+          // Create and register General Alerts channel (Default sound)
+          val generalChannelId = "general_alerts"
+          val generalName = "General & Security Alerts"
+          val generalDescription = "General information and non-emergency security alerts"
+          val generalImportance = NotificationManager.IMPORTANCE_HIGH
+          
+          val generalChannel = NotificationChannel(generalChannelId, generalName, generalImportance).apply {
+              description = generalDescription
+              // We do not setSound, so it uses the system default
+              enableLights(true)
+              enableVibration(true)
+          }
+          notificationManager.createNotificationChannel(generalChannel)
       }
   }
   

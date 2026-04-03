@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import messaging from '@react-native-firebase/messaging';
 import { apiService } from '../services/apiService';
-import { Platform } from 'react-native';
+import { Platform, PermissionsAndroid, Alert } from 'react-native';
 
 export const usePushNotifications = (isAuthenticated: boolean) => {
     useEffect(() => {
@@ -18,6 +18,16 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
                 if (!enabled) {
                     console.log('[FCM] Permission not granted');
                     return;
+                }
+            } else if (Platform.OS === 'android') {
+                if (Platform.Version >= 33) {
+                    const granted = await PermissionsAndroid.request(
+                        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+                    );
+                    if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+                        console.log('[FCM] Permission not granted on Android 13+');
+                        return;
+                    }
                 }
             }
 
@@ -47,9 +57,29 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
         });
 
         // Handle messages in foreground
-        const unsubscribeMessage = messaging().onMessage(async remoteMessage => {
+        const unsubscribeMessage = messaging().onMessage(async (remoteMessage) => {
             console.log('[FCM] Foreground Message:', JSON.stringify(remoteMessage));
-            // Optional: Show in-app toast here if needed
+            
+            // Handle SOS alerts and officer broadcasts in the foreground
+            const type = remoteMessage.data?.type;
+            if (type === 'sos_alert' || type === 'emergency' || type === 'area_security_alert' || type === 'officer_alert_broadcast' || type === 'sos_alert_confirmation') {
+                
+                const title = remoteMessage.notification?.title || "🚨 SECURITY ALERT";
+                const body = remoteMessage.notification?.body || "A new security alert has been issued for your area.";
+
+                Alert.alert(
+                    title,
+                    body,
+                    [
+                        { 
+                            text: 'OK', 
+                            style: 'default',
+                            onPress: () => console.log('[FCM] User dismissed foreground alert') 
+                        }
+                    ],
+                    { cancelable: false }
+                );
+            }
         });
 
         return () => {

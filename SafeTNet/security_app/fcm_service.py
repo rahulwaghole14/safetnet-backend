@@ -65,12 +65,15 @@ class FCMService:
                     data_payload[str(k)] = str(v)
 
             # Android-specific configuration for high priority and loud alerts
+            # Determine target notification channel based on sound
+            target_channel = 'sos_alerts' if sound == 'siren' else 'general_alerts'
+            
             android_config = messaging.AndroidConfig(
                 priority='high',
                 notification=messaging.AndroidNotification(
-                    priority='max',
+                    priority='max' if sound == 'siren' else 'high',
                     sound=sound,
-                    notification_channel_id='sos_alerts',
+                    notification_channel_id=target_channel,
                 )
             )
 
@@ -86,6 +89,7 @@ class FCMService:
             )
 
             # Convert each token to a Message object
+            logger.info(f"FCM v1: Preparing to send to {len(registration_tokens)} tokens: {registration_tokens}")
             messages = [
                 messaging.Message(
                     notification=messaging.Notification(
@@ -102,16 +106,13 @@ class FCMService:
             # send_each is the modern batch replacement in Firebase Admin SDK 6.x+
             response = messaging.send_each(messages)
             
-            # Note: messaging.send_each(messages) is the most modern way in SDK 6.x
-            # Let's try send_each directly if send_each_for_multicast is tricky
-            # Actually, the simplest for 6.9.0 is send_each
-            
             logger.info(f"FCM v1: Successfully sent {response.success_count} messages. Failures: {response.failure_count}")
             
             if response.failure_count > 0:
                 for index, resp in enumerate(response.responses):
                     if not resp.success:
-                        logger.warning(f"Token {registration_tokens[index][:15]}... failed: {resp.exception}")
+                        token_snippet = registration_tokens[index][:15] if index < len(registration_tokens) else "Unknown"
+                        logger.warning(f"Token {token_snippet}... failed: {resp.exception}")
             
             return response.success_count > 0
                 
