@@ -13,10 +13,15 @@ import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import {
   toggleNotifications,
   setNotificationPermissionGranted,
+  toggleQuietHours,
+  toggleDoNotDisturb,
+  toggleVibration,
+  toggleSound,
 } from '../../store/slices/settingsSlice';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../../contexts/ThemeContext';
 import { typography, spacing } from '../../utils';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 
 export const NotificationSettingsScreen = () => {
   const navigation = useNavigation();
@@ -34,7 +39,6 @@ export const NotificationSettingsScreen = () => {
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: spacing.base,
-      paddingTop: 10,
       paddingBottom: spacing.md,
       backgroundColor: colors.cardBackground,
       borderBottomLeftRadius: 24,
@@ -241,156 +245,158 @@ export const NotificationSettingsScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.7}
-        >
-          <Icon name="arrow-back" size={24} color={colors.darkText} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Notification Settings</Text>
-        <View style={styles.placeholder} />
-      </View>
-
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* General Settings */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Icon name="notifications" size={28} color={colors.white} style={styles.sectionIcon} />
-            <Text style={styles.sectionTitle}>General</Text>
-          </View>
-          <View style={styles.sectionContent}>
-            {renderSettingItem({
-              title: 'Push Notifications',
-              subtitle: 'Receive alerts and updates',
-              type: 'toggle',
-              value: settings.notificationsEnabled,
-              onToggle: handleToggleNotifications,
-            })}
-            {renderSettingItem({
-              title: 'Emergency Alerts',
-              subtitle: 'Critical security notifications',
-              type: 'toggle',
-              value: settings.notificationsEnabled, // Could be separate setting
-              onToggle: handleToggleNotifications,
-            })}
-          </View>
+    <ScreenWrapper scrollable={false} backgroundColor={colors.background}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <Icon name="arrow-back" size={24} color={colors.darkText} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Notification Settings</Text>
+          <View style={styles.placeholder} />
         </View>
 
-        {/* Alert Types */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Icon name="warning" size={28} color={colors.white} style={styles.sectionIcon} />
-            <Text style={styles.sectionTitle}>Alert Types</Text>
-          </View>
-          <View style={styles.sectionContent}>
-            {renderSettingItem({
-              title: 'Security Alerts',
-              subtitle: 'Intrusion and breach notifications',
-              type: 'toggle',
-              value: settings.notificationsEnabled,
-              onToggle: handleToggleNotifications,
-            })}
-            {renderSettingItem({
-              title: 'Location Updates',
-              subtitle: 'Geofence entry/exit alerts',
-              type: 'toggle',
-              value: settings.notificationsEnabled,
-              onToggle: handleToggleNotifications,
-            })}
-            {renderSettingItem({
-              title: 'System Status',
-              subtitle: 'Service availability updates',
-              type: 'toggle',
-              value: settings.notificationsEnabled,
-              onToggle: handleToggleNotifications,
-            })}
-          </View>
-        </View>
-
-        {/* Schedule */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Icon name="schedule" size={28} color={colors.white} style={styles.sectionIcon} />
-            <Text style={styles.sectionTitle}>Schedule</Text>
-          </View>
-          <View style={styles.sectionContent}>
-            {renderSettingItem({
-              title: 'Quiet Hours',
-              subtitle: 'Disable notifications 10 PM - 6 AM',
-              type: 'toggle',
-              value: false, // Could be a separate setting
-              onToggle: () => {},
-            })}
-            {renderSettingItem({
-              title: 'Do Not Disturb',
-              subtitle: 'Temporarily silence all notifications',
-              type: 'toggle',
-              value: false, // Could be a separate setting
-              onToggle: () => {},
-            })}
-          </View>
-        </View>
-
-        {/* Advanced */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Icon name="settings" size={28} color={colors.white} style={styles.sectionIcon} />
-            <Text style={styles.sectionTitle}>Advanced</Text>
-          </View>
-          <View style={styles.sectionContent}>
-            {renderSettingItem({
-              title: 'Vibration',
-              subtitle: 'Vibrate for notifications',
-              type: 'toggle',
-              value: true, // Could be a separate setting
-              onToggle: () => {},
-            })}
-            {renderSettingItem({
-              title: 'Sound',
-              subtitle: 'Play notification sounds',
-              type: 'toggle',
-              value: true, // Could be a separate setting
-              onToggle: () => {},
-            })}
-          </View>
-        </View>
-
-        {/* Permission Status */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Icon name="security" size={28} color={colors.white} style={styles.sectionIcon} />
-            <Text style={styles.sectionTitle}>Permission Status</Text>
-          </View>
-          <View style={styles.sectionContent}>
-            <View style={styles.permissionItem}>
-              <View style={styles.permissionInfo}>
-                <Text style={styles.permissionTitle}>Notification Permission</Text>
-                <Text style={[styles.permissionStatus, {
-                  color: settings.notificationPermissionGranted ? colors.success : colors.error
-                }]}>
-                  {settings.notificationPermissionGranted ? 'Granted' : 'Not Granted'}
-                </Text>
-              </View>
-              {!settings.notificationPermissionGranted && (
-                <TouchableOpacity
-                  style={styles.grantButton}
-                  onPress={() => {
-                    dispatch(setNotificationPermissionGranted(true));
-                    Alert.alert('Success', 'Notification permissions granted!');
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.grantButtonText}>Grant</Text>
-                </TouchableOpacity>
-              )}
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          {/* General Settings */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Icon name="notifications" size={28} color={colors.white} style={styles.sectionIcon} />
+              <Text style={styles.sectionTitle}>General</Text>
+            </View>
+            <View style={styles.sectionContent}>
+              {renderSettingItem({
+                title: 'Push Notifications',
+                subtitle: 'Receive alerts and updates',
+                type: 'toggle',
+                value: settings.notificationsEnabled,
+                onToggle: handleToggleNotifications,
+              })}
+              {renderSettingItem({
+                title: 'Emergency Alerts',
+                subtitle: 'Critical security notifications',
+                type: 'toggle',
+                value: settings.notificationsEnabled, // Could be separate setting
+                onToggle: handleToggleNotifications,
+              })}
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </View>
+
+          {/* Alert Types */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Icon name="warning" size={28} color={colors.white} style={styles.sectionIcon} />
+              <Text style={styles.sectionTitle}>Alert Types</Text>
+            </View>
+            <View style={styles.sectionContent}>
+              {renderSettingItem({
+                title: 'Security Alerts',
+                subtitle: 'Intrusion and breach notifications',
+                type: 'toggle',
+                value: settings.notificationsEnabled,
+                onToggle: handleToggleNotifications,
+              })}
+              {renderSettingItem({
+                title: 'Location Updates',
+                subtitle: 'Geofence entry/exit alerts',
+                type: 'toggle',
+                value: settings.notificationsEnabled,
+                onToggle: handleToggleNotifications,
+              })}
+              {renderSettingItem({
+                title: 'System Status',
+                subtitle: 'Service availability updates',
+                type: 'toggle',
+                value: settings.notificationsEnabled,
+                onToggle: handleToggleNotifications,
+              })}
+            </View>
+          </View>
+
+          {/* Schedule */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Icon name="schedule" size={28} color={colors.white} style={styles.sectionIcon} />
+              <Text style={styles.sectionTitle}>Schedule</Text>
+            </View>
+            <View style={styles.sectionContent}>
+              {renderSettingItem({
+                title: 'Quiet Hours',
+                subtitle: 'Disable notifications 10 PM - 6 AM',
+                type: 'toggle',
+                value: settings.quietHoursEnabled,
+                onToggle: () => dispatch(toggleQuietHours()),
+              })}
+              {renderSettingItem({
+                title: 'Do Not Disturb',
+                subtitle: 'Temporarily silence all notifications',
+                type: 'toggle',
+                value: settings.doNotDisturbEnabled,
+                onToggle: () => dispatch(toggleDoNotDisturb()),
+              })}
+            </View>
+          </View>
+
+          {/* Advanced */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Icon name="settings" size={28} color={colors.white} style={styles.sectionIcon} />
+              <Text style={styles.sectionTitle}>Advanced</Text>
+            </View>
+            <View style={styles.sectionContent}>
+              {renderSettingItem({
+                title: 'Vibration',
+                subtitle: 'Vibrate for notifications',
+                type: 'toggle',
+                value: settings.vibrationEnabled,
+                onToggle: () => dispatch(toggleVibration()),
+              })}
+              {renderSettingItem({
+                title: 'Sound',
+                subtitle: 'Play notification sounds',
+                type: 'toggle',
+                value: settings.soundEnabled,
+                onToggle: () => dispatch(toggleSound()),
+              })}
+            </View>
+          </View>
+
+          {/* Permission Status */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Icon name="security" size={28} color={colors.white} style={styles.sectionIcon} />
+              <Text style={styles.sectionTitle}>Permission Status</Text>
+            </View>
+            <View style={styles.sectionContent}>
+              <View style={styles.permissionItem}>
+                <View style={styles.permissionInfo}>
+                  <Text style={styles.permissionTitle}>Notification Permission</Text>
+                  <Text style={[styles.permissionStatus, {
+                    color: settings.notificationPermissionGranted ? colors.success : colors.error
+                  }]}>
+                    {settings.notificationPermissionGranted ? 'Granted' : 'Not Granted'}
+                  </Text>
+                </View>
+                {!settings.notificationPermissionGranted && (
+                  <TouchableOpacity
+                    style={styles.grantButton}
+                    onPress={() => {
+                      dispatch(setNotificationPermissionGranted(true));
+                      Alert.alert('Success', 'Notification permissions granted!');
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.grantButtonText}>Grant</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
+    </ScreenWrapper>
   );
-};
+};

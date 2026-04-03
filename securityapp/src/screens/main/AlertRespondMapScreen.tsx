@@ -23,6 +23,7 @@ import { useColors } from '../../utils/colors';
 import { typography, spacing } from '../../utils';
 import { formatExactTime } from '../../utils/helpers';
 import { LeafletMap } from '../../components/maps/LeafletMap';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import Toast from 'react-native-toast-message';
 import { Alert } from '../../types/alert.types';
 
@@ -645,17 +646,21 @@ export const AlertRespondMapScreen = () => {
   // Loading state
   if (isLoading) {
     return (
-      <View style={[styles.container, styles.centered]}>
+      <ScreenWrapper
+        backgroundColor={colors.background}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={[styles.loadingText, { color: colors.mediumText }]}>Loading alert details...</Text>
-      </View>
+      </ScreenWrapper>
     );
   }
 
   // Error state or missing GPS
   if (error || !alert || !alertLocation) {
     return (
-      <View style={[styles.container, styles.centered]}>
+      <ScreenWrapper
+        backgroundColor={colors.background}
+      >
         <Icon name="error" size={48} color={colors.error} />
         <Text style={[styles.errorText, { color: colors.error }]}>{error || 'Alert has no valid GPS location'}</Text>
         <TouchableOpacity
@@ -664,15 +669,17 @@ export const AlertRespondMapScreen = () => {
         >
           <Text style={[styles.retryButtonText, { color: colors.textOnPrimary }]}>Go Back</Text>
         </TouchableOpacity>
-      </View>
+      </ScreenWrapper>
     );
   }
   
   const geofenceCoordinates = getGeofenceCoordinates();
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
+    <ScreenWrapper
+      backgroundColor={colors.background}
+      scrollable={false}
+    >
       <View style={[styles.header, { backgroundColor: colors.white, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <Icon name="arrow-back" size={24} color={colors.darkText} />
@@ -681,7 +688,6 @@ export const AlertRespondMapScreen = () => {
         <View style={styles.placeholder} />
       </View>
 
-      {/* Alert Info */}
       <View style={[styles.alertInfo, { backgroundColor: colors.white, borderBottomColor: colors.border }]}>
         <View style={styles.alertHeader}>
           <View style={styles.alertTypeContainer}>
@@ -727,12 +733,9 @@ export const AlertRespondMapScreen = () => {
         </View>
       </View>
 
-      {/* Map */}
       <View style={styles.mapContainer}>
-
         {alertLocation ? (
           <>
-            {/* Location Info Bar */}
             <View style={[styles.locationInfoBar, { backgroundColor: colors.white, borderBottomColor: colors.border }]}>
               <Icon name="location-on" size={16} color={colors.primary} />
               <Text 
@@ -787,23 +790,22 @@ export const AlertRespondMapScreen = () => {
               longitude={alertLocation.longitude}
               officerLatitude={officerLocation?.latitude}
               officerLongitude={officerLocation?.longitude}
-              zoom={16} // Street level zoom
-              height={screenHeight * 0.45} // Adjust height for info bar
+              zoom={16}
+              height={screenHeight * 0.45}
               showMarker={true}
-              markerTitle="Alert Location"  // Rule 1: Static alert marker label
+              markerTitle="Alert Location"
               polygonCoordinates={geofenceCoordinates}
               multiplePolygons={officerGeofenceCoords.map(gf => ({
                 id: gf.id,
                 name: gf.name,
                 coordinates: gf.coordinates,
-                color: colors.primary, // Use theme primary color for officer zones
+                color: colors.primary,
               }))}
-              mapKey={`alert-${alert.id}-${showRoute ? 'route' : 'map'}-${Date.now()}`} // Force re-render when route toggled
+              mapKey={`alert-${alert.id}-${showRoute ? 'route' : 'map'}-${Date.now()}`}
               autoFitBounds={true}
               showRoute={showRoute}
             />
             
-            {/* Officer Location Indicator */}
             <View style={[
               styles.officerLocationContainer, 
               { 
@@ -820,7 +822,6 @@ export const AlertRespondMapScreen = () => {
               </Text>
             </View>
 
-            {/* Manual Location Input for Indoor Environments */}
             {showManualLocation && (
               <View style={[styles.manualLocationContainer, { backgroundColor: colors.white }]}>
                 <Text style={[styles.manualLocationTitle, { color: colors.darkText }]}>
@@ -879,7 +880,6 @@ export const AlertRespondMapScreen = () => {
         )}
       </View>
 
-      {/* Accept Button - Hide for officer-created alerts */}
       {alert?.created_by_role !== 'OFFICER' && (
         <View style={[styles.footer, { backgroundColor: colors.white, borderTopColor: colors.border }]}>
           <TouchableOpacity
@@ -905,7 +905,7 @@ export const AlertRespondMapScreen = () => {
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </ScreenWrapper>
   );
 };
 

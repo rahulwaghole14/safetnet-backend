@@ -16,6 +16,7 @@ import { SearchScreen } from '../screens/common/SearchScreen';
 import { OfflineScreen } from '../screens/common/OfflineScreen';
 import { APITestScreen } from '../screens/test/APITestScreen';
 import { UpdateProfileScreen } from '../screens/main/UpdateProfileScreen';
+import { ChangePasswordScreen } from '../screens/settings/ChangePasswordScreen';
 import SOSPage from '../components/common/SOSPage';
 
 const Stack = createNativeStackNavigator();
@@ -59,6 +60,10 @@ export const MainNavigator = () => {
       <Stack.Screen
         name="Privacy"
         component={PrivacyScreen}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
       />
       <Stack.Screen
         name="AlertResponse"

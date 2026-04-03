@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert as RNAlert,
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Alert } from '../../types/alert.types';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import { colors } from '../../utils/colors';
 import { typography, spacing, shadows } from '../../utils';
 import { calculateDistance, formatRelativeTime } from '../../utils/helpers';
@@ -138,7 +139,9 @@ export const AlertResponseScreen = ({ route }: any) => {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScreenWrapper
+      backgroundColor={colors.background}
+    >
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.primary }]}>
         <TouchableOpacity
@@ -286,7 +289,7 @@ export const AlertResponseScreen = ({ route }: any) => {
         </ScrollView>
         </View>
       </View>
-    </ScrollView>
+    </ScreenWrapper>
   );
 };
 
@@ -300,7 +303,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.base,
-    paddingTop: 50,
     paddingBottom: spacing.md,
     backgroundColor: colors.primary,
     shadowColor: '#000',

@@ -18,6 +18,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Alert } from '../../types/alert.types';
 import { useAlertsStore } from '../../store/alertsStore';
 import { AlertCard } from '../../components/alerts/AlertCard';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import { EmptyState } from '../../components/common/EmptyState';
 import { AlertRespondModal } from '../../components/common/AlertRespondModal';
 import { useColors } from '../../utils/colors';
@@ -466,7 +467,10 @@ export const AlertsScreen = forwardRef<AlertsScreenRef, AlertsScreenProps>((prop
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.lightGrayBg }]}>
+    <ScreenWrapper
+      scrollable={false}
+      backgroundColor={colors.lightGrayBg}
+    >
       <View style={[styles.header, styles.headerShadow, {
         backgroundColor: colors.white,
       }]}>
@@ -979,7 +983,7 @@ export const AlertsScreen = forwardRef<AlertsScreenRef, AlertsScreenProps>((prop
           <Text style={[styles.toastMessage, { color: colors.white }]}>{toastMessage}</Text>
         </View>
       )}
-    </View>
+    </ScreenWrapper>
   );
 });
 

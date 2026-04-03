@@ -14,6 +14,7 @@ import { useCallback } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AlertCard } from '../../components/alerts/AlertCard';
 import { AlertRespondModal } from '../../components/common/AlertRespondModal';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import { Alert } from '../../types/alert.types';
 import { alertService } from '../../api/services/alertService';
 import { dashboardService, DashboardData, DashboardStats } from '../../api/services/dashboardService';
@@ -459,13 +460,11 @@ export const DashboardScreen = () => {
   }
 
   return (
-    <>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
+    <ScreenWrapper
+      backgroundColor={colors.background}
+      contentContainerStyle={styles.scrollContent}
+    >
+      {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.settingsButton}
@@ -564,7 +563,6 @@ export const DashboardScreen = () => {
             )}
           </View>
         </View>
-      </ScrollView>
 
       {/* Alert Respond Modal */}
       <AlertRespondModal
@@ -573,6 +571,6 @@ export const DashboardScreen = () => {
         onClose={handleCloseRespondModal}
         onResponseAccepted={handleResponseAccepted}
       />
-    </>
+    </ScreenWrapper>
   );
 };

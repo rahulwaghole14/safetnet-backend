@@ -18,6 +18,7 @@ urlpatterns = [
     path('login/', views.OfficerLoginView.as_view(), name='security-login'),
     path('profile/', views.OfficerProfileView.as_view(), name='security-profile'),
     path('profile/update-fcm-token/', views_user.UpdateFCMTokenView.as_view(), name='security-update-fcm-token'),
+    path('profile/change-password/', views_user.change_password, name='security-change-password'),
     path('geofence/', views.GeofenceCurrentView.as_view(), name='security-geofence-current'),
     path('geofence/<int:geofence_id>/', views.GeofenceDetailView.as_view(), name='security-geofence-detail'),
     path('geofence/<int:geofence_id>/users/', views.GeofenceUsersView.as_view(), name='security-geofence-users'),

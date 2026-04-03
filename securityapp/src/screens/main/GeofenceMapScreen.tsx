@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity
 import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
 import { LeafletMap } from '../../components/maps/LeafletMap';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import { useColors } from '../../utils/colors';
 import { typography, spacing } from '../../utils';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -469,20 +470,24 @@ export const GeofenceMapScreen = () => {
   // Show loading state
   if (loading) {
     return (
-      <View style={[styles.container, styles.centered, { backgroundColor: colors.lightGrayBg }]}>
+      <ScreenWrapper
+        backgroundColor={colors.lightGrayBg}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={[styles.loadingText, { color: colors.darkText }]}>Loading geofence...</Text>
         <Text style={[styles.loadingText, { fontSize: 12, marginTop: 8, opacity: 0.7, color: colors.darkText }]}>
           Fetching assigned security area
         </Text>
-      </View>
+      </ScreenWrapper>
     );
   }
 
   // Show error state
   if (error) {
     return (
-      <View style={[styles.container, styles.centered, { backgroundColor: colors.lightGrayBg }]}>
+      <ScreenWrapper
+        backgroundColor={colors.lightGrayBg}
+      >
         <Icon name="location-off" size={48} color={colors.emergencyRed} />
         <Text style={[styles.errorText, { color: colors.emergencyRed }]}>Geofence Error</Text>
         <Text style={[styles.errorDescription, { color: colors.mediumText }]}>{error}</Text>
@@ -493,14 +498,16 @@ export const GeofenceMapScreen = () => {
         >
           <Text style={[styles.retryButtonText, { color: colors.white }]}>Retry</Text>
         </TouchableOpacity>
-      </View>
+      </ScreenWrapper>
     );
   }
 
   // Show no geofence assigned state
   if (geofence === null && !loading && !error) {
     return (
-      <View style={[styles.container, styles.centered, { backgroundColor: colors.lightGrayBg }]}>
+      <ScreenWrapper
+        backgroundColor={colors.lightGrayBg}
+      >
         <Icon name="location-off" size={48} color={colors.mediumText} />
         <Text style={[styles.errorText, { color: colors.darkText }]}>No Geofence Assigned</Text>
         <Text style={[styles.errorDescription, { color: colors.mediumText }]}>
@@ -513,13 +520,16 @@ export const GeofenceMapScreen = () => {
         >
           <Text style={[styles.retryButtonText, { color: colors.white }]}>Check Again</Text>
         </TouchableOpacity>
-      </View>
+      </ScreenWrapper>
     );
   }
 
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper
+      backgroundColor={colors.background}
+      scrollable={false}
+    >
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.titleContainer}>
@@ -610,8 +620,7 @@ export const GeofenceMapScreen = () => {
           </Text>
         </View>
       </View>
-
-    </View>
+    </ScreenWrapper>
   );
 };
 
@@ -809,7 +818,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: '#1a1a1a',
-    paddingTop: 50, // Account for status bar
     paddingHorizontal: 20,
     paddingBottom: 15,
     zIndex: 10,

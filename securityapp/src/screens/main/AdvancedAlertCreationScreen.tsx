@@ -13,6 +13,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { advancedAlertService } from '../../api/services/advancedAlertService';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import { colors } from '../../utils/colors';
 import { typography, spacing, shadows } from '../../utils';
 
@@ -289,7 +290,9 @@ export const AdvancedAlertCreationScreen: React.FC = () => {
 
   if (createdAlert) {
     return (
-      <View style={styles.container}>
+      <ScreenWrapper
+        backgroundColor={colors.lightGrayBg}
+      >
         <View style={styles.successContainer}>
           <Icon name="check-circle" size={64} color={colors.successGreen} />
           <Text style={styles.successTitle}>Alert Created Successfully</Text>
@@ -313,12 +316,15 @@ export const AdvancedAlertCreationScreen: React.FC = () => {
             <Text style={styles.viewMapButtonText}>View on Tracking Map</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScreenWrapper>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper
+      backgroundColor={colors.lightGrayBg}
+      scrollable={false}
+    >
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -357,7 +363,7 @@ export const AdvancedAlertCreationScreen: React.FC = () => {
           )}
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenWrapper>
   );
 };
 
@@ -371,7 +377,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
-    paddingTop: Platform.OS === 'ios' ? 50 : 30,
     paddingBottom: spacing.md,
     backgroundColor: colors.white,
     ...shadows.sm,

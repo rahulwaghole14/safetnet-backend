@@ -123,6 +123,15 @@ export const resetPassword = async (token: string, password: string): Promise<vo
     throw new Error('Password reset failed');
   }
 };
+export const changePassword = async (old_password: string, new_password: string, confirm_password: string): Promise<void> => {
+  try {
+    await apiClient.post(API_ENDPOINTS.CHANGE_PASSWORD, { old_password, new_password, confirm_password });
+    console.log('✅ PASSWORD CHANGE SUCCESSFUL');
+  } catch (error: any) {
+    console.error('❌ PASSWORD CHANGE FAILED:', error);
+    throw error;
+  }
+};
 
 export const authService = {
   login,
@@ -130,5 +139,6 @@ export const authService = {
   refreshToken,
   forgotPassword,
   resetPassword,
+  changePassword,
   testBackendConnectivity,
 };

@@ -15,6 +15,7 @@ import { updateOfficerProfile } from '../../store/slices/authSlice';
 import { profileService } from '../../api/services/profileService';
 import { useColors } from '../../utils/colors';
 import { shadows, spacing, typography } from '../../utils';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export const UpdateProfileScreen = ({ navigation, route }: any) => {
@@ -168,8 +169,10 @@ export const UpdateProfileScreen = ({ navigation, route }: any) => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+    <ScreenWrapper
+      backgroundColor={colors.background}
+      scrollable={false}
+    >
 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.cardBackground, borderBottomColor: colors.border }]}>
@@ -280,7 +283,7 @@ export const UpdateProfileScreen = ({ navigation, route }: any) => {
           <Text style={styles.cancelButtonText}>CANCEL</Text>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </ScreenWrapper>
   );
 };
 
@@ -306,7 +309,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingTop: 50,
     paddingBottom: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,

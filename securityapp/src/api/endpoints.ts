@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
   LOGOUT: '/logout/', // Optional - may not exist on backend (404 is handled gracefully)
   REFRESH_TOKEN: '/token/refresh/', // Optional - may not exist on backend (404 is handled gracefully)
   FORGOT_PASSWORD: '/password-reset/', // Password reset - sends email to user
+  CHANGE_PASSWORD: '/profile/change-password/', // Change password while logged in
 
   // ==================== PROFILE ====================
   GET_PROFILE: '/profile/',

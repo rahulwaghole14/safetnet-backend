@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import { useAppSelector } from '../../store/hooks';
 import { Button } from '../../components/common/Button';
 import { BroadcastProgressModal } from '../../components/modals/BroadcastProgressModal';
@@ -214,7 +215,9 @@ export const BroadcastScreen = ({ navigation }: any) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScreenWrapper
+      backgroundColor={colors.background}
+    >
       <BroadcastProgressModal
         visible={showProgress}
         progress={broadcastProgress}
@@ -328,7 +331,7 @@ export const BroadcastScreen = ({ navigation }: any) => {
           <Text style={styles.footerCancel}>Cancel</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenWrapper>
   );
 };
 

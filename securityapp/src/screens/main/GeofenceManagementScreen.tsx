@@ -17,6 +17,7 @@ import { UserInArea } from '../../api/services/geofenceService';
 import { useColors } from '../../utils/colors';
 import { typography, spacing } from '../../utils';
 import { LeafletMap } from '../../components/maps/LeafletMap';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import { useAppSelector } from '../../store/hooks';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -303,15 +304,14 @@ export const GeofenceManagementScreen = () => {
     return 16; // Much higher zoom for immediate polygon clarity
   };
 
-  // Get user markers for map
+  // Get user markers for map - map to LeafletMap props
   const getUserMarkers = () => {
     return usersInArea.map(user => ({
       id: user.user_id,
       latitude: user.current_latitude,
       longitude: user.current_longitude,
-      title: user.user_name,
-      description: `Last seen: ${new Date(user.last_seen).toLocaleTimeString()}`,
-      icon: user.is_inside ? 'security' : 'person'
+      username: user.user_name, // Map user_name to username
+      updated_at: user.last_seen, // Map last_seen to updated_at
     }));
   };
 
@@ -452,9 +452,11 @@ export const GeofenceManagementScreen = () => {
   }
 
   return (
-    <>
-      <ScrollView style={styles(colors).container} contentContainerStyle={styles(colors).scrollContent}>
-        {/* Header */}
+    <ScreenWrapper
+      backgroundColor={colors.background}
+      contentContainerStyle={styles(colors).scrollContent}
+    >
+      {/* Header */}
         <View style={styles(colors).header}>
           <Text style={styles(colors).headerTitle}>Geofence Management</Text>
           <Text style={styles(colors).headerSubtitle}>
@@ -506,7 +508,6 @@ export const GeofenceManagementScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-      </ScrollView>
 
       {/* Map Modal Overlay */}
       <Modal
@@ -577,6 +578,7 @@ export const GeofenceManagementScreen = () => {
                     showMarker={true}
                     markerTitle={`${selectedGeofence!.name} Center`}
                     autoFitBounds={true}
+                    userMarkers={getUserMarkers()}
                   />
                 );
               })()}
@@ -584,7 +586,7 @@ export const GeofenceManagementScreen = () => {
           )}
         </View>
       </Modal>
-    </>
+    </ScreenWrapper>
   );
 };
 

@@ -28,6 +28,7 @@ import { authService } from '../../api/services';
 import { useTheme } from '../../contexts/ThemeContext';
 import { typography, spacing } from '../../utils';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 
 export const SettingsScreen = ({ navigation }: any) => {
   const dispatch = useAppDispatch();
@@ -45,7 +46,6 @@ export const SettingsScreen = ({ navigation }: any) => {
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: spacing.base,
-      paddingTop: 10,
       paddingBottom: spacing.md,
       backgroundColor: colors.cardBackground,
       borderBottomLeftRadius: 24,
@@ -587,9 +587,10 @@ export const SettingsScreen = ({ navigation }: any) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.cardBackground, borderBottomColor: colors.border }]}>
+    <ScreenWrapper scrollable={false} backgroundColor={colors.background}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        {/* Header */}
+        <View style={[styles.header, { backgroundColor: colors.cardBackground, borderBottomColor: colors.border }]}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -616,6 +617,7 @@ export const SettingsScreen = ({ navigation }: any) => {
           </View>
         ))}
       </ScrollView>
-    </View>
+      </View>
+    </ScreenWrapper>
   );
 };

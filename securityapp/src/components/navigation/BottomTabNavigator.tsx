@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useColors, colors } from '../../utils/colors';
 import { typography, spacing } from '../../utils';
@@ -23,6 +24,7 @@ export const BottomTabNavigator = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const colors = useColors();
+  const insets = useSafeAreaInsets();
 
   const getActiveRouteName = () => {
     return route.name || '';
@@ -39,8 +41,11 @@ export const BottomTabNavigator = () => {
     }
   };
 
+  // Determine bottom padding - use safe area inset or fallback to standard spacing
+  const bottomPadding = Math.max(insets.bottom, spacing.sm);
+
   return (
-    <View style={styles(colors).container}>
+    <View style={[styles(colors).container, { paddingBottom: bottomPadding }]}>
       {tabs.map((tab) => {
         // Check if this tab is active
         const isActive = activeRoute === tab.name;
@@ -75,7 +80,7 @@ const styles = (colors: any) => StyleSheet.create({
     backgroundColor: colors.tabBackground,
     borderTopWidth: 1,
     borderTopColor: colors.border,
-    paddingVertical: spacing.sm,
+    paddingTop: spacing.sm,
     paddingHorizontal: spacing.base,
     justifyContent: 'space-around',
     shadowColor: '#000',
@@ -83,15 +88,17 @@ const styles = (colors: any) => StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 8,
+    minHeight: 60, // Ensure a minimum height for the tab bar
   },
   tab: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
     position: 'relative',
+    paddingVertical: spacing.xs,
   },
   icon: {
-    marginBottom: spacing.xs,
+    marginBottom: spacing.xs / 2,
   },
   label: {
     ...typography.caption,
@@ -104,7 +111,7 @@ const styles = (colors: any) => StyleSheet.create({
   },
   activeIndicator: {
     position: 'absolute',
-    bottom: -spacing.sm,
+    bottom: -spacing.xs,
     left: '50%',
     marginLeft: -20,
     width: 40,
@@ -112,4 +119,4 @@ const styles = (colors: any) => StyleSheet.create({
     backgroundColor: colors.tabActive,
     borderRadius: 2,
   },
-});
+});

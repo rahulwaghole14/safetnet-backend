@@ -176,23 +176,40 @@ class OfficerGeofenceService {
    */
   async getUsersInArea(geofenceId: string): Promise<UserInArea[]> {
     try {
+      if (!geofenceId) {
+        console.warn('⚠️ No geofenceId provided to getUsersInArea');
+        return [];
+      }
+
       console.log('👥 Fetching users in area for geofence:', geofenceId);
       
       // Correct endpoint: GET /geofence/{geofence_id}/users/
       const endpoint = `/geofence/${geofenceId}/users/`;
       const response = await apiClient.get(endpoint);
       
-      console.log(`📥 Users in area response (${geofenceId}):`, response.data);
+      console.log(`📥 Users in area raw response (${geofenceId}):`, response.data);
       
+      let users: UserInArea[] = [];
       if (Array.isArray(response.data)) {
-        return response.data;
+        users = response.data;
       } else if (response.data && response.data.results && Array.isArray(response.data.results)) {
-        return response.data.results;
+        users = response.data.results;
+      } else if (response.data && typeof response.data === 'object') {
+        // Handle case where it might be a single user or a different object structure
+        console.log('📦 Non-standard structure for users response, checking fields...');
+        if ('users' in response.data && Array.isArray(response.data.users)) {
+          users = response.data.users;
+        }
       }
       
-      return [];
+      console.log(`✅ Processed ${users.length} users in area for geofence ${geofenceId}`);
+      return users;
     } catch (error: any) {
       console.error(`❌ Error fetching users in area for geofence ${geofenceId}:`, error.message);
+      if (error.response) {
+        console.error('🚫 Error response status:', error.response.status);
+        console.error('🚫 Error response data:', error.response.data);
+      }
       return [];
     }
   }

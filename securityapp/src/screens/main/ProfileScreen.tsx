@@ -16,6 +16,7 @@ import { typography, spacing, shadows } from '../../utils';
 import { profileService } from '../../api/services/profileService';
 import { authService } from '../../api/services';
 import { SecurityOfficer } from '../../types/user.types';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import { useAppDispatch } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
 
@@ -56,6 +57,7 @@ export const ProfileScreen = () => {
       setError(error.message || 'Failed to load profile');
       // Set a default officer object to prevent crashes
       setOfficer({
+        id: 0,
         security_id: 'N/A',
         name: 'Unknown Officer',
         email_id: 'N/A',
@@ -336,7 +338,10 @@ export const ProfileScreen = () => {
   }
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.lightGrayBg }]} contentContainerStyle={styles.scrollContent}>
+    <ScreenWrapper
+      backgroundColor={colors.lightGrayBg}
+      contentContainerStyle={styles.scrollContent}
+    >
       {/* Profile Header */}
       <View style={[styles.profileHeader, { backgroundColor: colors.primary }]}>
         <View style={styles.profilePictureContainer}>
@@ -412,6 +417,6 @@ export const ProfileScreen = () => {
       <TouchableOpacity style={[styles.logoutButton, { backgroundColor: colors.emergencyRed }]} onPress={handleLogout}>
         <Text style={[styles.logoutButtonText, { color: colors.white }]}>Logout</Text>
       </TouchableOpacity>
-    </ScrollView>
+    </ScreenWrapper>
   );
 };

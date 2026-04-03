@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAppSelector } from '../../store/hooks';
 import { useGeofenceStore } from '../../store/geofenceStore';
 import { LeafletMap } from '../../components/maps/LeafletMap';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import { colors } from '../../utils/colors';
 import { typography, spacing } from '../../utils';
 import { calculateDistance } from '../../utils/helpers';
@@ -187,7 +188,10 @@ export const AlertsMapScreen = () => {
     </html>`;
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper
+      backgroundColor={colors.primary}
+      scrollable={false}
+    >
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -280,7 +284,7 @@ export const AlertsMapScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </ScreenWrapper>
   );
 };
 
@@ -295,7 +299,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.lg,
-    paddingTop: 50, // Account for status bar
     backgroundColor: colors.primary,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

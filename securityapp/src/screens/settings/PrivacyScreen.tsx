@@ -13,7 +13,13 @@ import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import {
   toggleLocationTracking,
   setNotificationPermissionGranted,
+  toggleAnalytics,
+  toggleCrashReports,
+  togglePerformanceData,
+  toggleBiometrics,
+  toggleTwoFactor,
 } from '../../store/slices/settingsSlice';
+import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '../../contexts/ThemeContext';
 import { typography, spacing } from '../../utils';
@@ -34,7 +40,6 @@ export const PrivacyScreen = () => {
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: spacing.base,
-      paddingTop: 5,
       paddingBottom: spacing.md,
       backgroundColor: colors.cardBackground,
       borderBottomLeftRadius: 24,
@@ -212,7 +217,7 @@ export const PrivacyScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper scrollable={true} style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -226,7 +231,7 @@ export const PrivacyScreen = () => {
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <View style={{ flex: 1 }}>
         {/* Location Services */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -268,22 +273,22 @@ export const PrivacyScreen = () => {
               title: 'Analytics',
               subtitle: 'Help improve the app with usage data',
               type: 'toggle',
-              value: true, // Could be a separate setting
-              onToggle: () => {},
+              value: settings.analyticsEnabled,
+              onToggle: () => dispatch(toggleAnalytics()),
             })}
             {renderSettingItem({
               title: 'Crash Reports',
               subtitle: 'Automatically send crash reports',
               type: 'toggle',
-              value: true, // Could be a separate setting
-              onToggle: () => {},
+              value: settings.crashReportsEnabled,
+              onToggle: () => dispatch(toggleCrashReports()),
             })}
             {renderSettingItem({
               title: 'Performance Data',
               subtitle: 'Monitor app performance and speed',
               type: 'toggle',
-              value: true, // Could be a separate setting
-              onToggle: () => {},
+              value: settings.performanceDataEnabled,
+              onToggle: () => dispatch(togglePerformanceData()),
             })}
           </View>
         </View>
@@ -389,28 +394,27 @@ export const PrivacyScreen = () => {
               title: 'Biometric Authentication',
               subtitle: 'Use fingerprint/face unlock',
               type: 'toggle',
-              value: false, // Could be a separate setting
-              onToggle: () => {},
+              value: settings.biometricEnabled,
+              onToggle: () => dispatch(toggleBiometrics()),
             })}
             {renderSettingItem({
               title: 'Two-Factor Authentication',
               subtitle: 'Add extra security layer',
               type: 'toggle',
-              value: false, // Could be a separate setting
-              onToggle: () => {},
+              value: settings.twoFactorEnabled,
+              onToggle: () => dispatch(toggleTwoFactor()),
             })}
             {renderSettingItem({
               title: 'Change Password',
               subtitle: 'Update your account password',
               type: 'navigation',
               onPress: () => {
-                // Navigate to change password screen
-                Alert.alert('Coming Soon', 'Password change feature will be available soon');
+                navigation.navigate('ChangePassword');
               },
             })}
           </View>
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ScreenWrapper>
   );
 };
