@@ -713,6 +713,22 @@ class OfficerProfileView(OfficerOnlyMixin, APIView):
         
         avg_response_time = sum(response_times) / len(response_times) if response_times else 0
         
+        # 3. Active hours calculation
+        from .models import DutySession
+        all_sessions = DutySession.objects.filter(officer=user)
+        total_seconds = 0
+        for session in all_sessions:
+            if session.is_active:
+                # Add time since session started for active session
+                delta = timezone.now() - session.start_time
+                total_seconds += delta.total_seconds()
+            elif session.end_time:
+                # Add recorded session duration
+                delta = session.end_time - session.start_time
+                total_seconds += delta.total_seconds()
+        
+        active_hours = total_seconds / 3600
+        
         # Get base serialized data
         from users_profile.serializers import UserProfileSerializer
         serializer = UserProfileSerializer(user, context={'request': request})
@@ -727,7 +743,7 @@ class OfficerProfileView(OfficerOnlyMixin, APIView):
         data['stats'] = {
             'total_responses': total_responses,
             'avg_response_time': round(avg_response_time, 1),
-            'active_hours': 0,  # Placeholder
+            'active_hours': round(active_hours, 2),
             'area_coverage': 0   # Placeholder
         }
         
@@ -915,6 +931,8 @@ class OfficerLoginView(APIView):
 
     def post(self, request):
         from rest_framework_simplejwt.tokens import RefreshToken
+        from django.contrib.auth.models import update_last_login
+        from .models import DutySession
         import logging
 
         logger = logging.getLogger(__name__)
@@ -935,6 +953,10 @@ class OfficerLoginView(APIView):
 
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
+            update_last_login(None, user)
+            
+            # Start a new duty session
+            DutySession.objects.create(officer=user)
 
             response_data = {
                 'access': str(refresh.access_token),
@@ -961,6 +983,28 @@ class OfficerLoginView(APIView):
                 'error': 'Login failed',
                 'detail': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class OfficerLogoutView(OfficerOnlyMixin, APIView):
+    """
+    API endpoint for security officer logout.
+    Marks all active duty sessions as ended.
+    """
+    def post(self, request):
+        from .models import DutySession
+        from django.utils import timezone
+        
+        officer = request.user
+        active_sessions = DutySession.objects.filter(officer=officer, is_active=True)
+        count = active_sessions.count()
+        
+        for session in active_sessions:
+            session.end_session()
+            
+        return Response({
+            'message': f'Successfully logged out. Closed {count} duty sessions.',
+            'sessions_closed': count
+        }, status=status.HTTP_200_OK)
 
 
 class NotificationView(OfficerOnlyMixin, APIView, PageNumberPagination):

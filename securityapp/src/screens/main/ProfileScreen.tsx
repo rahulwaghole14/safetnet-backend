@@ -361,15 +361,15 @@ export const ProfileScreen = () => {
       {/* Stats Container */}
       <View style={styles.statsContainer}>
         <View style={[styles.statItem, { backgroundColor: colors.white }]}>
-          <Text style={[styles.statNumber, { color: colors.primary }]}>{officer.stats?.total_responses || 'N/A'}</Text>
+          <Text style={[styles.statNumber, { color: colors.primary }]}>{officer.stats?.total_responses ?? 'N/A'}</Text>
           <Text style={styles.statLabel}>Responses</Text>
         </View>
         <View style={[styles.statItem, { backgroundColor: colors.white }]}>
-          <Text style={[styles.statNumber, { color: colors.primary }]}>{officer.stats?.avg_response_time ? `${officer.stats.avg_response_time}m` : 'N/A'}</Text>
+          <Text style={[styles.statNumber, { color: colors.primary }]}>{officer.stats?.avg_response_time !== undefined ? `${officer.stats.avg_response_time}m` : 'N/A'}</Text>
           <Text style={styles.statLabel}>Avg. Response</Text>
         </View>
         <View style={[styles.statItem, { backgroundColor: colors.white }]}>
-          <Text style={[styles.statNumber, { color: colors.primary }]}>{officer.stats?.active_hours ? `${officer.stats.active_hours}h` : 'N/A'}</Text>
+          <Text style={[styles.statNumber, { color: colors.primary }]}>{officer.stats?.active_hours !== undefined ? `${officer.stats.active_hours}h` : 'N/A'}</Text>
           <Text style={styles.statLabel}>Active Hours</Text>
         </View>
       </View>

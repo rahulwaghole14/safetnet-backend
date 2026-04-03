@@ -16,6 +16,7 @@ urlpatterns = [
     path('navigation/', views.NavigationView.as_view(), name='security-navigation'),#http://localhost:8000/api/security/navigation/?from_lat=18.5204&from_lng=73.8567&to_lat=18.5310&to_lng=73.8440
     path('incidents/', views.IncidentsView.as_view(), name='security-incidents'),
     path('login/', views.OfficerLoginView.as_view(), name='security-login'),
+    path('logout/', views.OfficerLogoutView.as_view(), name='security-logout'),
     path('profile/', views.OfficerProfileView.as_view(), name='security-profile'),
     path('profile/update-fcm-token/', views_user.UpdateFCMTokenView.as_view(), name='security-update-fcm-token'),
     path('profile/change-password/', views_user.change_password, name='security-change-password'),

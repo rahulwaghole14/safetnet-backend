@@ -459,3 +459,39 @@ class AlertRead(models.Model):
     
     class Meta:
         unique_together = ['user', 'officer_alert']
+
+
+class DutySession(models.Model):
+    """Tracks security officer duty sessions for active hours calculation."""
+    officer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='duty_sessions',
+        limit_choices_to={'role': 'security_officer'}
+    )
+    start_time = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ['-start_time']
+        verbose_name = 'Duty Session'
+        verbose_name_plural = 'Duty Sessions'
+    
+    def __str__(self):
+        return f"Session of {self.officer.username} (Active: {self.is_active})"
+    
+    def end_session(self):
+        """End the current session."""
+        from django.utils import timezone
+        self.end_time = timezone.now()
+        self.is_active = False
+        self.save(update_fields=['end_time', 'is_active'])
+
+    @property
+    def duration_hours(self):
+        """Get duration of this session in hours."""
+        from django.utils import timezone
+        end = self.end_time or timezone.now()
+        delta = end - self.start_time
+        return delta.total_seconds() / 3600.0
