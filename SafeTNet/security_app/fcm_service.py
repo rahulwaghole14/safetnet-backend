@@ -73,10 +73,10 @@ class FCMService:
             }
             
             # Only specify the channel if it's for the siren (high priority)
-            # High priority emergencies MUST use 'sos_alerts'
+            # In Python SDK, use channel_id, not notification_channel_id
             if sound == 'siren':
-                android_notif_args['notification_channel_id'] = 'sos_alerts'
-                android_notif_args['notification_priority'] = 'PRIORITY_MAX'
+                android_notif_args['channel_id'] = 'sos_alerts'
+                android_notif_args['notification_priority'] = 'priority_max'
             
             android_config = messaging.AndroidConfig(
                 priority='high',
