@@ -124,9 +124,11 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
         logger.info(f"Triggered by: {instance.user.username} (Org: {user_org})")
         logger.info(f"DEBUG Mode: {settings.DEBUG}")
         
-        # Targeted Filter: Only notify officers assigned to the same geofence
+        # 🎯 TIERED SOS BROADCAST LOGIC (Ensures SOS is never dropped)
         geofence = getattr(instance, 'geofence', None)
+        officers = User.objects.none()
         
+        # Priority 1: Officers assigned to this geofence
         if geofence:
             from users.models import OfficerGeofenceAssignment
             assigned_officer_ids = OfficerGeofenceAssignment.objects.filter(
@@ -138,18 +140,28 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 id__in=assigned_officer_ids, 
                 is_active=True
             )
-            logger.info(f"Targeted Geofence {geofence.name}: Found {officers.count()} assigned officers")
-        elif user_org:
+            if officers.exists():
+                logger.info(f"==> SOS Path: Geofence {geofence.name} ({officers.count()} assigned officers)")
+        
+        # Priority 2: Fallback to all officers in the sender's organization
+        if not officers.exists() and user_org:
             officers = User.objects.filter(
                 role='security_officer',
                 organization=user_org,
                 is_active=True
             )
-        else:
-            # If no geofence/organization, notify all active security officers as fallback
-            officers = User.objects.filter(role='security_officer', is_active=True)
+            if officers.exists():
+                logger.info(f"==> SOS Path: Organization {user_org.name} ({officers.count()} fallback officers)")
         
-        logger.info(f"Found {officers.count()} security officers to notify: {[o.email for o in officers]}")
+        # Priority 3: Final fallback to ALL active security officers
+        if not officers.exists():
+            officers = User.objects.filter(role='security_officer', is_active=True)
+            if officers.exists():
+                logger.info(f"==> SOS Path: System Fallback ({officers.count()} total officers)")
+            else:
+                logger.warning(f"❌ SOS CRITICAL WARNING: NO ACTIVE OFFICERS FOUND IN SYSTEM FOR {instance.user.email}")
+        
+        logger.info(f"Final officer notification set size: {officers.count()}")
         
         # Create notifications and send FCM
         for officer in officers:
@@ -168,7 +180,7 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 )
                 
                 # Send FCM push notification
-                is_emergency = instance.alert_type == 'emergency' or instance.priority == 'high'
+                is_emergency = instance.alert_type == 'emergency'
                 fcm_service.send_to_officer(
                     officer=officer,
                     title="🚨 New SOS Alert" if is_emergency else "⚠️ New Security Alert",
@@ -244,7 +256,7 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                 else:
                     users_to_notify = User.objects.filter(is_active=True)
 
-                is_emergency_broadcast = instance.alert_type == 'emergency' or instance.priority == 'high'
+                is_emergency_broadcast = instance.alert_type == 'emergency'
                 logger.info(f"🔄 Broadcasting to {len(users_to_notify)} users. Channel: {'sos_alerts' if is_emergency_broadcast else 'general_alerts'}")
                 fcm_service.send_to_users(
                     users_queryset=users_to_notify,
