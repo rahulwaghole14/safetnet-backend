@@ -49,6 +49,11 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
                 const errorStr = String(error);
                 if (errorStr.includes('SERVICE_NOT_AVAILABLE')) {
                     console.log('[FCM] Google Play Services unavailable (SERVICE_NOT_AVAILABLE). Push notifications will be disabled for this session.');
+                    Alert.alert(
+                        "Push Notifications Unavailable",
+                        "Your device/emulator lacks Google Play Services. Push notifications will not work on this device. Please use an emulator with 'Google Play Store' enabled.",
+                        [{ text: "OK" }]
+                    );
                 } else {
                     console.error('[FCM] Registration Error:', error);
                 }
