@@ -154,10 +154,8 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
         # Create notifications and send FCM
         for officer in officers:
             tokens = getattr(officer, 'fcm_tokens', [])
-            logger.info(f"==> Notifying officer: {officer.email} (Org: {officer.organization.name if officer.organization else 'None'})")
-            logger.info(f"    Tokens found: {len(tokens)}")
+            logger.info(f"==> Notifying officer: {officer.email} (Tokens: {len(tokens)})")
             if not tokens:
-                logger.warning(f"    SKIPPING: No tokens for {officer.email}")
                 continue
             try:
                 # Create database notification
@@ -247,6 +245,7 @@ def send_sos_alert_notification(sender, instance, created, **kwargs):
                     users_to_notify = User.objects.filter(is_active=True)
 
                 is_emergency_broadcast = instance.alert_type == 'emergency' or instance.priority == 'high'
+                logger.info(f"🔄 Broadcasting to {len(users_to_notify)} users. Channel: {'sos_alerts' if is_emergency_broadcast else 'general_alerts'}")
                 fcm_service.send_to_users(
                     users_queryset=users_to_notify,
                     title=f"Security Alert: {instance.alert_type.replace('_', ' ').title()}",

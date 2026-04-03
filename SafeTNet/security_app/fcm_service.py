@@ -59,22 +59,28 @@ class FCMService:
         # Use messaging.send_each_for_multicast (newer, doesn't use the deprecated batch API)
         try:
             # Prepare data payload (must be strings)
-            data_payload = {}
+            data_payload = {
+                'title': str(title),
+                'body': str(body),
+            }
             if data:
                 for k, v in data.items():
                     data_payload[str(k)] = str(v)
 
             # Android-specific configuration for high priority and loud alerts
-            # Determine target notification channel based on sound
-            target_channel = 'sos_alerts' if sound == 'siren' else 'general_alerts'
+            android_notif_args = {
+                'sound': sound,
+            }
+            
+            # Only specify the channel if it's for the siren (high priority)
+            # High priority emergencies MUST use 'sos_alerts'
+            if sound == 'siren':
+                android_notif_args['notification_channel_id'] = 'sos_alerts'
+                android_notif_args['notification_priority'] = 'PRIORITY_MAX'
             
             android_config = messaging.AndroidConfig(
                 priority='high',
-                notification=messaging.AndroidNotification(
-                    priority='max' if sound == 'siren' else 'high',
-                    sound=sound,
-                    notification_channel_id=target_channel,
-                )
+                notification=messaging.AndroidNotification(**android_notif_args)
             )
 
             # Apple-specific configuration
