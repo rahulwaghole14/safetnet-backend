@@ -20,8 +20,8 @@ interface ContactStoreState {
   initialized: boolean;
   loadContacts: () => Promise<void>;
   addContact: (contact: any) => Promise<void>;
-  updateContact: (id: number, contact: any) => Promise<void>;
-  deleteContact: (id: number) => Promise<void>;
+  updateContact: (id: number | string, contact: any) => Promise<void>;
+  deleteContact: (id: number | string) => Promise<void>;
   setPrimaryContact: (id: string) => Promise<void>;
   reset: () => void;
 }
@@ -68,10 +68,10 @@ export const useContactStore = create<ContactStoreState>((set, get) => ({
       await storage.setItem(getCacheKey(userId), JSON.stringify(updated));
     }
   },
-  updateContact: async (id: number, contact: any) => {
+  updateContact: async (id: number | string, contact: any) => {
     const currentContacts = get().contacts;
     const updated = currentContacts.map((c: any) =>
-      c.id === id ? {...c, ...contact} : c,
+      c.id === id || String(c.id) === String(id) ? {...c, ...contact} : c,
     );
     set({contacts: updated});
     const userId = useAuthStore.getState().user?.id;
@@ -80,8 +80,8 @@ export const useContactStore = create<ContactStoreState>((set, get) => ({
       await storage.setItem(getCacheKey(userId), JSON.stringify(updated));
     }
   },
-  deleteContact: async (id: number) => {
-    const filtered = get().contacts.filter((c: any) => c.id !== id);
+  deleteContact: async (id: number | string) => {
+    const filtered = get().contacts.filter((c: any) => c.id !== id && String(c.id) !== String(id));
     let primaryContactId = get().primaryContactId;
     if (primaryContactId === id.toString()) {
       primaryContactId = filtered[0]?.id?.toString();

@@ -300,9 +300,13 @@ class FamilyContactDetailView(generics.RetrieveUpdateDestroyAPIView):
                 {'error': 'You can only delete your own family contacts.'},
                 status=status.HTTP_403_FORBIDDEN
             )
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        logger.info(f"Family contact deleted for user: {request.user.email}")
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            logger.info(f"Family contact deleted for user: {request.user.email}")
+        except Exception:
+            # If contact does not exist or was already deleted, return 204
+            logger.info("Family contact already removed or not found during destroy.")
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

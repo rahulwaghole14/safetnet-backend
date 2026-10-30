@@ -345,7 +345,8 @@ class FamilyContactCreateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = FamilyContact
-        fields = ('name', 'phone', 'relationship', 'is_primary')
+        fields = ('id', 'name', 'phone', 'relationship', 'is_primary', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'created_at', 'updated_at')
     
     def validate(self, attrs):
         """Validate family contact creation."""

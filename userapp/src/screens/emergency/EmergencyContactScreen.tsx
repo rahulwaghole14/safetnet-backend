@@ -95,8 +95,8 @@ const EmergencyContactScreen = () => {
   const [loading, setLoading] = useState(true);
   
   // Use contacts from store (loaded from API)
-  const contacts = storeContacts.map((c: any) => ({
-    id: c.id?.toString() || Date.now().toString(),
+  const contacts = storeContacts.map((c: any, index: number) => ({
+    id: c.id ? c.id.toString() : `temp_${index}_${c.phone || c.name || index}`,
     name: c.name || c.full_name || '',
     phone: c.phone || c.phone_number || '',
     email: c.email || '',
@@ -192,13 +192,24 @@ const EmergencyContactScreen = () => {
           onPress: async () => {
             setAlertVisible(false);
             try {
-              const contactId = parseInt(id);
-              if (!isNaN(contactId) && user?.id) {
-                await apiService.deleteFamilyContact(user.id, contactId);
-                await deleteContact(contactId);
+              const contactId = parseInt(id, 10);
+              // Only call backend if it's a real server ID (not a large JS timestamp or NaN)
+              if (!isNaN(contactId) && contactId < 100000000000 && user?.id) {
+                try {
+                  await apiService.deleteFamilyContact(user.id, contactId);
+                } catch (apiError: any) {
+                  console.warn('Backend delete error (ignoring if already gone):', apiError);
+                }
               }
+              await deleteContact(id);
+              await loadContacts();
             } catch (error) {
               console.error('Error deleting contact:', error);
+              // Ensure item is removed locally regardless
+              try {
+                await deleteContact(id);
+                await loadContacts();
+              } catch (_) {}
               setAlertConfig({
                 title: 'Error',
                 message: 'Failed to delete contact. Please try again.',
@@ -255,38 +266,39 @@ const EmergencyContactScreen = () => {
 
     setSavingContact(true);
     try {
-    if (editingContact) {
-        // Update existing contact
-        const contactId = parseInt(editingContact.id);
-        if (!isNaN(contactId)) {
-          const contactData = {
-            name: nameTrimmed,
-            phone: phoneTrimmed,
-            email: formData.email?.trim() || '',
-            relationship: formData.relationship?.trim() || '',
-            type: formData.type.toLowerCase(),
-          };
+      const contactData = {
+        name: nameTrimmed,
+        phone: phoneTrimmed,
+        email: formData.email?.trim() || '',
+        relationship: formData.relationship?.trim() || '',
+        type: formData.type.toLowerCase(),
+      };
+
+      if (editingContact) {
+        const contactId = parseInt(editingContact.id, 10);
+        // If it was stored with a client timestamp or temp id, add as new on backend
+        if (isNaN(contactId) || contactId > 100000000000) {
+          await apiService.addFamilyContact(user.id, contactData);
+          await deleteContact(editingContact.id);
+        } else {
           await apiService.updateFamilyContact(user.id, contactId, contactData);
           await updateContact(contactId, {...contactData, type: formData.type});
         }
-    } else {
-      if (contacts.length >= maxContacts) {
+        await loadContacts();
+      } else {
+        if (contacts.length >= maxContacts) {
           setSavingContact(false);
-        requirePremium('You have reached the contact limit. Upgrade to add more.');
-        return;
-      }
-        const contactData = {
-          name: nameTrimmed,
-          phone: phoneTrimmed,
-          email: formData.email?.trim() || '',
-          relationship: formData.relationship?.trim() || '',
-          type: formData.type.toLowerCase(),
-      };
+          requirePremium('You have reached the contact limit. Upgrade to add more.');
+          return;
+        }
         const result = await apiService.addFamilyContact(user.id, contactData);
-        await addContact(result);
-    }
-    setShowAddModal(false);
-    setEditingContact(null);
+        if (result && result.id) {
+          await addContact(result);
+        }
+        await loadContacts();
+      }
+      setShowAddModal(false);
+      setEditingContact(null);
     } catch (error) {
       console.error('Error saving contact:', error);
       setAlertConfig({
