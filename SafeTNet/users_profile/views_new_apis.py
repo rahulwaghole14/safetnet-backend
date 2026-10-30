@@ -218,7 +218,7 @@ def security_officer_locations(request):
     if geofence_ids:
         officers = officers.filter(geofences__id__in=geofence_ids).distinct()
 
-    officers = officers.select_related('organization', 'assigned_geofence')
+    officers = officers.select_related('organization').prefetch_related('geofences')
 
     payload = _build_security_officer_payload(officers, ref_lat, ref_lon)
 

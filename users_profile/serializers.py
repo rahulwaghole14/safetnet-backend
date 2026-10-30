@@ -610,10 +610,13 @@ class LiveLocationShareSerializer(serializers.ModelSerializer):
     
     def get_geofence_id(self, obj):
         """Return the geofence ID from security officer's assigned geofence"""
-        if obj.security_officer and obj.security_officer.assigned_geofence:
-            return obj.security_officer.assigned_geofence.id
-        # For regular users, you might want to get geofence from user's profile
-        # For now, return None if not a security officer
+        if obj.security_officer:
+            gf = getattr(obj.security_officer, 'assigned_geofence', None)
+            if gf:
+                return gf.id
+            first_gf = obj.security_officer.geofences.first()
+            if first_gf:
+                return first_gf.id
         return None
 
 
