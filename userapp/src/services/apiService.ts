@@ -220,6 +220,45 @@ class ApiService {
   }
 
   /**
+   * Refresh the access token using the refresh token
+   */
+  async refreshAccessToken(): Promise<boolean> {
+    if (!this.refreshToken) {
+      console.warn('[API] Cannot refresh token: No refresh token stored');
+      return false;
+    }
+
+    try {
+      console.log('[API] Attempting to refresh access token...');
+      const response = await fetch(`${BACKEND_BASE_URL}/api/auth/refresh/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refresh: this.refreshToken }),
+      });
+
+      if (!response.ok) {
+        console.warn(`[API] Token refresh failed with status ${response.status}`);
+        return false;
+      }
+
+      const data = await response.json();
+      if (data && data.access) {
+        this.accessToken = data.access;
+        const newRefresh = data.refresh || this.refreshToken;
+        await this.setTokens(data.access, newRefresh);
+        console.log('✅ [API] Access token refreshed successfully');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('[API] Error during token refresh:', error);
+      return false;
+    }
+  }
+
+  /**
    * Make authenticated API request
    */
   private async request(

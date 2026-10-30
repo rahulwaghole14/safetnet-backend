@@ -21,9 +21,20 @@ class MainActivity : ReactActivity() {
 
   private fun createNotificationChannel() {
       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-          val channelId = "sos_alerts"
-          val name = "Emergency Alerts"
-          val descriptionText = "Notifications for SOS and emergency security alerts"
+          val notificationManager: NotificationManager =
+              getSystemService(NotificationManager::class.java)
+
+          // Clean up old channels
+          try {
+              notificationManager.deleteNotificationChannel("sos_alerts")
+              notificationManager.deleteNotificationChannel("sos_alerts_v2")
+          } catch (e: Exception) {
+              // ignore
+          }
+
+          val channelId = "sos_alerts_v3"
+          val name = "Emergency SOS Alerts"
+          val descriptionText = "Notifications for SOS and emergency security alerts with siren"
           val importance = NotificationManager.IMPORTANCE_HIGH
           
           val channel = NotificationChannel(channelId, name, importance).apply {
@@ -40,21 +51,16 @@ class MainActivity : ReactActivity() {
               enableLights(true)
               enableVibration(true)
           }
-          
-          // Register SOS channel
-          val notificationManager: NotificationManager =
-              getSystemService(NotificationManager::class.java)
           notificationManager.createNotificationChannel(channel)
           
           // Create and register General Alerts channel (Default sound)
           val generalChannelId = "general_alerts"
           val generalName = "General & Security Alerts"
           val generalDescription = "General information and non-emergency security alerts"
-          val generalImportance = NotificationManager.IMPORTANCE_HIGH // Still high to show visually, but default sound
+          val generalImportance = NotificationManager.IMPORTANCE_HIGH
           
           val generalChannel = NotificationChannel(generalChannelId, generalName, generalImportance).apply {
               description = generalDescription
-              // We do not setSound, so it uses the system default
               enableLights(true)
               enableVibration(true)
           }

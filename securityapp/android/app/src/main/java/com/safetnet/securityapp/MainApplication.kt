@@ -3,8 +3,11 @@ package com.safetnet.securityapp
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ContentResolver
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import com.facebook.react.PackageList
@@ -41,6 +44,7 @@ class MainApplication : Application(), ReactApplication {
           add(RNCWebViewPackage())
           add(ReactNativeFirebaseAppPackage())
           add(ReactNativeFirebaseMessagingPackage())
+          add(SirenPackage())
           
           Log.d("MainApplication", "Manual packages added to reactHost")
         },
@@ -70,18 +74,43 @@ class MainApplication : Application(), ReactApplication {
 
   private fun createNotificationChannel() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val name = "SafeTNet Emergency Alerts"
-      val descriptionText = "Critical SOS and emergency notifications"
-      val importance = NotificationManager.IMPORTANCE_HIGH
-      val channel = NotificationChannel("sos_alerts", name, importance).apply {
-        description = descriptionText
-        enableVibration(true)
-        vibrationPattern = longArrayOf(0, 500, 200, 500)
-        setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), null)
-      }
       val notificationManager: NotificationManager =
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+      // Clean up legacy channels if present
+      try {
+        notificationManager.deleteNotificationChannel("sos_alerts")
+        notificationManager.deleteNotificationChannel("sos_alerts_v2")
+      } catch (e: Exception) {
+        // ignore
+      }
+
+      // Configure siren sound URI
+      val soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/siren")
+      val audioAttributes = AudioAttributes.Builder()
+        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+        .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+        .build()
+
+      val name = "SafeTNet Emergency SOS Alerts"
+      val descriptionText = "Critical SOS and emergency notifications with siren"
+      val importance = NotificationManager.IMPORTANCE_HIGH
+      val channel = NotificationChannel("sos_alerts_v3", name, importance).apply {
+        description = descriptionText
+        enableVibration(true)
+        enableLights(true)
+        vibrationPattern = longArrayOf(0, 500, 200, 500)
+        setSound(soundUri, audioAttributes)
+      }
       notificationManager.createNotificationChannel(channel)
+
+      // General alerts channel
+      val generalChannel = NotificationChannel("general_alerts", "General & Security Alerts", NotificationManager.IMPORTANCE_HIGH).apply {
+        description = "General information and non-emergency security alerts"
+        enableLights(true)
+        enableVibration(true)
+      }
+      notificationManager.createNotificationChannel(generalChannel)
     }
   }
 }

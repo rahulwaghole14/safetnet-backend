@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import * as fcmTokenService from '../api/services/fcmTokenService';
-import { DeviceEventEmitter, Platform, PermissionsAndroid } from 'react-native';
+import { DeviceEventEmitter, Platform, PermissionsAndroid, NativeModules } from 'react-native';
 import { CustomAlert } from '../components/common/CustomAlert';
 import { useAppSelector } from '../store/hooks';
 import { useAlertsStore } from '../store/alertsStore'; // Assuming this import exists or needs to be added
@@ -94,6 +94,16 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
                     return;
                 }
 
+                // Trigger native siren sound in foreground for emergency alerts
+                const SirenModule = NativeModules.SirenModule;
+                if (SirenModule && typeof SirenModule.playSiren === 'function') {
+                    try {
+                        SirenModule.playSiren();
+                    } catch (sirenErr) {
+                        console.warn('[FCM] Failed to play foreground siren:', sirenErr);
+                    }
+                }
+
                 CustomAlert.alert(
                     title,
                     body,
@@ -101,6 +111,11 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
                         { 
                             text: 'VIEW ALERT',
                             onPress: () => {
+                                if (SirenModule && typeof SirenModule.stopSiren === 'function') {
+                                    try {
+                                        SirenModule.stopSiren();
+                                    } catch (e) {}
+                                }
                                 if (remoteMessage.data?.sos_alert_id) {
                                     DeviceEventEmitter.emit('notification:navigate', {
                                         alertId: String(remoteMessage.data.sos_alert_id)
@@ -109,7 +124,17 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
                                 console.log('[FCM] User clicked View Alert from Foreground');
                             }
                         },
-                        { text: "DISMISS", style: "cancel" }
+                        { 
+                            text: "DISMISS", 
+                            style: "cancel",
+                            onPress: () => {
+                                if (SirenModule && typeof SirenModule.stopSiren === 'function') {
+                                    try {
+                                        SirenModule.stopSiren();
+                                    } catch (e) {}
+                                }
+                            }
+                        }
                     ],
                     { type: 'emergency', cancelable: false }
                 );

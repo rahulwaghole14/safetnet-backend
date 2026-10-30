@@ -19,6 +19,7 @@ import {
   Alert,
   AppState,
   DeviceEventEmitter,
+  ToastAndroid,
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import GeolocationService from 'react-native-geolocation-service';
@@ -479,8 +480,11 @@ const HomeScreen = ({navigation}: any) => {
       if (alertTimerRef.current) {
         clearInterval(alertTimerRef.current);
         alertTimerRef.current = null;
-    }
+      }
       resetState();
+      if (Platform.OS === 'android') {
+        ToastAndroid.show('Hold button for 3 seconds to send SOS', ToastAndroid.SHORT);
+      }
       return;
     }
     
