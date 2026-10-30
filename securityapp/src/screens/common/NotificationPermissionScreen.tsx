@@ -4,10 +4,10 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   Platform,
   Linking,
 } from 'react-native';
+import { CustomAlert } from '../../components/common/CustomAlert';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch } from '../../store/hooks';
 import { setNotificationPermissionGranted } from '../../store/slices/settingsSlice';
@@ -26,7 +26,7 @@ export const NotificationPermissionScreen = () => {
       // For now, we'll simulate the permission request
       if (Platform.OS === 'ios') {
         // iOS permission request
-        Alert.alert(
+        CustomAlert.alert(
           'Enable Notifications',
           'Please go to Settings > SafeTNet > Notifications and allow notifications.',
           [
@@ -42,7 +42,8 @@ export const NotificationPermissionScreen = () => {
                 handleDenyNotifications(); // Navigate away since user needs to go to settings
               },
             },
-          ]
+          ],
+          { type: 'info' }
         );
       } else {
         // Android permission request
@@ -54,7 +55,7 @@ export const NotificationPermissionScreen = () => {
       }
     } catch (error) {
       console.error('Notification permission error:', error);
-      Alert.alert('Error', 'Failed to request notification permissions');
+      CustomAlert.alert('Error', 'Failed to request notification permissions', [{ text: 'OK' }], { type: 'error' });
     } finally {
       setIsLoading(false);
     }

@@ -6,8 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
-  Alert,
 } from 'react-native';
+import { CustomAlert } from '../../components/common/CustomAlert';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import {
@@ -190,7 +190,7 @@ export const NotificationSettingsScreen = () => {
   const handleToggleNotifications = () => {
     if (!settings.notificationsEnabled && !settings.notificationPermissionGranted) {
       // If notifications are disabled and permission not granted, show alert
-      Alert.alert(
+      CustomAlert.alert(
         'Enable Notifications',
         'Notifications are currently disabled. Would you like to enable them?',
         [
@@ -202,7 +202,8 @@ export const NotificationSettingsScreen = () => {
               dispatch(toggleNotifications());
             },
           },
-        ]
+        ],
+        { type: 'info' }
       );
     } else {
       dispatch(toggleNotifications());
@@ -385,7 +386,7 @@ export const NotificationSettingsScreen = () => {
                     style={styles.grantButton}
                     onPress={() => {
                       dispatch(setNotificationPermissionGranted(true));
-                      Alert.alert('Success', 'Notification permissions granted!');
+                      CustomAlert.alert('Success', 'Notification permissions granted!', [{ text: 'OK' }], { type: 'success' });
                     }}
                     activeOpacity={0.7}
                   >

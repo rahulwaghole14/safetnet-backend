@@ -1,4 +1,5 @@
-import { Alert, Platform, PermissionsAndroid } from 'react-native';
+import { Platform, PermissionsAndroid } from 'react-native';
+import { CustomAlert } from '../components/common/CustomAlert';
 
 /**
  * Requests location permissions with a prominent disclosure as required by Google Play.
@@ -13,7 +14,7 @@ export const requestLocationPermission = async (): Promise<boolean> => {
 
   if (Platform.OS === 'android') {
     return new Promise((resolve) => {
-      Alert.alert(
+      CustomAlert.alert(
         'Location Permission for Officer Safety',
         'SafeTNet Security collects location data to enable real-time tracking of officers during SOS alerts and for geofencing purposes, even when the app is closed or not in use. This data is essential for emergency response and officer safety.',
         [

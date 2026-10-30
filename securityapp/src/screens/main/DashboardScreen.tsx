@@ -6,7 +6,6 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
-  Alert as RNAlert,
   LogBox,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';

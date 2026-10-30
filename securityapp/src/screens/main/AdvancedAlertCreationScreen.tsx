@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert as RNAlert,
   ActivityIndicator,
   Platform,
 } from 'react-native';
+import { CustomAlert } from '../../components/common/CustomAlert';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { advancedAlertService } from '../../api/services/advancedAlertService';
@@ -59,7 +59,7 @@ export const AdvancedAlertCreationScreen: React.FC = () => {
   const handleCreateAlert = async () => {
     // Validate form
     if (!formData.message.trim()) {
-      RNAlert.alert('Error', 'Please enter an alert message');
+      CustomAlert.alert('Error', 'Please enter an alert message', [{ text: 'OK' }], { type: 'error' });
       return;
     }
 
@@ -90,7 +90,7 @@ export const AdvancedAlertCreationScreen: React.FC = () => {
       });
 
       // Show success message
-      RNAlert.alert(
+      CustomAlert.alert(
         'Alert Created Successfully',
         `Your ${formData.alert_type} alert has been created and your location has been captured.\n\nAlert ID: ${alert.id}\nLocation: GPS captured`,
         [
@@ -121,7 +121,8 @@ export const AdvancedAlertCreationScreen: React.FC = () => {
             onPress: () => navigation.goBack(),
             style: 'cancel',
           },
-        ]
+        ],
+        { type: 'success' }
       );
 
     } catch (error: any) {
@@ -130,7 +131,7 @@ export const AdvancedAlertCreationScreen: React.FC = () => {
       setGpsStatus('error');
       setGpsMessage(error.message || 'Failed to create alert');
       
-      RNAlert.alert(
+      CustomAlert.alert(
         'Error',
         error.message || 'Failed to create alert. Please try again.',
         [
@@ -145,7 +146,8 @@ export const AdvancedAlertCreationScreen: React.FC = () => {
             text: 'Cancel',
             style: 'cancel',
           },
-        ]
+        ],
+        { type: 'error' }
       );
     } finally {
       setIsCreatingAlert(false);

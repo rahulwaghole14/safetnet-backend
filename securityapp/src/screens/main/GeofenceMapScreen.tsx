@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Platform } from 'react-native';
+import { CustomAlert } from '../../components/common/CustomAlert';
 import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
 import { LeafletMap } from '../../components/maps/LeafletMap';
@@ -320,13 +321,13 @@ export const GeofenceMapScreen = () => {
 
     if (!geofence) {
       console.log('❌ No geofence loaded yet - cannot center');
-      Alert.alert('Geofence Not Loaded', 'Please wait for the geofence to load before centering the map.');
+      CustomAlert.alert('Geofence Not Loaded', 'Please wait for the geofence to load before centering the map.', [{ text: 'OK' }], { type: 'warning' });
       return;
     }
 
     if (!webViewRef.current) {
       console.log('❌ WebView ref not available');
-      Alert.alert('Map Not Ready', 'Please wait for the map to load before centering.');
+      CustomAlert.alert('Map Not Ready', 'Please wait for the map to load before centering.', [{ text: 'OK' }], { type: 'warning' });
       return;
     }
 
@@ -352,7 +353,7 @@ export const GeofenceMapScreen = () => {
 
     } catch (error) {
       console.error('❌ Error sending center message:', error);
-      Alert.alert('Error', 'Failed to center map on geofence area.');
+      CustomAlert.alert('Error', 'Failed to center map on geofence area.', [{ text: 'OK' }], { type: 'error' });
     }
   };
 

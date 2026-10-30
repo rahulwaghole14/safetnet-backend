@@ -22,6 +22,7 @@ import { NetworkErrorToast } from './src/components/common/NetworkErrorToast';
 import { navigationRef } from './src/navigation/navigationRef';
 import { usePushNotifications } from './src/hooks/usePushNotifications';
 import { LocationDisclosureModal } from './src/components/common/LocationDisclosureModal';
+import { CustomAlertRoot } from './src/components/common/CustomAlert';
 
 const RootStack = createStackNavigator();
 
@@ -117,6 +118,7 @@ function App(): React.JSX.Element {
             onAccept={handleAcceptLocationDisclosure}
             onDecline={handleDeclineLocationDisclosure}
           />
+          <CustomAlertRoot />
         </NavigationContainer>
       </SafeAreaProvider>
     </SafeGestureHandlerRootView>

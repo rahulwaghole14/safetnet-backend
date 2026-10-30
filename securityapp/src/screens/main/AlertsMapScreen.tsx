@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { CustomAlert } from '../../components/common/CustomAlert';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAppSelector } from '../../store/hooks';
@@ -81,7 +82,7 @@ export const AlertsMapScreen = () => {
 
   const handleGetDirections = () => {
     // This would integrate with navigation apps
-    Alert.alert(
+    CustomAlert.alert(
       'Get Directions',
       'Open directions to alert location?',
       [
@@ -93,12 +94,13 @@ export const AlertsMapScreen = () => {
             console.log('Opening directions to alert location');
           },
         },
-      ]
+      ],
+      { type: 'info' }
     );
   };
 
   const handleCallBackup = () => {
-    Alert.alert(
+    CustomAlert.alert(
       'Request Backup',
       'Send backup request to nearby officers?',
       [
@@ -110,7 +112,8 @@ export const AlertsMapScreen = () => {
             console.log('Backup requested');
           },
         },
-      ]
+      ],
+      { type: 'warning' }
     );
   };
 

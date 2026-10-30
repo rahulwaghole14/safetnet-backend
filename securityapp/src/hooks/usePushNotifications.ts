@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import * as fcmTokenService from '../api/services/fcmTokenService';
-import { DeviceEventEmitter, Platform, Alert, PermissionsAndroid } from 'react-native';
+import { DeviceEventEmitter, Platform, PermissionsAndroid } from 'react-native';
+import { CustomAlert } from '../components/common/CustomAlert';
 import { useAppSelector } from '../store/hooks';
 import { useAlertsStore } from '../store/alertsStore'; // Assuming this import exists or needs to be added
 
@@ -49,10 +50,11 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
                 const errorStr = String(error);
                 if (errorStr.includes('SERVICE_NOT_AVAILABLE')) {
                     console.log('[FCM] Google Play Services unavailable (SERVICE_NOT_AVAILABLE). Push notifications will be disabled for this session.');
-                    Alert.alert(
+                    CustomAlert.alert(
                         "Push Notifications Unavailable",
                         "Your device/emulator lacks Google Play Services. Push notifications will not work on this device. Please use an emulator with 'Google Play Store' enabled.",
-                        [{ text: "OK" }]
+                        [{ text: "OK" }],
+                        { type: 'warning' }
                     );
                 } else {
                     console.error('[FCM] Registration Error:', error);
@@ -92,7 +94,7 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
                     return;
                 }
 
-                Alert.alert(
+                CustomAlert.alert(
                     title,
                     body,
                     [
@@ -109,7 +111,7 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
                         },
                         { text: "DISMISS", style: "cancel" }
                     ],
-                    { cancelable: false }
+                    { type: 'emergency', cancelable: false }
                 );
             }
         });

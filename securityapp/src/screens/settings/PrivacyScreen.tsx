@@ -6,8 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
-  Alert,
 } from 'react-native';
+import { CustomAlert } from '../../components/common/CustomAlert';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import {
@@ -159,7 +159,7 @@ export const PrivacyScreen = () => {
 
   const handleToggleLocation = () => {
     if (!settings.locationTrackingEnabled) {
-      Alert.alert(
+      CustomAlert.alert(
         'Location Permission',
         'This app needs location access to provide geofence alerts and location-based services. Would you like to enable it?',
         [
@@ -168,7 +168,8 @@ export const PrivacyScreen = () => {
             text: 'Enable',
             onPress: () => dispatch(toggleLocationTracking()),
           },
-        ]
+        ],
+        { type: 'info' }
       );
     } else {
       dispatch(toggleLocationTracking());
@@ -333,7 +334,7 @@ export const PrivacyScreen = () => {
               subtitle: 'Remove stored location data',
               type: 'navigation',
               onPress: () => {
-                Alert.alert(
+                CustomAlert.alert(
                   'Clear Location History',
                   'This will permanently delete all stored location data. Are you sure?',
                   [
@@ -343,10 +344,11 @@ export const PrivacyScreen = () => {
                       style: 'destructive',
                       onPress: () => {
                         // Clear location history logic
-                        Alert.alert('Success', 'Location history cleared');
+                        CustomAlert.alert('Success', 'Location history cleared', [{ text: 'OK' }], { type: 'success' });
                       },
                     },
-                  ]
+                  ],
+                  { type: 'warning' }
                 );
               },
             })}
@@ -355,7 +357,7 @@ export const PrivacyScreen = () => {
               subtitle: 'Download your data for backup',
               type: 'navigation',
               onPress: () => {
-                Alert.alert('Coming Soon', 'Data export feature will be available soon');
+                CustomAlert.alert('Coming Soon', 'Data export feature will be available soon', [{ text: 'OK' }], { type: 'info' });
               },
             })}
             {renderSettingItem({
@@ -363,7 +365,7 @@ export const PrivacyScreen = () => {
               subtitle: 'Permanently delete your account and data',
               type: 'navigation',
               onPress: () => {
-                Alert.alert(
+                CustomAlert.alert(
                   'Delete Account',
                   'This action cannot be undone. All your data will be permanently deleted.',
                   [
@@ -373,10 +375,11 @@ export const PrivacyScreen = () => {
                       style: 'destructive',
                       onPress: () => {
                         // Delete account logic
-                        Alert.alert('Account Deleted', 'Your account has been permanently deleted');
+                        CustomAlert.alert('Account Deleted', 'Your account has been permanently deleted', [{ text: 'OK' }], { type: 'warning' });
                       },
                     },
-                  ]
+                  ],
+                  { type: 'warning' }
                 );
               },
             })}

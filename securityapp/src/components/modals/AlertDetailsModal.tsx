@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator, Alert as RNAlert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator, ScrollView } from 'react-native';
+import { CustomAlert } from '../common/CustomAlert';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useColors } from '../../utils/colors';
 import { typography, spacing, shadows } from '../../utils';
@@ -42,7 +43,7 @@ export const AlertDetailsModal: React.FC<AlertDetailsModalProps> = ({
   };
 
   const handleAcceptPress = async () => {
-    RNAlert.alert(
+    CustomAlert.alert(
       'Accept Alert',
       'Are you sure you want to accept this alert and start responding?',
       [
@@ -54,16 +55,17 @@ export const AlertDetailsModal: React.FC<AlertDetailsModalProps> = ({
             setIsAccepting(true);
             try {
               await onAccept();
-              RNAlert.alert('Success', 'Alert accepted successfully!');
+              CustomAlert.alert('Success', 'Alert accepted successfully!', [{ text: 'OK' }], { type: 'success' });
               onClose();
             } catch (error: any) {
-              RNAlert.alert('Error', error?.message || 'Failed to accept alert. Please try again.');
+              CustomAlert.alert('Error', error?.message || 'Failed to accept alert. Please try again.', [{ text: 'OK' }], { type: 'error' });
             } finally {
               setIsAccepting(false);
             }
           },
         },
-      ]
+      ],
+      { type: 'warning' }
     );
   };
 

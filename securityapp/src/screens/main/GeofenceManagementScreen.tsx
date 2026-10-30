@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Alert as RNAlert,
   ActivityIndicator,
   ScrollView,
   Dimensions,

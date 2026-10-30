@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert as RNAlert, Linking, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking, Platform } from 'react-native';
+import { CustomAlert } from '../../components/common/CustomAlert';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Alert } from '../../types/alert.types';
@@ -94,7 +95,7 @@ export const AlertResponseScreen = ({ route }: any) => {
     : colors.primary;
 
   const handleAccept = async () => {
-    RNAlert.alert(
+    CustomAlert.alert(
       'Respond to Alert',
       'Are you sure you want to respond to this alert?',
       [
@@ -106,12 +107,13 @@ export const AlertResponseScreen = ({ route }: any) => {
             (navigation as any).navigate('AlertRespondMap', { alertId: alert.id });
           }
         }
-      ]
+      ],
+      { type: 'warning' }
     );
   };
 
   const handleReject = () => {
-    RNAlert.alert('Reject Alert', 'Alert rejected.');
+    CustomAlert.alert('Reject Alert', 'Alert rejected.', [{ text: 'OK' }], { type: 'info' });
     navigation.goBack();
   };
 
@@ -122,7 +124,7 @@ export const AlertResponseScreen = ({ route }: any) => {
       if (supported) {
         Linking.openURL(url);
       } else {
-        RNAlert.alert('Error', 'Unable to make phone call');
+        CustomAlert.alert('Error', 'Unable to make phone call', [{ text: 'OK' }], { type: 'error' });
       }
     });
   };
@@ -134,7 +136,7 @@ export const AlertResponseScreen = ({ route }: any) => {
       : `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
 
     Linking.openURL(url).catch(() => {
-      RNAlert.alert('Error', 'Unable to open maps application');
+      CustomAlert.alert('Error', 'Unable to open maps application', [{ text: 'OK' }], { type: 'error' });
     });
   };
 

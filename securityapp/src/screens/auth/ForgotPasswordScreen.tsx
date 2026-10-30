@@ -5,11 +5,11 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
+import { CustomAlert } from '../../components/common/CustomAlert';
 import { useNavigation } from '@react-navigation/native';
 import { authService } from '../../api/services';
 import { colors } from '../../utils/colors';
@@ -21,18 +21,19 @@ export const ForgotPasswordScreen = () => {
 
   const handleResetPassword = async () => {
     if (!email.trim()) {
-      Alert.alert('Error', 'Please enter your email address');
+      CustomAlert.alert('Error', 'Please enter your email address', [{ text: 'OK' }], { type: 'error' });
       return;
     }
 
     setIsLoading(true);
     try {
       await authService.forgotPassword(email.trim());
-      Alert.alert('Success', 'Password reset link sent to your email');
-      navigation.goBack();
+      CustomAlert.alert('Success', 'Password reset link sent to your email', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ], { type: 'success' });
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to send reset link';
-      Alert.alert('Error', errorMessage);
+      CustomAlert.alert('Error', errorMessage, [{ text: 'OK' }], { type: 'error' });
     } finally {
       setIsLoading(false);
     }

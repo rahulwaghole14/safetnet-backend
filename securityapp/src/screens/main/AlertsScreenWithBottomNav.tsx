@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Modal, TextInput, ScrollView, ActivityIndicator, Alert as RNAlert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Modal, TextInput, ScrollView, ActivityIndicator } from 'react-native';
 import { AlertsScreen } from './AlertsScreen';
 
 type AlertsScreenRef = React.RefObject<{

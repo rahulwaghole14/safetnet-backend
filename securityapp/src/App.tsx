@@ -39,6 +39,8 @@ function AuthPersistenceWrapper({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+import { CustomAlertRoot } from './components/common/CustomAlert';
+
 // Component that uses theme context for status bar
 function AppContent() {
   const { currentTheme } = useTheme();
@@ -56,6 +58,7 @@ function AppContent() {
         translucent={true}
       />
       <AppNavigator />
+      <CustomAlertRoot />
     </AuthPersistenceWrapper>
   );
 }

@@ -7,9 +7,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
+import { CustomAlert } from '../../components/common/CustomAlert';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useColors } from '../../utils/colors';
 import { typography, spacing, shadows } from '../../utils';
@@ -80,7 +80,7 @@ export const ProfileScreen = () => {
   };
 
   const handleLogout = () => {
-    Alert.alert(
+    CustomAlert.alert(
       'Logout',
       'Are you sure you want to logout?',
       [

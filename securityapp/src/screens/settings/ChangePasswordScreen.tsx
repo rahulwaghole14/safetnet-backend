@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
@@ -16,6 +15,8 @@ import { ScreenWrapper } from '../../components/common/ScreenWrapper';
 import { useTheme } from '../../contexts/ThemeContext';
 import { typography, spacing } from '../../utils';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
+import { CustomAlert } from '../../components/common/CustomAlert';
 
 export const ChangePasswordScreen = () => {
   const [oldPassword, setOldPassword] = useState('');
@@ -32,29 +33,29 @@ export const ChangePasswordScreen = () => {
   const handleUpdatePassword = async () => {
     // Validation
     if (!oldPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
-      Alert.alert('Error', 'Please fill in all fields');
+      CustomAlert.alert('Error', 'Please fill in all fields', [{ text: 'OK' }], { type: 'error' });
       return;
     }
 
     if (newPassword.length < 8) {
-      Alert.alert('Error', 'New password must be at least 8 characters long');
+      CustomAlert.alert('Error', 'New password must be at least 8 characters long', [{ text: 'OK' }], { type: 'error' });
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'New passwords do not match');
+      CustomAlert.alert('Error', 'New passwords do not match', [{ text: 'OK' }], { type: 'error' });
       return;
     }
 
     setIsLoading(true);
     try {
       await authService.changePassword(oldPassword, newPassword, confirmPassword);
-      Alert.alert('Success', 'Password updated successfully', [
+      CustomAlert.alert('Success', 'Password updated successfully', [
         { text: 'OK', onPress: () => navigation.goBack() }
-      ]);
+      ], { type: 'success' });
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to update password';
-      Alert.alert('Error', errorMessage);
+      CustomAlert.alert('Error', errorMessage, [{ text: 'OK' }], { type: 'error' });
     } finally {
       setIsLoading(false);
     }

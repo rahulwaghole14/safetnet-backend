@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   Modal,
   ActivityIndicator,
-  Alert,
   Dimensions,
 } from 'react-native';
+import { CustomAlert } from './CustomAlert';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAlertsStore } from '../../store/alertsStore';
 import { alertService } from '../../api/services/alertService';
@@ -101,14 +101,14 @@ export const AlertRespondModal: React.FC<AlertRespondModalProps> = ({
       console.log('✅ Alert response accepted successfully');
 
       // Show success alert
-      Alert.alert('Success', 'You are now responding to this alert.');
+      CustomAlert.alert('Success', 'You are now responding to this alert.', [{ text: 'OK' }], { type: 'success' });
 
       // Close modal and notify parent
       onResponseAccepted();
       onClose();
     } catch (error: any) {
       console.error('❌ Failed to accept alert response:', error);
-      Alert.alert('Error', 'Failed to accept alert response. Please try again.');
+      CustomAlert.alert('Error', 'Failed to accept alert response. Please try again.', [{ text: 'OK' }], { type: 'error' });
     } finally {
       setIsAccepting(false);
     }

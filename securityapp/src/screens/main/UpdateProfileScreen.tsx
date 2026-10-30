@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StatusBar,
-  Alert,
 } from 'react-native';
+import { CustomAlert } from '../../components/common/CustomAlert';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { updateOfficerProfile } from '../../store/slices/authSlice';
 import { profileService } from '../../api/services/profileService';
@@ -85,25 +85,25 @@ export const UpdateProfileScreen = ({ navigation, route }: any) => {
 
   const handleSave = async () => {
     if (!(officer && officer.security_id)) {
-      Alert.alert('Error', 'Officer ID not found');
+      CustomAlert.alert('Error', 'Officer ID not found', [{ text: 'OK' }], { type: 'error' });
       return;
     }
 
     // Basic validation
     if (!name.trim()) {
-      Alert.alert('Validation Error', 'Name is required');
+      CustomAlert.alert('Validation Error', 'Name is required', [{ text: 'OK' }], { type: 'warning' });
       return;
     }
 
     if (!email.trim()) {
-      Alert.alert('Validation Error', 'Email is required');
+      CustomAlert.alert('Validation Error', 'Email is required', [{ text: 'OK' }], { type: 'warning' });
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      Alert.alert('Validation Error', 'Please enter a valid email address');
+      CustomAlert.alert('Validation Error', 'Please enter a valid email address', [{ text: 'OK' }], { type: 'warning' });
       return;
     }
 
@@ -136,7 +136,7 @@ export const UpdateProfileScreen = ({ navigation, route }: any) => {
       
       console.log('[UpdateProfileScreen] Update successful!');
 
-      Alert.alert('Success', 'Profile updated successfully', [
+      CustomAlert.alert('Success', 'Profile updated successfully', [
         { 
           text: 'OK', 
           onPress: () => {
@@ -144,7 +144,7 @@ export const UpdateProfileScreen = ({ navigation, route }: any) => {
             navigation.goBack();
           }
         }
-      ]);
+      ], { type: 'success' });
 
     } catch (error: any) {
       console.error('[UpdateProfileScreen] Error updating profile:', error);
@@ -152,7 +152,7 @@ export const UpdateProfileScreen = ({ navigation, route }: any) => {
                           error?.message ||
                           'Failed to update profile';
       
-      Alert.alert('Update Failed', errorMessage);
+      CustomAlert.alert('Update Failed', errorMessage, [{ text: 'OK' }], { type: 'error' });
     } finally {
       setIsSaving(false);
     }
