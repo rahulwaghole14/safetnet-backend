@@ -312,11 +312,29 @@ class FamilyContactSerializer(serializers.ModelSerializer):
     """
     Serializer for family contacts.
     """
+    contact_type = serializers.CharField(required=False, default='family')
+    type = serializers.CharField(required=False, allow_blank=True, default='Family')
     
     class Meta:
         model = FamilyContact
-        fields = ('id', 'name', 'phone', 'relationship', 'is_primary', 'created_at', 'updated_at')
+        fields = ('id', 'name', 'phone', 'relationship', 'contact_type', 'type', 'is_primary', 'created_at', 'updated_at')
         read_only_fields = ('id', 'created_at', 'updated_at')
+
+    def to_internal_value(self, data):
+        data_dict = data.copy() if hasattr(data, 'copy') else dict(data)
+        if 'type' in data_dict and not data_dict.get('contact_type'):
+            data_dict['contact_type'] = str(data_dict['type']).lower()
+        ret = super().to_internal_value(data_dict)
+        if 'type' in data_dict and not ret.get('contact_type'):
+            ret['contact_type'] = str(data_dict['type']).lower()
+        return ret
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        raw = getattr(instance, 'contact_type', None) or 'family'
+        ret['contact_type'] = str(raw).lower()
+        ret['type'] = str(raw).capitalize()
+        return ret
     
     def validate(self, attrs):
         """Validate family contact data."""
@@ -342,11 +360,29 @@ class FamilyContactCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating family contacts.
     """
+    contact_type = serializers.CharField(required=False, default='family')
+    type = serializers.CharField(required=False, allow_blank=True, default='Family')
     
     class Meta:
         model = FamilyContact
-        fields = ('id', 'name', 'phone', 'relationship', 'is_primary', 'created_at', 'updated_at')
+        fields = ('id', 'name', 'phone', 'relationship', 'contact_type', 'type', 'is_primary', 'created_at', 'updated_at')
         read_only_fields = ('id', 'created_at', 'updated_at')
+
+    def to_internal_value(self, data):
+        data_dict = data.copy() if hasattr(data, 'copy') else dict(data)
+        if 'type' in data_dict and not data_dict.get('contact_type'):
+            data_dict['contact_type'] = str(data_dict['type']).lower()
+        ret = super().to_internal_value(data_dict)
+        if 'type' in data_dict and not ret.get('contact_type'):
+            ret['contact_type'] = str(data_dict['type']).lower()
+        return ret
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        raw = getattr(instance, 'contact_type', None) or 'family'
+        ret['contact_type'] = str(raw).lower()
+        ret['type'] = str(raw).capitalize()
+        return ret
     
     def validate(self, attrs):
         """Validate family contact creation."""

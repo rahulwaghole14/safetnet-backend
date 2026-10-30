@@ -181,6 +181,16 @@ class FamilyContact(models.Model):
         blank=True,
         help_text="Relationship to the user (e.g., 'Spouse', 'Parent', 'Sibling')"
     )
+    contact_type = models.CharField(
+        max_length=20,
+        default='family',
+        choices=[
+            ('family', 'Family'),
+            ('emergency', 'Emergency'),
+            ('friend', 'Friend'),
+        ],
+        help_text="Category of contact (family, emergency, friend)"
+    )
     is_primary = models.BooleanField(
         default=False,
         help_text="Whether this is the primary emergency contact"

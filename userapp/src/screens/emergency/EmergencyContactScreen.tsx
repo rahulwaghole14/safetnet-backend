@@ -94,13 +94,26 @@ const EmergencyContactScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   
+  // Helper to normalize and capitalize contact type ('Family' | 'Emergency' | 'Friend')
+  const normalizeContactType = (raw: any, relationship?: string): ContactCategory => {
+    const val = String(raw || '').trim().toLowerCase();
+    if (val === 'emergency') return 'Emergency';
+    if (val === 'friend') return 'Friend';
+    if (val === 'family') return 'Family';
+    // Fallback to relationship text if type was not explicitly preserved
+    const rel = String(relationship || '').trim().toLowerCase();
+    if (rel === 'emergency' || rel.includes('emergency')) return 'Emergency';
+    if (rel === 'friend' || rel.includes('friend')) return 'Friend';
+    return 'Family';
+  };
+
   // Use contacts from store (loaded from API)
   const contacts = storeContacts.map((c: any, index: number) => ({
     id: c.id ? c.id.toString() : `temp_${index}_${c.phone || c.name || index}`,
     name: c.name || c.full_name || '',
     phone: c.phone || c.phone_number || '',
     email: c.email || '',
-    type: (c.type || c.contact_type || 'Family') as ContactCategory,
+    type: normalizeContactType(c.type || c.contact_type, c.relationship),
     relationship: c.relationship || '',
   }));
   const [showAddModal, setShowAddModal] = useState(false);
@@ -271,7 +284,8 @@ const EmergencyContactScreen = () => {
         phone: phoneTrimmed,
         email: formData.email?.trim() || '',
         relationship: formData.relationship?.trim() || '',
-        type: formData.type.toLowerCase(),
+        contact_type: formData.type.toLowerCase(),
+        type: formData.type,
       };
 
       if (editingContact) {
@@ -293,7 +307,7 @@ const EmergencyContactScreen = () => {
         }
         const result = await apiService.addFamilyContact(user.id, contactData);
         if (result && result.id) {
-          await addContact(result);
+          await addContact({...result, type: formData.type, contact_type: formData.type.toLowerCase()});
         }
         await loadContacts();
       }
