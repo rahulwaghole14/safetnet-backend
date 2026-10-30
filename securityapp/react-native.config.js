@@ -5,6 +5,11 @@ module.exports = {
         ios: null,
       },
     },
+    '@react-native-community/geolocation': {
+      platforms: {
+        android: null,
+      },
+    },
   },
   assets: ['./node_modules/react-native-vector-icons/Fonts'],
 };
