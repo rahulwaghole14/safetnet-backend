@@ -8,6 +8,7 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
+    "start:8082": "react-native start --port 8082",
     "start:no-debug": "node disable-debugger.js && react-native start --reset-cache",
     "test": "jest",
     "disable-debugger": "node disable-debugger.js"
