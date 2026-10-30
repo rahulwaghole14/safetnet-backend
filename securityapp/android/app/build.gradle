@@ -57,11 +57,12 @@ react {
 
 // Pre-build task to generate autolinking.json before it's needed - matches userapp stabilization pattern
 task generateAutolinkingJson {
-    def autolinkingDir = file("${buildDir}/generated/autolinking")
-    autolinkingDir.mkdirs()
-    def autolinkingFile = file("${autolinkingDir}/autolinking.json")
-    // Create a minimal valid autolinking.json
-    autolinkingFile.text = """{
+    doFirst {
+        def autolinkingDir = file("${project.buildDir}/generated/autolinking")
+        autolinkingDir.mkdirs()
+        def autolinkingFile = file("${autolinkingDir}/autolinking.json")
+        // Create a minimal valid autolinking.json
+        autolinkingFile.text = """{
   "project": {
     "android": {
       "packageName": "com.safetnet.securityapp"
@@ -69,14 +70,15 @@ task generateAutolinkingJson {
   },
   "dependencies": {}
 }"""
-    doLast {
-        println "Generated autolinking.json"
+        println "Generated autolinking.json at ${autolinkingFile.absolutePath}"
     }
 }
 
-// Make sure autolinking.json is generated before the package list task
-tasks.named('generateAutolinkingPackageList').configure {
-    dependsOn 'generateAutolinkingJson'
+// Make sure autolinking.json is generated before the package list and new architecture tasks
+tasks.configureEach { task ->
+    if (task.name == 'generateAutolinkingPackageList' || task.name == 'generateAutolinkingNewArchitectureFiles') {
+        task.dependsOn 'generateAutolinkingJson'
+    }
 }
 
 /**

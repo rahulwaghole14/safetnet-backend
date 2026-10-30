@@ -1,73 +1,43 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-env/
-ENV/
-*.egg-info/
-dist/
+# Large files and archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Build outputs
 build/
+dist/
+*.apk
+*.ipa
+*.aab
+.gradle/
+.gradle-user-home/
+.gradle-user-home-2/
+.gradle-user-home*/
+
+# Node modules
+node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
 
 # Django
 *.log
 db.sqlite3
-db.sqlite3-journal
-media/
-staticfiles/
+.env
 
-# Node
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnp/
-.yarn/
-
-# Next.js
-.next/
-out/
-dist/
-build/
-
-# IDE
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-.DS_Store
 
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Documentation files (as requested) - but keep README.md
-IMPROVEMENTS.md
-COMPLETE_STATUS_REPORT.md
-IMPLEMENTATION_STATUS_REPORT.md
-STATUS.md
-SUMMARY.md
-*.md
-!README.md
-
-# Test files
-coverage/
-.nyc_output/
-
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# Gradle
-.gradle-user-home/
-.gradle-user-home-2/
-.gradle/
-**/build/
-**/bin/
-
+# Temporary files
+*.tmp
+*.temp
